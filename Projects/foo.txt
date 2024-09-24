@@ -1,2 +1,3 @@
 #the contents in this folder is in compliance of Fulton Academic Integrity Policies: https://students.engineering.asu.edu/wp-content/uploads/2023/09/Academic-Integrity-Code-Writing-Tips.pdf
 #before submitting run the codefiles through a plagiarism checker to check work that others nor you may have accidently copied: https://www.scribbr.com/plagiarism-checker/
+Manas In class activity
