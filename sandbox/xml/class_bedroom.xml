@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.12.0" xml:lang="en-US">
+  <compounddef id="class_bedroom" kind="class" language="C++" prot="public">
+    <compoundname>Bedroom</compoundname>
+    <basecompoundref refid="class_house" prot="public" virt="non-virtual">House</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_bedroom_1a67823bd5cec4f53a7c613f851d7188e6" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Bedroom::beds</definition>
+        <argsstring></argsstring>
+        <name>beds</name>
+        <qualifiedname>Bedroom::beds</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="45" column="13" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="45" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_bedroom_1a3fe3695266f60dc86e34420b2804a6ad" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Bedroom::windows</definition>
+        <argsstring></argsstring>
+        <name>windows</name>
+        <qualifiedname>Bedroom::windows</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="46" column="13" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="46" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_bedroom_1ad55bfda5437cae2fe0794317c6c9fa96" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>Bedroom::Bedroom</definition>
+        <argsstring>(int fans, int lights, int doors, std::string roomOwner, float rent, int beds, int windows)</argsstring>
+        <name>Bedroom</name>
+        <qualifiedname>Bedroom::Bedroom</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>fans</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>lights</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>doors</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>roomOwner</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>rent</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>beds</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>windows</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="37" column="9" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="37" bodyend="37"/>
+      </memberdef>
+      <memberdef kind="function" id="class_bedroom_1a46f80067915b77d17bb7ffded2ed85c1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Bedroom::setBeds</definition>
+        <argsstring>(int beds)</argsstring>
+        <name>setBeds</name>
+        <qualifiedname>Bedroom::setBeds</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>beds</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="38" column="14" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="38" bodyend="40"/>
+      </memberdef>
+      <memberdef kind="function" id="class_bedroom_1add0617848f8a11cb606ed6b06af17d7a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Bedroom::setWindows</definition>
+        <argsstring>(int windows)</argsstring>
+        <name>setWindows</name>
+        <qualifiedname>Bedroom::setWindows</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>windows</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="41" column="14" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="41" bodyend="43"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>Bedroom</label>
+        <link refid="class_bedroom"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>House</label>
+        <link refid="class_house"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>Bedroom</label>
+        <link refid="class_bedroom"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>House</label>
+        <link refid="class_house"/>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="35" column="1" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="35" bodyend="47"/>
+    <listofallmembers>
+      <member refid="class_bedroom_1ad55bfda5437cae2fe0794317c6c9fa96" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>Bedroom</name></member>
+      <member refid="class_bedroom_1a67823bd5cec4f53a7c613f851d7188e6" prot="private" virt="non-virtual"><scope>Bedroom</scope><name>beds</name></member>
+      <member refid="class_house_1a2788a8a7e4f2e455188c2438f33460cc" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>House</name></member>
+      <member refid="class_bedroom_1a46f80067915b77d17bb7ffded2ed85c1" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setBeds</name></member>
+      <member refid="class_house_1a4a4e777b91f928aad455ab780debff5f" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setDoors</name></member>
+      <member refid="class_house_1ae7d353e6db05fda45907d4a1be223c9a" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setFans</name></member>
+      <member refid="class_house_1afb6c364eb7e5dd2d412e37f4b5da96a6" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setLights</name></member>
+      <member refid="class_house_1adeda40d15d89480c7dbb4d827acdd9c7" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setRent</name></member>
+      <member refid="class_house_1a17333db52ca78dd632b2f13655b3e337" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setRoomOwner</name></member>
+      <member refid="class_bedroom_1add0617848f8a11cb606ed6b06af17d7a" prot="public" virt="non-virtual"><scope>Bedroom</scope><name>setWindows</name></member>
+      <member refid="class_bedroom_1a3fe3695266f60dc86e34420b2804a6ad" prot="private" virt="non-virtual"><scope>Bedroom</scope><name>windows</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
