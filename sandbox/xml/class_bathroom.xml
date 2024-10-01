@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.12.0" xml:lang="en-US">
+  <compounddef id="class_bathroom" kind="class" language="C++" prot="public">
+    <compoundname>Bathroom</compoundname>
+    <basecompoundref refid="class_house" prot="private" virt="non-virtual">House</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_bathroom_1a9d45a2a4d70cdabfdfda22421abc0816" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Bathroom::showers</definition>
+        <argsstring></argsstring>
+        <name>showers</name>
+        <qualifiedname>Bathroom::showers</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="73" column="13" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_bathroom_1a4d1e5ea9b84f489b782f59ea6fef7a58" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int Bathroom::sinks</definition>
+        <argsstring></argsstring>
+        <name>sinks</name>
+        <qualifiedname>Bathroom::sinks</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="74" column="13" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="74" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_bathroom_1ab712b100d848e9c0bad9f1e9e89b350b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>Bathroom::Bathroom</definition>
+        <argsstring>(int fans, int lights, int doors, std::string roomOwner, float rent, int showers, int sinks)</argsstring>
+        <name>Bathroom</name>
+        <qualifiedname>Bathroom::Bathroom</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>fans</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>lights</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>doors</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>roomOwner</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>rent</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>showers</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>sinks</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="65" column="9" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="65" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="class_bathroom_1a3fbf83734310b32fc59f5874b7880ebe" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Bathroom::setShowers</definition>
+        <argsstring>(int showers)</argsstring>
+        <name>setShowers</name>
+        <qualifiedname>Bathroom::setShowers</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>showers</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="66" column="14" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="66" bodyend="68"/>
+      </memberdef>
+      <memberdef kind="function" id="class_bathroom_1aa42f56e6fd0ff220ff9583a4ce1ebb5b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Bathroom::setSinks</definition>
+        <argsstring>(int sinks)</argsstring>
+        <name>setSinks</name>
+        <qualifiedname>Bathroom::setSinks</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>sinks</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="69" column="14" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="69" bodyend="71"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>Bathroom</label>
+        <link refid="class_bathroom"/>
+        <childnode refid="2" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>House</label>
+        <link refid="class_house"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>Bathroom</label>
+        <link refid="class_bathroom"/>
+        <childnode refid="2" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>House</label>
+        <link refid="class_house"/>
+      </node>
+    </collaborationgraph>
+    <location file="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" line="63" column="1" bodyfile="/Users/MuhammedH/github/CSE-360/sandbox/cppClassesToUML.cpp" bodystart="63" bodyend="75"/>
+    <listofallmembers>
+      <member refid="class_bathroom_1ab712b100d848e9c0bad9f1e9e89b350b" prot="public" virt="non-virtual"><scope>Bathroom</scope><name>Bathroom</name></member>
+      <member refid="class_bathroom_1a3fbf83734310b32fc59f5874b7880ebe" prot="public" virt="non-virtual"><scope>Bathroom</scope><name>setShowers</name></member>
+      <member refid="class_bathroom_1aa42f56e6fd0ff220ff9583a4ce1ebb5b" prot="public" virt="non-virtual"><scope>Bathroom</scope><name>setSinks</name></member>
+      <member refid="class_bathroom_1a9d45a2a4d70cdabfdfda22421abc0816" prot="private" virt="non-virtual"><scope>Bathroom</scope><name>showers</name></member>
+      <member refid="class_bathroom_1a4d1e5ea9b84f489b782f59ea6fef7a58" prot="private" virt="non-virtual"><scope>Bathroom</scope><name>sinks</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
