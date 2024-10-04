@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"passwordEvaluationTestbed","l":"PasswordEvaluationTestingAutomation"},{"p":"passwordEvaluationTestbed","l":"PasswordEvaluator"}];updateSearchResults();

@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"dateRecognizerTestbed","l":"DateRecognizer"},{"p":"dateRecognizerTestbed","l":"DateRecognizerTestbed"},{"p":"dateRecognizerTestbed","l":"UserInterface"}];updateSearchResults();
