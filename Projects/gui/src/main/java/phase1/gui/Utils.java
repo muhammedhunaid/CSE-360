@@ -1,5 +1,7 @@
 package phase1.gui;
 
+import java.security.SecureRandom;
+
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -10,6 +12,7 @@ public class Utils {
     public static String password_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=])[A-Za-z\\d@#$%^&+=]{8,}$";
     public static String email_regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     public static String name_regex = "^[a-zA-Z]+$";
+    private static String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public static String validateUsername(String username) {
         // Define the individual regex conditions
@@ -130,4 +133,17 @@ public class Utils {
         }
         return ret;
     }
+
+    public static String generateInviteCode(int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder inviteCode = new StringBuilder(length);
+    
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            inviteCode.append(CHARACTERS.charAt(index));
+        }
+    
+        return inviteCode.toString();
+    }
+
 }

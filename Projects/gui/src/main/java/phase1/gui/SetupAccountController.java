@@ -85,8 +85,14 @@ public class SetupAccountController implements Initializable {
             {
                 //add prefferred name in db
             }
+            
+            if(App.user.hadMultipleRoles())
+            {
+                App.setRoot("select_role");
+            }else{
+                App.setRoot("dashboard");
+            }
 
-            App.setRoot("dashboard");
         }
     }
 }

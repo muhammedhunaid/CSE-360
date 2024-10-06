@@ -36,26 +36,36 @@ public class LoginController implements Initializable{
         String username = username_textfield.getText().toString();
         String password = password_textfield.getText().toString();
 
-        boolean one_time_flag = true;
-        boolean username_in_db = false;
-        boolean pw_in_db = false;
-        boolean email_in_db = true;
+        boolean one_time_flag = false;
+        boolean username_in_db = true;
+        boolean pw_in_db = true;
+        boolean email_in_db = false;
+        boolean has_multiple_roles = false;
 
         //query using db///
         //check uname
-        if(username_in_db) 
+        if(username_in_db && pw_in_db) 
         {
             if(one_time_flag)
             {
                 App.setRoot("new_pw");
+                return;
             }
             
-            if(pw_in_db && !email_in_db)
+            if(!email_in_db)
             {
                 App.setRoot("setup_account");
+                return;
+            }
+
+            if(has_multiple_roles)
+            {
+                App.setRoot("select_role");
+                return;
             }
 
             App.setRoot("dashboard");
+            return;
         }
 
         Utils.setText(login_error, "Username or Password not found", Color.RED);
