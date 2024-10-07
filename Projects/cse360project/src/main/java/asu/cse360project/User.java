@@ -1,20 +1,15 @@
 package asu.cse360project;
 
 public class User {
-    private int id;
     private String username;
     private String role;
+    private String first_name;
     private String login_role = "";
 
-    public User(int id, String username, String role) {
-        this.id = id;
+    public User(String username, String first_name, String role) {
         this.username = username;
+        this.first_name = first_name;
         this.role = role;
-    }
-
-    public int getId() 
-    {
-        return id;
     }
 
     public String getUsername() 
@@ -25,6 +20,11 @@ public class User {
     public String getRole() 
     {
         return role;
+    }
+
+    public String getFirst_name() 
+    {
+        return first_name;
     }
 
     public boolean isAdmin()
@@ -81,7 +81,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "first name=" + first_name +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
                 '}';

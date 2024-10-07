@@ -14,11 +14,13 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
-    public static User user = new User(1,"Hunter","admin,student");
+    public static User user = new User("MOFO","Adain","admin,student");
+    
 
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(App.class.getResource("login.fxml"));
+        user.setLoginRole("admin");
+        Parent root = FXMLLoader.load(App.class.getResource("dashboard.fxml"));
         scene = new Scene(root, 500, 500);
         stage.setScene(scene);
         stage.show();

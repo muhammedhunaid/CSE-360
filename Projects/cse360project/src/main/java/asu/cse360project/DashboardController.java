@@ -38,16 +38,18 @@ public class DashboardController extends SceneController implements Initializabl
         {
             Utils.disableNode(admin_controlls);
         }
+        /*
+        try {
+            setContentArea("manage_user");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+            */
     }
 
     @FXML
-    void addUser(ActionEvent event) throws IOException {
-        setContentArea("add_user");
-    }
-
-    @FXML
-    void listUsers(ActionEvent event) {
-
+    void manageUsers(ActionEvent event) throws IOException {
+        setContentArea("manage_users");
     }
 
     @FXML
@@ -66,15 +68,6 @@ public class DashboardController extends SceneController implements Initializabl
                 }
             }
         });
-
-    }
-
-    @FXML
-    void modifyUser(ActionEvent event) throws IOException {
-        setContentArea("modify_user");
-    }
-
-    static void setScene(String fxml) throws IOException {
 
     }
 

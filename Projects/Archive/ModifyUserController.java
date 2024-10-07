@@ -145,7 +145,7 @@ public class ModifyUserController implements Initializable{
         if(user_in_db)
         {
             user_found = true;
-            Utils.setText(user_label, "Modifying User: ", Color.BLACK);
+            Utils.setText(user_label, "Modifying User: " + user, Color.BLACK);
         }else{
             Utils.setText(user_label, "User Does Not Exsit", Color.BLACK);
         }
