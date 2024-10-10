@@ -11,6 +11,11 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class SelectRoleController implements Initializable {
 
     @FXML
@@ -25,77 +30,38 @@ public class SelectRoleController implements Initializable {
     @FXML
     private Text error_text;
 
-    boolean admin = true;
-    boolean instructor = true;
-    boolean student = true;
-
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        if(!App.user.isAdmin())
-        {
+        if (!App.user.isAdmin()) {
             Utils.disableNode(admin_button);
-            admin = false;
         }
 
-        if(!App.user.isInstructor())
-        {
+        if (!App.user.isInstructor()) {
             Utils.disableNode(instructor_button);
-            instructor = false;
         }
 
-        if(!App.user.isStudent())
-        {
+        if (!App.user.isStudent()) {
             Utils.disableNode(student_button);
-            student = false;
         }
 
         Utils.disableNode(error_text);
     }
 
     @FXML
+    //
     void select(ActionEvent event) throws IOException {
-        boolean check_admin = false;
-        boolean check_instructor = false;
-        boolean check_student = false;
         App.user.resetLoginRole();
-        
-        if(admin)
-        {
-            check_admin = admin_button.selectedProperty().getValue();
-            if(check_admin)
-            {
-                App.user.setLoginRole("admin");
-            }
+
+        if (admin_button.isSelected()) {
+            App.user.setLoginRole("admin");
+        } else if (instructor_button.isSelected()) {
+            App.user.setLoginRole("instructor");
+        } else if (student_button.isSelected()) {
+            App.user.setLoginRole("student");
         }
 
-        if(instructor)
-        {
-            check_instructor = instructor_button.selectedProperty().getValue();
-            if(check_instructor)
-            {
-                App.user.setLoginRole("instructor");
-            }
-        }
-
-        if(student)
-        {
-            check_student = student_button.selectedProperty().getValue();
-            if(check_student)
-            {
-                App.user.setLoginRole("student");
-            }
-        }
-
-        System.out.println(App.user.getLoginRole());
-        if(App.user.getLoginRole() == "")
-        {
+        if (App.user.getLoginRole().isEmpty()) {
             Utils.setText(error_text, "No Role Selected", Color.RED);
-            return;
-        }
-
-        if((check_admin ? 1 : 0) + (check_instructor ? 1 : 0) + (check_student ? 1 : 0) > 1)
-        {
-            Utils.setText(error_text, "Multiple Roles Selected", Color.RED);
             return;
         }
 

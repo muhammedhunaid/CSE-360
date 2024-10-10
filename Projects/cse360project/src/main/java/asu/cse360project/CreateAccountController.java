@@ -15,6 +15,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class CreateAccountController extends SceneController implements Initializable{
 
@@ -46,7 +50,7 @@ public class CreateAccountController extends SceneController implements Initiali
         Utils.disableNode(re_password_error);
         Utils.disableNode(username_error);
     }
-
+    //
     @FXML
     void join(ActionEvent event) throws IOException, InterruptedException{
         //get input from text fields and validate
@@ -66,7 +70,7 @@ public class CreateAccountController extends SceneController implements Initiali
             Utils.setLabel(re_password_error, "Passwords dont match.", Color.RED);
             same = false;
         }
-
+         //check if username and password are valid
         if(valid_pw && valid_uname && same)
         {
             //add user to database
@@ -86,5 +90,35 @@ public class CreateAccountController extends SceneController implements Initiali
 
             
         }
+    }
+    // Method to create a new user
+    private void createUser(String username, String password, String inviteCode) {
+        String sql = "INSERT INTO users (username, password, invite_code) VALUES (?, ?, ?)";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, inviteCode);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to check for unique username
+    private boolean isUsernameUnique(String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

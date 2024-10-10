@@ -17,6 +17,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+//
 public class DashboardController extends SceneController implements Initializable{
     User user = App.user;
 
@@ -32,26 +38,36 @@ public class DashboardController extends SceneController implements Initializabl
     
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        Utils.setLabel(top_label, user.getLoginRole() + ": " + user.getUsername(), Color.BLACK);
+        // Set the label with the user's role and username
+        //Utils.setLabel(top_label, user.getLoginRole() + ": " + user.getUsername(), Color.BLACK);
 
-        if(user.getLoginRole() != "admin")
-        {
-            Utils.disableNode(admin_controlls);
-        }
-        /*
-        try {
-            setContentArea("manage_user");
-        } catch (IOException e) {
+        // Query the database to determine the user's role
+        try (Connection conn = Database.getConnection()) {
+            String sql = "SELECT role_admin, role_student, role_instructor FROM users WHERE username = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, user.getUsername());
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                boolean isAdmin = rs.getBoolean("role_admin");
+
+                // Disable admin controls if the user is not an admin
+                if (!isAdmin) {
+                    Utils.disableNode(admin_controlls);
+                }
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-            */
     }
 
+    //Method to manage users
     @FXML
     void manageUsers(ActionEvent event) throws IOException {
         setContentArea("manage_users");
     }
 
+    //Method to logout
     @FXML
     void logout(ActionEvent event) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -70,7 +86,7 @@ public class DashboardController extends SceneController implements Initializabl
         });
 
     }
-
+    //
     private void setContentArea(String fxml) throws IOException {
         Parent fxmlLoader = FXMLLoader.load(DashboardController.class.getResource("DashboardScenes/" + fxml + ".fxml"));
 		contentArea.getChildren().removeAll();

@@ -1,98 +1,77 @@
 package asu.cse360project;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import javafx.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-public class SetupAccountController implements Initializable {
+public class SetupAccountController {
 
     @FXML
     private TextField email;
 
     @FXML
-    private Text email_error;
-
-    @FXML
     private TextField first_name;
-
-    @FXML
-    private Text first_name_error;
-
-    @FXML
-    private TextField last_name;
-
-    @FXML
-    private Text last_name_error;
 
     @FXML
     private TextField middle_name;
 
     @FXML
+    private TextField last_name;
+
+    @FXML
+    private Text email_error;
+
+    @FXML
+    private Text first_name_error;
+
+    @FXML
     private Text middle_name_error;
 
     @FXML
-    private PasswordField pref_name;
+    private Text last_name_error;
 
     @FXML
-    private Text pref_name_error;
+    //
+    private void finish() {
+        String emailInput = email.getText();
+        String firstName = first_name.getText();
+        String middleName = middle_name.getText();
+        String lastName = last_name.getText();
 
-    
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
-        Utils.disableNode(email_error);
-        Utils.disableNode(first_name_error);
-        Utils.disableNode(middle_name_error);
-        Utils.disableNode(last_name_error);
-        Utils.disableNode(pref_name_error);
+        if (validateInputs(emailInput, firstName, lastName)) {
+            try (Connection conn = Database.getConnection()) {
+                String sql = "INSERT INTO users (email, first_name, middle_name, last_name) VALUES (?, ?, ?, ?)";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, emailInput);
+                pstmt.setString(2, firstName);
+                pstmt.setString(3, middleName);
+                pstmt.setString(4, lastName);
+                pstmt.executeUpdate();
+                // Navigate to the next scene or show success message
+            } catch (SQLException e) {
+                e.printStackTrace();
+                // Handle SQL exception
+            }
+        }
     }
 
-    @FXML
-    void finish(ActionEvent event) throws IOException {
-        boolean choose_pref_name = false;
-        String validate_email = Utils.validateEmail(email.getText());
-        String validate_first_name = Utils.validateName(first_name.getText());
-        String validate_middle_name = Utils.validateName(middle_name.getText());
-        String validate_last_name = Utils.validateName(last_name.getText());
-        String validate_pref_name = "";
-        if(!pref_name.getText().equals(""))
-        {
-            choose_pref_name = true;
-            validate_pref_name= Utils.validateName(pref_name.getText());
+    private boolean validateInputs(String email, String firstName, String lastName) {
+        boolean valid = true;
+        if (email.isEmpty()) {
+            email_error.setText("Email is required");
+            valid = false;
         }
-
-        boolean valid_email = Utils.isValid(email_error, validate_email);
-        boolean valid_first = Utils.isValid(first_name_error, validate_first_name);
-        boolean valid_middle = Utils.isValid(middle_name_error, validate_middle_name);
-        boolean valid_last = Utils.isValid(last_name_error, validate_last_name);
-        boolean valid_pref_name = true;
-        if(choose_pref_name)
-        {
-            valid_pref_name = Utils.isValid(pref_name_error, validate_pref_name);
+        if (firstName.isEmpty()) {
+            first_name_error.setText("First name is required");
+            valid = false;
         }
-
-
-        if(valid_email && valid_first && valid_middle && valid_last && ((choose_pref_name && valid_pref_name) || !choose_pref_name))
-        {
-            //add info in db
-            if(choose_pref_name)
-            {
-                //add prefferred name in db
-            }
-            
-            if(App.user.hadMultipleRoles())
-            {
-                App.setRoot("select_role");
-            }else{
-                App.setRoot("dashboard");
-            }
-
+        if (lastName.isEmpty()) {
+            last_name_error.setText("Last name is required");
+            valid = false;
         }
+        return valid;
     }
 }

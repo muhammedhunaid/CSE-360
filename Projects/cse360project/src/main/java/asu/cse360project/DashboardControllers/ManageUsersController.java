@@ -1,3 +1,13 @@
+/**
+ 
+<p> ManageUsersController Class. </p>
+<p> Description: This class manages the user interface for handling user management tasks such as adding, deleting,
+changing roles, and resetting passwords for users in the system. It interacts with the database to perform these operations
+and updates the UI accordingly.</p>
+<p> Copyright: Tu35 Team © 2024 </p>
+@version 1.00        2024-10-09 Phase 1 implementation of the user management controller
+@author Tu35 Team
+*/
 package asu.cse360project.DashboardControllers;
 
 import java.net.URL;
@@ -7,6 +17,7 @@ import asu.cse360project.App;
 import asu.cse360project.SceneController;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
+import asu.cse360project.Database;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,6 +36,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ManageUsersController extends SceneController implements Initializable{
 
@@ -72,13 +88,11 @@ public class ManageUsersController extends SceneController implements Initializa
     
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-
         Utils.disableNode(change_role_box);
         Utils.disableNode(error_label);
 
         alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Confirm");
-        alert.setTitle("Confirmation Dialog");
         alert.setHeaderText("Please confirm your action");
 
         username_col.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -86,9 +100,28 @@ public class ManageUsersController extends SceneController implements Initializa
         role_col.setCellValueFactory(new PropertyValueFactory<>("role"));
 
         all_Users = FXCollections.observableArrayList();
-        //add all users from db into table;
-        all_Users.add(new User("fnidnf","john", "admin"));
-        all_Users.add(new User("ahhhhhhh","elliot", "student"));
+        try (Connection conn = Database.getConnection()) {
+            String sql = "SELECT username, first_name, " +
+                        "CASE " +
+                        "    WHEN role_admin = 1 THEN 'Admin' " +
+                        "    WHEN role_student = 1 THEN 'Student' " +
+                        "    WHEN role_instructor = 1 THEN 'Instructor' " +
+                        "    ELSE 'Unknown' " +
+                        "END AS role " +
+                        "FROM users";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                all_Users.add(new User(
+                    rs.getString("username"),
+                    rs.getString("password")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         table.setItems(all_Users);
 
         table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -97,7 +130,6 @@ public class ManageUsersController extends SceneController implements Initializa
                 Utils.disableNode(error_label);
             }
         });
-
     }
 
     @FXML
@@ -113,11 +145,11 @@ public class ManageUsersController extends SceneController implements Initializa
 
     @FXML
     void changeRole(ActionEvent event) {
-        if(selectedUser != null)
-        {
+        if(selectedUser == null) {
+            Utils.setLabel(error_label, "No User Selected", Color.RED);
+        } else {
             Utils.enableNode(change_role_box);
         }
-        Utils.setLabel(error_label, "No User Selected", Color.RED);
     }
 
     @FXML
@@ -179,21 +211,27 @@ public class ManageUsersController extends SceneController implements Initializa
 
     @FXML
     void resetPassword(ActionEvent event) {
-        if(selectedUser != null)
-        {
-            alert.setContentText("Are you sure you want to reset user");
-            alert.showAndWait().ifPresent(response -> {
+        if (selectedUser != null) {
+            alert.setContentText("Are you sure you want to reset user " + selectedUser.getUsername() + "'s password?");
+                alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    String one_time_pw = Utils.generateInviteCode(10);
-                    Utils.setLabel(error_label, "One time Password: " + one_time_pw, Color.GREEN);
-                    //but one_time_pw in pw and set flag true;
-
-                } else {
-                    //Utils.setText(display_text, "No User reset", Color.BLACK);
+                    String oneTimePassword = Utils.generateInviteCode(10);
+                    Utils.setLabel(error_label, "One-time Password: " + oneTimePassword, Color.GREEN);
+                    try (Connection conn = Database.getConnection()) {
+                        String sql = "UPDATE users SET password = ?, one_time_flag = ? WHERE username = ?";
+                        PreparedStatement pstmt = conn.prepareStatement(sql);
+                        pstmt.setString(1, oneTimePassword);
+                        pstmt.setBoolean(2, true);
+                        pstmt.setString(3, selectedUser.getUsername());
+                        pstmt.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        Utils.setLabel(error_label, "Error resetting password", Color.RED);
+                    }
                 }
-            });    
-        }else{
-            Utils.setLabel(error_label, "No User Selected", Color.RED);
+            });
+        } else {
+            Utils.setLabel(error_label, "No user selected", Color.RED);
         }
     }
 
@@ -214,6 +252,25 @@ public class ManageUsersController extends SceneController implements Initializa
             //Utils.setLabel(error_label, "User Found", Color.GREEN);
         }else{
             Utils.setLabel(error_label, "User not Found", Color.RED);
+        }
+    }
+    // Method to load users from the database
+    private void loadUsers() {
+        String sql = "SELECT username, first_name, role FROM users";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            all_Users.clear();
+            while (rs.next()) {
+                String username = rs.getString("username");
+                String firstName = rs.getString("first_name");
+                String role = rs.getString("role");
+                all_Users.add(new User(username, firstName, role));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
