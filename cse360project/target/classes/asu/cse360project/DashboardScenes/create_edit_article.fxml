@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox alignment="CENTER" prefHeight="998.0" prefWidth="843.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.CEArticleController">
+   <children>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="893.0" prefWidth="524.0" spacing="10.0">
+         <children>
+            <Label fx:id="title_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="338.0" text="Create/Edit Article">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <TextField fx:id="title" promptText="Title" />
+            <TextField fx:id="description" promptText="Desciption" />
+            <TextArea fx:id="body" prefHeight="155.0" prefWidth="524.0" promptText="Body" />
+            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0" spacing="20.0">
+               <children>
+                  <MenuButton fx:id="level" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Level">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#beginner" text="beginner" />
+                      <MenuItem mnemonicParsing="false" onAction="#intermediate" text="intermediate" />
+                        <MenuItem mnemonicParsing="false" onAction="#advanced" text="advanced" />
+                        <MenuItem mnemonicParsing="false" onAction="#expert" text="expert" />
+                    </items>
+                  </MenuButton>
+                  <CheckBox fx:id="admin" mnemonicParsing="false" text="Admin" />
+                  <CheckBox fx:id="instructor" mnemonicParsing="false" text="Instructor" />
+                  <CheckBox fx:id="student" mnemonicParsing="false" text="Student" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="248.0" prefWidth="524.0" spacing="10.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="248.0" prefWidth="279.0">
+                     <children>
+                        <TableView fx:id="group_table" prefHeight="230.0" prefWidth="250.0">
+                          <columns>
+                            <TableColumn fx:id="group_col" prefWidth="256.0" text="Group" />
+                          </columns>
+                        </TableView>
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="88.0" text="Add Group" />
+                              <Button mnemonicParsing="false" onAction="#filter" prefHeight="25.0" prefWidth="90.0" text="Filter Articles" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="248.0" prefWidth="278.0">
+                     <children>
+                        <TableView fx:id="article_table" prefHeight="223.0" prefWidth="250.0">
+                           <columns>
+                              <TableColumn fx:id="article_col" prefWidth="263.0" text="Article" />
+                           </columns>
+                        </TableView>
+                        <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="88.0" text="Add Article" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="40.0" prefWidth="524.0">
+               <items>
+                  <Label fx:id="article_links" prefHeight="17.0" prefWidth="559.0" text="Article Links: " />
+                  <Label fx:id="group_links" prefHeight="17.0" prefWidth="559.0" text="Group Links: " />
+               </items>
+            </SplitPane>
+            <Button mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="108.0" text="Submit" />
+         </children>
+      </VBox>
+   </children>
+</HBox>
