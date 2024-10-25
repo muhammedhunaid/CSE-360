@@ -1,7 +1,19 @@
 package asu.cse360project;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.Base64;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 import javafx.collections.ObservableList;
 
@@ -18,6 +30,10 @@ public class DatabaseHelper {
     private Statement statement = null; // Statement for executing SQL queries
     // PreparedStatement pstmt; // Uncomment if needed for additional prepared statements
 
+	//Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+	//having troubles with importing bouncy castle - manas
+//	private EncryptionHelper encryptionHelper;
+
     // Method to establish a connection to the database
     public void connectToDatabase() throws SQLException {
         try {
@@ -26,6 +42,9 @@ public class DatabaseHelper {
             connection = DriverManager.getConnection(DB_URL, USER, PASS); // Establish the connection
             statement = connection.createStatement(); // Create a statement for executing SQL commands
             createTables();  // Call method to create necessary tables if they don't already exist
+
+			//calling the method to create article tables
+			createArticleTable();
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage()); // Handle the case where the driver isn't found
         }
@@ -350,5 +369,261 @@ public class DatabaseHelper {
 		} 
 	
 		return all_Users; // Return the list of users
+	}
+
+
+	//Methods to deal with articles:
+
+	//method which will create a table articles in the database to store article fields.
+	private void createArticleTable() throws SQLException {
+
+		//sql command for creating a table in the database
+		//the table name is articles and it is created only if it is not present before
+		//schema for the table:
+		//id: which is int and increments everytime when new record is inserted. it also the primary key in the database
+		//title: which is text , it is stored in encrypted form
+		//authors: which is text , it is stored in encrypted form
+		//abstract: which is text , it is stored in encrypted form
+		//keywords: which is text , it is stored in encrypted form
+		//references: which is text , it is stored in encrypted form
+
+		String sql = "CREATE TABLE IF NOT EXISTS articles (" +
+				"id INT AUTO_INCREMENT PRIMARY KEY, " +
+				"title TEXT, " +
+				"authors TEXT, " +
+				"abstract TEXT, " +
+				"keywords TEXT, " +
+				"body TEXT, " +
+				"references TEXT)";
+
+		//executing the table creation query
+		statement.execute(sql);
+	}
+
+	//Method to insert a new article into the database with encrypted fields for title, authors, abstract, keywords, body, and references
+	public void createArticle(Article newArticle) throws Exception {
+
+		String title = newArticle.getTitle();
+		String authors = newArticle.getAuthors();
+		String abstractInfo = newArticle.getAbstractText();
+		String keywords = newArticle.getKeywords();
+		String body = newArticle.getBody();
+		String references = newArticle.getReferences();
+
+		//sql command for inserting the article into the table
+		String insertArticle = "INSERT INTO articles (title, authors, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?)";
+
+		//defining the Initialization Vector for the encryptions
+
+//		byte[] IV = EncryptionUtils.getInitializationVector("team35".toCharArray());
+
+		//adding the sql insert statements
+		try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
+
+			//encrypt the title, authors, abstract, body, referenes and then push them into the table
+			pstmt.setString(1, title);
+			pstmt.setString(2, authors);
+			pstmt.setString(3, abstractInfo);
+			pstmt.setString(4, keywords);
+			pstmt.setString(5, body);
+			pstmt.setString(6, references);
+
+			//executing sql statement for insertion of the article
+			pstmt.executeUpdate();
+
+			//clear the article from the system memory after storing the information in DB
+			newArticle.clearArticle();
+
+		} catch (Error e) {
+			System.out.println("error: " + e.getMessage()); // Log SQL error
+			throw e; // Rethrow the exception if necessary
+		}
+	}
+
+	//Method to list the articles into the database after decrypting all the article fields for title, authors, abstract, keywords, body, and references
+	public void listArticles() throws SQLException, Exception {
+
+		//sql command for select all the data from the articles table
+		String sql = "SELECT * FROM articles";
+
+		//defining the same Initialization Vector for the decryptions
+//		byte[] iv = EncryptionUtils.getInitializationVector("team35".toCharArray());
+
+		// sql query to fetch all the articles
+		try (Statement stmt = connection.createStatement();
+
+			 //reading and storing the record one by one
+			 ResultSet record = stmt.executeQuery(sql)) {
+
+			//loop through each and every record while extracting the title, authors, abstract, keywords, body, references
+			while (record.next()) {
+
+				//retrieving and decrypting each field from the result set
+				String title = record.getString("title");
+//				char[] decryptTitle = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(title), iv));
+
+				String authors = record.getString("authors");
+//				char[] decryptAuthors = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(authors), iv));
+
+				String abstractText = record.getString("abstract");
+//				char[] decryptAbstract = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(abstractText), iv));
+
+				String keywords = record.getString("keywords");
+//				char[] decryptKeywords = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(keywords), iv));
+
+				String body = record.getString("body");
+//				char[] decryptBody = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(body), iv));
+
+				String references = record.getString("references");
+//				char[] decryptReferences = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(references), iv));
+
+				// The article ID can be displayed to the user
+				System.out.println("\nArticle ID: " + record.getInt("id"));
+
+				//remove these print statements in actual production
+				System.out.println("Title Encrypted: " + title);
+//				System.out.print("Title Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptTitle);
+
+				System.out.println("\n\nAuthors Encrypted: " + authors);
+//				System.out.print("Author Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptAuthors);
+
+				System.out.println("\n\nAbstract Encrypted: " + abstractText);
+//				System.out.print("Abstract Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptAbstract);
+
+				System.out.println("\n\nKeywords Encrypted: " + keywords);
+//				System.out.print("Keywords Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptKeywords);
+
+				System.out.println("\n\nBody Encrypted: " + body);
+//				System.out.print("Body Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptBody);
+
+				System.out.println("\n\nReferences Encrypted: " + references);
+//				System.out.print("References Decrypted: ");
+//				EncryptionUtils.printCharArray(decryptReferences);
+
+				System.out.println("\n--------------------------------------------\n");
+			}
+		}
+	}
+
+	//Method to delete the articles from the database with the help of their ID
+	public void deleteArticle(int id) throws SQLException {
+
+		//sql command for delete the article from the articles table after finding the id
+		String deleteSQL = "DELETE FROM articles WHERE id = ?";
+
+		//sql query to delete the particular article
+		try (PreparedStatement pstmt = connection.prepareStatement(deleteSQL)) {
+
+			//the ID of the article to delete
+			pstmt.setInt(1, id);
+
+			//executing the delete operation
+			pstmt.executeUpdate();
+
+
+		}
+	}
+
+	//Method to backup the articles into a secondary storage location where all the article fields for title, authors, abstract, keywords, body, and references are encrypted
+	public void backupArticles(String backupFilePath) {
+		try (Statement stmt = connection.createStatement();
+
+			 //Executing the query to retrieve all rows from the table
+			 ResultSet record = stmt.executeQuery("SELECT * FROM articles");
+
+			 //intializing bufferedwriter to write the data to the user given backup file
+			 BufferedWriter writer = new BufferedWriter(new FileWriter(backupFilePath))) {
+
+			//loop through each and every record while extracting the title, authors, abstract, keywords, body, references
+			while (record.next()) {
+
+				// Writing each encrypted field to the file
+				writer.write(record.getString("title") + "\n");
+				writer.write(record.getString("authors") + "\n");
+				writer.write(record.getString("abstract") + "\n");
+				writer.write(record.getString("keywords") + "\n");
+				writer.write(record.getString("body") + "\n");
+				writer.write(record.getString("references") + "\n");
+
+				//using a delimiter character for identifying each and every article record
+				writer.write("---\n");
+			}
+
+			//tell the user that backup is done successfully
+			System.out.println("Backup completed successfully to " + backupFilePath);
+		}
+
+		//catch block to catch any errors
+		catch (Exception e) {
+
+			//show the error to the user
+			System.err.println("Error during backup: " + e.getMessage());
+		}
+	}
+
+	//Method to restore the articles into the database where all the article fields for title, authors, abstract, keywords, body, and references are encrypted
+	public void restoreArticles(String backupFilePath) {
+		try (Statement stmt = connection.createStatement()) {
+
+			//sql query to delete all current articles from the table
+			stmt.executeUpdate("DELETE FROM articles");
+
+			//try block to catch any errors
+			try (BufferedReader reader = new BufferedReader(new FileReader(backupFilePath))) {
+
+				//declare line to store the information on each line
+				String line;
+
+				//loop through each and every record while extracting the title, authors, abstract, keywords, body, references
+				while ((line = reader.readLine()) != null) {
+
+					//intialize varibales to store the title, authors, abstract, keywords, body, references
+					String title = line;
+					String authors = reader.readLine();
+					String abstractText = reader.readLine();
+					String keywords = reader.readLine();
+					String body = reader.readLine();
+					String references = reader.readLine();
+
+					//I am using this line to skip the delimiter character which I used earlier
+					reader.readLine();
+
+					//Inserting the read data into the database again
+
+					//sql query to insert the data read from backup file
+					String insertArticle = "INSERT INTO articles (title, authors, abstract, keywords, body, references) VALUES (?, ?, ?, ?, ?, ?)";
+
+					//adding the sql insert statements
+					try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
+
+						//push the title, authors, abstract, body, referenes into the table
+						pstmt.setString(1, title);
+						pstmt.setString(2, authors);
+						pstmt.setString(3, abstractText);
+						pstmt.setString(4, keywords);
+						pstmt.setString(5, body);
+						pstmt.setString(6, references);
+
+						//executing sql statement for insertion of the article
+						pstmt.executeUpdate();
+					}
+				}
+
+				//tell the user that the database has been restored
+				System.out.println("Restore completed successfully from " + backupFilePath);
+			}
+		}
+
+		//catch block to catch any errors
+		catch (Exception e) {
+
+			//tell the user about the error
+			System.err.println("Error during restore: " + e.getMessage());
+		}
 	}
 }	

@@ -80,9 +80,9 @@ public class CEArticleController implements Initializable {
     void addArticle(ActionEvent event) {
         if(selectedArticle != null)
         {
-            article_links.setText(article_links.getText() + selectedArticle.getName());
+            article_links.setText(article_links.getText() + selectedArticle.getTitle());
         }
-    }   
+    }
 
     @FXML
     void addGroup(ActionEvent event) {
