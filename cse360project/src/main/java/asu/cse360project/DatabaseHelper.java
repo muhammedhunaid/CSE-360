@@ -46,7 +46,15 @@ public class DatabaseHelper {
                 + "preffered VARCHAR(255), " // User's preferred name
                 + "email VARCHAR(255) UNIQUE, " // Unique email address for user
                 + "otp_expires DATETIME)"; // Expiration date for one-time passwords (OTP)
+        
+        String groupTable = 
+        		"CREATE TABLE IF NOT EXISTS groups ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, " // Primary key with auto-incrementing ID
+                + "name VARCHAR(255), " // group's name
+                + "list VARCHAR(255)) "; // list of articles as a string
+        
         statement.execute(userTable); // Execute the SQL command to create the table
+        statement.execute(groupTable);
     }
 
     // Method to check if the database is empty
@@ -80,6 +88,84 @@ public class DatabaseHelper {
             e.printStackTrace(); // Print the stack trace for SQL exceptions
         }
     }
+    
+	public Group getGroup(String group_name) throws SQLException{
+		String query = "SELECT name, list FROM groups WHERE name = ?";
+		
+		long[] curr_list = {4678L, 8367L, 156L, 823L, 2539L};
+//		
+//		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+//			pstmt.setString(1, group_name); // Set the group's name in the query
+//			try (ResultSet rs = pstmt.executeQuery()) {
+//				// If user exists, retrieve their details
+//				if (rs.next()) {
+//					Array list = rs.getArray("article_list");
+//					
+//				}
+//			}
+//		}
+		
+		
+		
+		return new Group(group_name, curr_list);
+		
+//		return null;
+	}
+	
+    // Method to insert a new user into the database
+    public void insertGroup(String group_name, long[] raw_list) throws SQLException {
+    	String list = "";
+    	int i = 0;
+    	
+    	for(long article : raw_list) {
+    		list += article;
+    		list += ",";
+    	}
+    	
+    	System.out.println(list);
+    	
+    	
+    	    	
+        String insertQuery = "INSERT INTO groups (name, list) VALUES (?, ?)"; // SQL query for inserting a new user
+
+        try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) { // Create prepared statement to prevent SQL injection
+            // Set values for the prepared statement
+            insertStmt.setString(1, group_name);  // Set name
+            insertStmt.setString(2, list);
+
+            // Execute the insert and get the number of rows affected
+            int rowsInserted = insertStmt.executeUpdate(); 
+            if (rowsInserted > 0) {
+                System.out.println("Group inserted successfully."); // Print success message
+            } else {
+                System.out.println("Failed to insert group."); // Print failure message
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Print the stack trace for SQL exceptions
+        }
+    }
+    
+	public ObservableList<Group> listGroups(ObservableList<Group> all_Groups) throws SQLException {
+		// SQL query to select all users
+//		String sql = "SELECT * FROM article_groups"; 
+//		Statement stmt = connection.createStatement(); // Create a statement object
+//		ResultSet rs = stmt.executeQuery(sql); // Execute the query
+//	
+//		// Iterate through the result set and add groups to the provided list
+//		while (rs.next()) { 
+//			String groupname = rs.getString("group_name"); // Get username
+//			all_Groups.add(getGroup(groupname)); // Add user object to the list
+//		} 
+		
+		for (int i = 0; i < 10; i++) {
+			String name = "Group ";
+			name += i;
+			all_Groups.add(getGroup(name));
+		}
+		
+		return all_Groups; // Return the list of users
+	}
 
     // Method to delete a user from the database
     public void deleteUser(String username) {

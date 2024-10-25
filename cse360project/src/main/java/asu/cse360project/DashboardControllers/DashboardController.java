@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import asu.cse360project.App;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
@@ -45,6 +46,12 @@ public class DashboardController implements Initializable {
     void manageUsers(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
         Utils.setContentArea("manage_users");
+    }
+    
+    @FXML
+    void manageGroups(ActionEvent event) throws IOException {
+        // Load the view groups scene when the corresponding action is triggered
+        Utils.setRoot("DashboardScenes/group_dashboard");
     }
 
     @FXML

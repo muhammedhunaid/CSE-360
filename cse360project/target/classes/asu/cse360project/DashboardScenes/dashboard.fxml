@@ -17,6 +17,7 @@
             <VBox fx:id="admin_controlls">
                <children>
                   <Button mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />
+                  <Button mnemonicParsing="false" onAction="#manageGroups" prefHeight="41.0" prefWidth="200.0" text="See Groups" />
                </children>
             </VBox>
             <Button mnemonicParsing="false" onAction="#logout" prefHeight="41.0" prefWidth="200.0" text="Logout" />
