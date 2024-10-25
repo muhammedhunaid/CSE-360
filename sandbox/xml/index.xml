@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.12.0" xml:lang="en-US">
+  <compound refid="class_bathroom" kind="class"><name>Bathroom</name>
+    <member refid="class_bathroom_1a9d45a2a4d70cdabfdfda22421abc0816" kind="variable"><name>showers</name></member>
+    <member refid="class_bathroom_1a4d1e5ea9b84f489b782f59ea6fef7a58" kind="variable"><name>sinks</name></member>
+    <member refid="class_bathroom_1ab712b100d848e9c0bad9f1e9e89b350b" kind="function"><name>Bathroom</name></member>
+    <member refid="class_bathroom_1a3fbf83734310b32fc59f5874b7880ebe" kind="function"><name>setShowers</name></member>
+    <member refid="class_bathroom_1aa42f56e6fd0ff220ff9583a4ce1ebb5b" kind="function"><name>setSinks</name></member>
+  </compound>
+  <compound refid="class_bedroom" kind="class"><name>Bedroom</name>
+    <member refid="class_bedroom_1a67823bd5cec4f53a7c613f851d7188e6" kind="variable"><name>beds</name></member>
+    <member refid="class_bedroom_1a3fe3695266f60dc86e34420b2804a6ad" kind="variable"><name>windows</name></member>
+    <member refid="class_bedroom_1ad55bfda5437cae2fe0794317c6c9fa96" kind="function"><name>Bedroom</name></member>
+    <member refid="class_bedroom_1a46f80067915b77d17bb7ffded2ed85c1" kind="function"><name>setBeds</name></member>
+    <member refid="class_bedroom_1add0617848f8a11cb606ed6b06af17d7a" kind="function"><name>setWindows</name></member>
+  </compound>
+  <compound refid="class_house" kind="class"><name>House</name>
+    <member refid="class_house_1a5ead9ac75eeb5c458218f7ef304a335d" kind="variable"><name>fans</name></member>
+    <member refid="class_house_1a4a0ffc069eacc88dd97214c02b9791d1" kind="variable"><name>lights</name></member>
+    <member refid="class_house_1a9186c74ebbde19c7f11afe40205dc30e" kind="variable"><name>doors</name></member>
+    <member refid="class_house_1a14eb492f6c4c38d0156bf2fe9912208d" kind="variable"><name>roomOwner</name></member>
+    <member refid="class_house_1a91197e97b6ec2e93dd084a653ddbea2a" kind="variable"><name>rent</name></member>
+    <member refid="class_house_1a2788a8a7e4f2e455188c2438f33460cc" kind="function"><name>House</name></member>
+    <member refid="class_house_1ae7d353e6db05fda45907d4a1be223c9a" kind="function"><name>setFans</name></member>
+    <member refid="class_house_1afb6c364eb7e5dd2d412e37f4b5da96a6" kind="function"><name>setLights</name></member>
+    <member refid="class_house_1a4a4e777b91f928aad455ab780debff5f" kind="function"><name>setDoors</name></member>
+    <member refid="class_house_1a17333db52ca78dd632b2f13655b3e337" kind="function"><name>setRoomOwner</name></member>
+    <member refid="class_house_1adeda40d15d89480c7dbb4d827acdd9c7" kind="function"><name>setRent</name></member>
+  </compound>
+  <compound refid="class_kitchen" kind="class"><name>Kitchen</name>
+    <member refid="class_kitchen_1adbba16f0011eb51cd49bfa464b75fac1" kind="variable"><name>stoves</name></member>
+    <member refid="class_kitchen_1a4c6478fb71e059e1cd73270b05441171" kind="variable"><name>fridges</name></member>
+    <member refid="class_kitchen_1ac0cb22f3ad2eff374023480ad3f628fa" kind="function"><name>Kitchen</name></member>
+    <member refid="class_kitchen_1ad2f431098b9bba397c15c9f63aaa9bb7" kind="function"><name>setStoves</name></member>
+    <member refid="class_kitchen_1a9ff0ca6a7274af346d985678f3359f27" kind="function"><name>setFridges</name></member>
+  </compound>
+  <compound refid="cpp_classes_to_u_m_l_8cpp" kind="file"><name>cppClassesToUML.cpp</name>
+  </compound>
+  <compound refid="dir_cdcb19311845d38f3120731b46048b9c" kind="dir"><name>/Users/MuhammedH/github/CSE-360</name>
+  </compound>
+  <compound refid="dir_aa394cd1d9abb8ffe941d9aaafca8d03" kind="dir"><name>/Users/MuhammedH/github</name>
+  </compound>
+  <compound refid="dir_7eac27b9327de10cd0b52c379d675d3e" kind="dir"><name>/Users/MuhammedH/github/CSE-360/sandbox</name>
+  </compound>
+</doxygenindex>
