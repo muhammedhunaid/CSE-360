@@ -10,6 +10,7 @@ import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * JavaFX App: JavaFX driver class that initializes and starts the application
@@ -28,7 +29,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException, SQLException {
 
         // Load the login screen from the FXML file and set the scene
-        Parent root = FXMLLoader.load(App.class.getResource("LoginScenes/login.fxml"));
+        Parent root = FXMLLoader.load(App.class.getResource("cse360project/src/main/resources/asu/cse360project/LoginScenes/login.fxml"));
         scene = new Scene(root, 700, 700);
         stage.setScene(scene);
         stage.show();

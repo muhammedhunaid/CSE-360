@@ -355,7 +355,10 @@ public class DatabaseHelper {
 			throw e; // Rethrow the exception if necessary
 		}
 	}
-	
+
+	//Suggestions: don't return the ObservableList because all the changes performed here will be visible in the main method. - Manas
+	//the only parameter is the ObservableList containing Users. We do not need to return the ObservableList, because all the changes performed here
+	//will be reflected in main method or any other function which has a reference to the all_users obseravableList.
 	public ObservableList<User> ListUsers(ObservableList<User> all_Users) throws SQLException {
 		// SQL query to select all users
 		String sql = "SELECT * FROM cse360users"; 
@@ -441,7 +444,9 @@ public class DatabaseHelper {
 	}
 
 	//Method to list the articles into the database after decrypting all the article fields for title, authors, abstract, keywords, body, and references
-	public void listArticles() throws SQLException, Exception {
+	//the only parameter is the ObservableList containing Articles. We do not need to return the ObservableList, because all the changes performed here
+	//will be reflected in main method or any other function which has a reference to the all_articles obseravableList.
+	public void listArticles(ObservableList<Article> all_articles) throws SQLException, Exception {
 
 		//sql command for select all the data from the articles table
 		String sql = "SELECT * FROM articles";
@@ -477,6 +482,12 @@ public class DatabaseHelper {
 				String references = record.getString("references");
 //				char[] decryptReferences = EncryptionUtils.toCharArray(encryptionHelper.decrypt(Base64.getDecoder().decode(references), iv));
 
+
+				all_articles.add(new Article(title, authors, abstractText, keywords, body, references));
+
+
+				//only for debugging purposes
+				//feel free to remove them if you think the code is working properly
 				// The article ID can be displayed to the user
 				System.out.println("\nArticle ID: " + record.getInt("id"));
 
@@ -506,9 +517,130 @@ public class DatabaseHelper {
 //				EncryptionUtils.printCharArray(decryptReferences);
 
 				System.out.println("\n--------------------------------------------\n");
+
 			}
 		}
 	}
+
+	public void updateArticle(int articleId, String title, String authors, String abstractInfo, String keywords, String body, String references) throws SQLException {
+
+		// Start building the SQL update query with only non-null values
+		StringBuilder updateArticle = new StringBuilder("UPDATE articles SET ");
+		boolean first = true; // Boolean flag to track if we're adding the first field
+
+		// Check if 'title' is non-null, add it to the SQL update statement
+		if (title != null) {
+			updateArticle.append("title = ?"); // Add 'title' to the SET clause
+			first = false; // Set 'first' to false, indicating first field has been added
+		}
+
+		// Check if 'authors' is non-null, add it to the SQL update statement
+		if (authors != null) {
+			// If not the first field, add a comma for separation
+			if (!first) {
+				updateArticle.append(", ");
+			}
+			updateArticle.append("authors = ?"); // Add 'authors' to the SET clause
+			first = false; // Set 'first' to false
+		}
+
+		// Check if 'abstractInfo' is non-null, add it to the SQL update statement
+		if (abstractInfo != null) {
+			// If not the first field, add a comma for separation
+			if (!first) {
+				updateArticle.append(", ");
+			}
+			updateArticle.append("abstract = ?"); // Add 'abstract' to the SET clause
+			first = false; // Set 'first' to false
+		}
+
+		// Check if 'keywords' is non-null, add it to the SQL update statement
+		if (keywords != null) {
+			// If not the first field, add a comma for separation
+			if (!first) {
+				updateArticle.append(", ");
+			}
+			updateArticle.append("keywords = ?"); // Add 'keywords' to the SET clause
+			first = false; // Set 'first' to false
+		}
+
+		// Check if 'body' is non-null, add it to the SQL update statement
+		if (body != null) {
+			// If not the first field, add a comma for separation
+			if (!first) {
+				updateArticle.append(", ");
+			}
+			updateArticle.append("body = ?"); // Add 'body' to the SET clause
+			first = false; // Set 'first' to false
+		}
+
+		// Check if 'references' is non-null, add it to the SQL update statement
+		if (references != null) {
+			// If not the first field, add a comma for separation
+			if (!first) {
+				updateArticle.append(", ");
+			}
+			updateArticle.append("references = ?"); // Add 'references' to the SET clause
+		}
+
+		// Finalize the query by adding the WHERE clause to specify the article by id
+		updateArticle.append(" WHERE id = ?");
+
+		// Prepare the SQL statement for execution with the dynamically created query
+		try (PreparedStatement pstmt = connection.prepareStatement(updateArticle.toString())) {
+
+			// Set only the non-null parameters in the prepared statement, in the correct order
+			int index = 1; // Initialize index for parameter positions
+
+			// Set title if non-null, increment index
+			if (title != null) {
+				pstmt.setString(index++, title);
+			}
+
+			// Set authors if non-null, increment index
+			if (authors != null) {
+				pstmt.setString(index++, authors);
+			}
+
+			// Set abstract if non-null, increment index
+			if (abstractInfo != null) {
+				pstmt.setString(index++, abstractInfo);
+			}
+
+			// Set keywords if non-null, increment index
+			if (keywords != null) {
+				pstmt.setString(index++, keywords);
+			}
+
+			// Set body if non-null, increment index
+			if (body != null) {
+				pstmt.setString(index++, body);
+			}
+
+			// Set references if non-null, increment index
+			if (references != null) {
+				pstmt.setString(index++, references);
+			}
+
+			// Set the article ID for the WHERE clause at the final position
+			pstmt.setInt(index, articleId);
+
+			// Execute the update statement in the database and get the number of rows affected
+			int rowsUpdated = pstmt.executeUpdate();
+
+			// Check if the update affected any rows, indicating a successful update
+			if (rowsUpdated > 0) {
+				System.out.println("Number of articles updated : " + rowsUpdated);
+			} else {
+				System.out.println("No article found with the given ID.");
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Error updating article: " + e.getMessage()); // Print error if SQL exception occurs
+			throw e;
+		}
+	}
+
 
 	//Method to delete the articles from the database with the help of their ID
 	public void deleteArticle(int id) throws SQLException {
