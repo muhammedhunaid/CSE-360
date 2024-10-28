@@ -51,6 +51,16 @@
                      <children>
                         <VBox prefHeight="522.0" prefWidth="282.0">
                            <children>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label text="ID:">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="article_id" text="id" />
+                                 </children>
+                              </HBox>
                               <Label text="Title">
                                  <font>
                                     <Font name="System Bold" size="16.0" />

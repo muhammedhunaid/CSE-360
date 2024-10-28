@@ -11,12 +11,12 @@ public class Article {
     private String level;
     private long id;
     private String permissions;
-    private ArrayList<String> groups;
-    private ArrayList<String> references;
+    private ArrayList<Integer> groups;
+    private ArrayList<Long> references;
 
 
     // Constructor to initialize the Article object
-    public Article(String title, String authors, String abstractText, String keywords, String body, long id, String level, ArrayList<String> groups, ArrayList<String> references) {
+    public Article(String title, String authors, String abstractText, String keywords, String body, long id, String level, ArrayList<Integer> groups, ArrayList<Long> references, String permissions) {
         this.title = title;
         this.authors = authors;
         this.abstractText = abstractText;
@@ -26,6 +26,7 @@ public class Article {
         this.groups = groups;
         this.id = id;
         this.level = level;
+        this.permissions = permissions;
     }
 
     public Article(String title, String authors, long id)
@@ -44,6 +45,10 @@ public class Article {
         return title;
     }
 
+    public String getPermissions() {
+        return permissions;
+    }
+
     public String getAuthors() {
         return authors;
     }
@@ -60,7 +65,7 @@ public class Article {
         return body;
     }
 
-    public ArrayList<String> getReferences() {
+    public ArrayList<Long> getReferences() {
         return references;
     }
 
@@ -68,12 +73,12 @@ public class Article {
         return id;
     }
 
-    public ArrayList<String> getGroups() {
+    public ArrayList<Integer> getGroups() {
         return groups;
     }
 
     // Setters
-    public void setGroups(ArrayList<String> groups) {
+    public void setGroups(ArrayList<Integer> groups) {
         this.groups = groups;
     }
 
@@ -81,7 +86,7 @@ public class Article {
         this.level = level;
     }
 
-    public void setreferences(ArrayList<String> references) {
+    public void setreferences(ArrayList<Long> references) {
         this.references = references;
     }
 
@@ -91,6 +96,10 @@ public class Article {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
     }
 
     public void setAuthors(String authors) {

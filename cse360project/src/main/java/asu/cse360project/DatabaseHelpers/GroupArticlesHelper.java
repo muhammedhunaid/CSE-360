@@ -202,21 +202,31 @@ public void createArticle(Article newArticle) throws Exception {
                     String body = rs.getString("body");
                     String keywords = rs.getString("keywords");
                     String level = rs.getString("level");
-                    ArrayList<String> groups = getArticleGroups(id);
-                    ArrayList<String> refrences = getArticleRefs(id);
+                    String permissions = rs.getString("permissions");
+                    ArrayList<Integer> groups = getArticleGroups(id);
+                    ArrayList<Long> refrences = getArticleRefs(id);
 
-                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences);
+                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
                     articles.add(article);
                 }
             }
 
         return articles;
-    } 
+    }
     
-    private ArrayList<String> getArticleRefs(Long id) throws SQLException {
-        ArrayList<String> groups = new ArrayList<>();
+    public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> group_id) throws SQLException {
+        ObservableList<Article> articles =  FXCollections.observableArrayList();
+        for(Integer grp_id: group_id)
+        {
+            articles.addAll(ListArticles(grp_id));
+        }
+        return articles;
+    }
+    
+    private ArrayList<Integer> getArticleGroups(Long id) throws SQLException {
+        ArrayList<Integer> groups = new ArrayList<>();
         String query = 
-            "SELECT g.group_name " + 
+            "SELECT g.group_id " + 
             "FROM Groups g " + 
             "JOIN Article_Groups ag ON g.group_id = ag.group_id " +
             "JOIN articles a ON ag.article_id = a.article_id " +
@@ -229,16 +239,16 @@ public void createArticle(Article newArticle) throws Exception {
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
-                groups.add(rs.getString("group_name"));
+                groups.add(rs.getInt("group_id"));
             }
         }
         return groups;
     }
 
-    private ArrayList<String> getArticleGroups(Long id) throws SQLException {
-        ArrayList<String> refrences = new ArrayList<>();
+    private ArrayList<Long> getArticleRefs(long id) throws SQLException {
+        ArrayList<Long> refrences = new ArrayList<>();
         String query = 
-            "SELECT r.title " + 
+            "SELECT r.article_id " + 
             "FROM articles r " + 
             "JOIN Article_Links ar ON r.article_id = ar.linked_article_id " +
             "JOIN articles a ON ar.article_id = a.article_id " +
@@ -251,7 +261,7 @@ public void createArticle(Article newArticle) throws Exception {
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
-                refrences.add(rs.getString("title"));
+                refrences.add(rs.getLong("article_id"));
             }
         }
         return refrences;
@@ -311,5 +321,47 @@ public void createArticle(Article newArticle) throws Exception {
             linkStmt.setInt(2, group);
             linkStmt.executeUpdate();
         }
+    }
+
+    public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
+        String sql = "UPDATE articles SET title = ?, abstract = ?, keywords = ?, body = ?, level = ?, authors = ?, permissions = ? WHERE article_id = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+            
+            pstmt.setString(1, title);
+            pstmt.setString(2, abstractTxt);
+            pstmt.setString(3, keywords);
+            pstmt.setString(4, body);
+            pstmt.setString(5, level);
+            pstmt.setString(6, authors);
+            pstmt.setString(7, permissions);
+            pstmt.setLong(8, id);
+            pstmt.executeUpdate();
+
+            removeArticleLinks(id);
+            removeGroupLinks(id);
+
+            linkGroups(id, groups);
+            linkArticles(id, links);    
+    }
+
+    private void removeGroupLinks(Long id) throws SQLException {
+        String deleteLinksSQL = "DELETE FROM Article_Groups WHERE article_id = ?";
+        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
+        pstmtLinks.setLong(1, id);  // Set the article ID
+        pstmtLinks.executeUpdate();
+    }
+
+    private void removeArticleLinks(Long id) throws SQLException {
+        String deleteLinksSQL = "DELETE FROM Article_Links WHERE article_id = ?";
+        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
+        pstmtLinks.setLong(1, id);  // Set the article ID
+        pstmtLinks.executeUpdate();
+    }
+
+    public void deleteArticle(Long id) throws SQLException {
+        String deleteLinksSQL = "DELETE FROM Articles WHERE article_id = ?";
+        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
+        pstmtLinks.setLong(1, id);  // Set the article ID
+        pstmtLinks.executeUpdate();
     }
 }

@@ -21,7 +21,7 @@
          <content>
             <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="893.0" prefWidth="645.0" spacing="10.0">
                <children>
-                  <Label fx:id="title_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="338.0" text="Create/Edit Article">
+                  <Label fx:id="title_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="338.0" text="Create Article">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
@@ -105,7 +105,12 @@
                         <Label fx:id="group_links" prefHeight="17.0" prefWidth="559.0" text="Group Links: " />
                      </items>
                   </SplitPane>
-                  <Button mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="108.0" text="Submit" />
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="108.0" text="Submit" />
+                        <Button mnemonicParsing="false" onAction="#cancel" prefHeight="25.0" prefWidth="102.0" text="Cancel" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
          </content>

@@ -1,5 +1,7 @@
 package asu.cse360project;
 
+import java.util.ArrayList;
+
 import asu.cse360project.DatabaseHelpers.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -20,7 +22,7 @@ public class Singleton {
     public Article article;
 
     public User app_user;
-    public Group edit_group = null;
+    public ArrayList<Integer> edit_group = null;
 
     // Public method to provide access to the instance
     public static synchronized Singleton getInstance() {

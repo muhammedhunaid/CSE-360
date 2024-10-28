@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -25,6 +26,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 /**
  * Controller class for managing users in the system.
@@ -35,6 +37,7 @@ public class GroupController implements Initializable {
     Singleton data = Singleton.getInstance();
     Alert alert;
     ObservableList<Group> all_Groups; // List to hold all group names
+    ArrayList<Integer> selected_groups = new ArrayList<>();
     
     private Group selectedGroup = null;
 	
@@ -45,6 +48,7 @@ public class GroupController implements Initializable {
     @FXML private Button search_button;
     @FXML private TextField search_group;
     @FXML private TableColumn<Group, String> article_ids_col;
+    @FXML private Text groups_selected_txt;
 
     // Initialization method to set up the UI and load user data
     @Override
@@ -74,6 +78,8 @@ public class GroupController implements Initializable {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 if (selectedGroup != null) {
                     try {
+                        selected_groups.clear();
+                        selected_groups.add(selectedGroup.getId());
                         view(new ActionEvent());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -125,7 +131,7 @@ public class GroupController implements Initializable {
     void view(ActionEvent event) throws IOException {
         if(selectedGroup != null)
         {
-            data.edit_group = selectedGroup;
+            data.edit_group = selected_groups;
             Utils.setContentArea("manage_articles");
         } 
     }
@@ -166,4 +172,22 @@ public class GroupController implements Initializable {
     void goBackDashboard(ActionEvent event) throws IOException {
     	//Utils.setRoot("dashboard");
     }
+
+    @FXML
+    void selectGroup(ActionEvent event) {
+        if(selectedGroup != null)
+        {
+            selected_groups.add(selectedGroup.getId());
+            groups_selected_txt.setText(selected_groups.toString());
+        }
+    }
+
+    @FXML
+    void removeGroup(ActionEvent event) {
+        if(selectedGroup != null)
+        {
+            selected_groups.remove(Integer.valueOf(selectedGroup.getId()));
+            groups_selected_txt.setText(selected_groups.toString());
+        }
+    }   
 }

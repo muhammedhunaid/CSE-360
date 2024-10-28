@@ -38,27 +38,30 @@ public class CEArticleController implements Initializable {
 
 
     //scene elements
-    @FXML private CheckBox admin;
-    @FXML private Label article_links;
     @FXML private TableColumn<Article, String> article_col;
     @FXML private TableColumn<Article, String> authors_col;
     @FXML private TableColumn<Article, Long> article_id_col;
     @FXML private TableView<Article> article_table;
+    @FXML private TableColumn<Group, String> group_col;
+    @FXML private TableColumn<Group, Integer> group_id_col;
+    @FXML private TableView<Group> group_table;
+    
     @FXML private TextArea body;
     @FXML private TextField description;
     @FXML private TextField keywords;
     @FXML private TextField authors;
     @FXML private TextField search_article;
     @FXML private TextField search_group;
-    @FXML private Label group_links;
-    @FXML private TableColumn<Group, String> group_col;
-    @FXML private TableColumn<Group, Integer> group_id_col;
-    @FXML private TableView<Group> group_table;
-    @FXML private CheckBox instructor;
-    @FXML private MenuButton level;
-    @FXML private CheckBox student;
     @FXML private TextField title;
+
+    @FXML private Label group_links;
+    @FXML private Label article_links;
     @FXML private Label title_label;
+
+    @FXML private CheckBox instructor;
+    @FXML private CheckBox student;
+    @FXML private CheckBox admin;
+    @FXML private MenuButton level;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -98,12 +101,12 @@ public class CEArticleController implements Initializable {
         article_table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedArticle = newSelection;
-
             }
         });
 
         if(data.editing_article)
         {
+            title_label.setText("Editing Article");
             setContent();
         }
     }
@@ -117,9 +120,29 @@ public class CEArticleController implements Initializable {
         body.setText(article.getBody());
         keywords.setText(article.getKeywords());
         setLevel(article.getLevel());
-        //setPermissions(article.getPermissions());
+        article_level = article.getLevel();
+        setPermissions(article.getPermissions());
         article_links.setText("Article Links: " + article.getReferences().toString());
         group_links.setText("Groups links: " + article.getGroups().toString());
+        refrences = article.getReferences();
+        groups = article.getGroups();
+    }
+
+    private void setPermissions(String permissions) {
+        if(permissions.contains("admin"))
+        {
+            admin.setSelected(true);
+        }
+
+        if(permissions.contains("instructor"))
+        {
+            instructor.setSelected(true);
+        }
+
+        if(permissions.contains("student"))
+        {
+            student.setSelected(true);
+        }
     }
 
     @FXML
@@ -182,6 +205,11 @@ public class CEArticleController implements Initializable {
         level.setText("intermediate");
     }
 
+    @FXML
+    void cancel(ActionEvent event) throws IOException {
+        Utils.setContentArea("manage_articles");
+    }
+
     void setLevel(String level_txt) {
         level.setText(level_txt);
     }
@@ -202,13 +230,11 @@ public class CEArticleController implements Initializable {
         String permissions = getPermissions();
         if(permissions == "") { return; }
 
-        groups.add(1);
-
-        //TODO: add or edit info info db
         if(data.editing_article)
         {
-            //edit article 
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
             data.editing_article = false;
+            data.article = null;
         }else{
             data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
         }
