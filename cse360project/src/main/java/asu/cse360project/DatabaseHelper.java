@@ -522,6 +522,9 @@ public class DatabaseHelper {
 		}
 	}
 
+	//Method to update the article information using the article ID provided by the user
+	//the user can tell which fields to modify by simply sending the new information as a string to the method
+	//if the user doesn't want to update keywords, then simply send in null during function call
 	public void updateArticle(int articleId, String title, String authors, String abstractInfo, String keywords, String body, String references) throws SQLException {
 
 		// Start building the SQL update query with only non-null values
@@ -660,6 +663,66 @@ public class DatabaseHelper {
 
 		}
 	}
+
+	//Method to list the articles from the database based on a grouping criteria. The grouping is made with the help of the keywords column in the database
+	//the parameter is the ObservableList containing Articles, string group criteria. We do not need to return the ObservableList, because all the changes performed here
+	//will be reflected in main method or any other function which has a reference to the obseravableList sent during function call.
+	public void getArticlesByGroup(ObservableList<Article> groupArticleList, String group) throws SQLException {
+
+		//SQL query to select all the articles that contain the specified grouping criteria in the keywords field
+		String query = "SELECT * FROM articles WHERE keywords LIKE ?";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+			// % wildcards character to match any article containing a grouping criteria
+			pstmt.setString(1, "%" + group + "%");
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while (rs.next()) {
+
+					//Constructing an Article object for each row in the result set
+					Article article = new Article(
+							rs.getString("title"),
+							rs.getString("authors"),
+							rs.getString("abstract"),
+							rs.getString("keywords"),
+							rs.getString("body"),
+							rs.getString("references")
+					);
+
+					//storing the article object in the ObservableList
+					groupArticleList.add(article);
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println("Error retrieving articles by group: " + e.getMessage());
+			throw e;
+		}
+
+	}
+
+	//Method to delete the articles having a certain group criteria
+	public void deleteArticlesByGroup(String group) throws SQLException {
+
+		//SQL query to delete articles containing the specified group criteria in the group field
+		String deleteQuery = "DELETE FROM articles WHERE keywords LIKE ?";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+
+			//% wildcards character to match any article containing the group criteria
+			pstmt.setString(1, "%" + group + "%");
+
+			//Execute the delete operation
+			int rowsDeleted = pstmt.executeUpdate();
+			System.out.println(rowsDeleted + " article(s) deleted with the group: " + group);
+
+		} catch (SQLException e) {
+			System.out.println("Error deleting articles by tag: " + e.getMessage());
+			throw e;
+		}
+	}
+
+
 
 	//Method to backup the articles into a secondary storage location where all the article fields for title, authors, abstract, keywords, body, and references are encrypted
 	public void backupArticles(String backupFilePath) {
