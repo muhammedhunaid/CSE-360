@@ -216,6 +216,12 @@ public void createArticle(Article newArticle) throws Exception {
     
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> group_id) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
+
+        if(group_id.contains(-1))
+        {
+            return AddAllArticles();
+        }
+
         for(Integer grp_id: group_id)
         {
             articles.addAll(ListArticles(grp_id));
@@ -223,6 +229,34 @@ public void createArticle(Article newArticle) throws Exception {
         return articles;
     }
     
+    private ObservableList<Article> AddAllArticles() throws SQLException {
+        ObservableList<Article> articles =  FXCollections.observableArrayList();
+
+        String query =  "SELECT * FROM Articles";
+        PreparedStatement stmt = connection.prepareStatement(query);            
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Article objects
+            while (rs.next()) {
+                Long id = rs.getLong("article_id");
+                String title = rs.getString("title");
+                String authors = rs.getString("authors");
+                String abstractTxt = rs.getString("abstract");
+                String body = rs.getString("body");
+                String keywords = rs.getString("keywords");
+                String level = rs.getString("level");
+                String permissions = rs.getString("permissions");
+                ArrayList<Integer> groups = getArticleGroups(id);
+                ArrayList<Long> refrences = getArticleRefs(id);
+
+                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
+                articles.add(article);
+            }
+        }
+
+        return articles;
+    }
+
     private ArrayList<Integer> getArticleGroups(Long id) throws SQLException {
         ArrayList<Integer> groups = new ArrayList<>();
         String query = 

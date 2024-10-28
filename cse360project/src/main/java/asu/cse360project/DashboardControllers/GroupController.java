@@ -69,6 +69,7 @@ public class GroupController implements Initializable {
         // Load all users from the database
         try {
         	all_Groups = data.group_articles_db.getAllGroups();
+            all_Groups.add(0, new Group("All Articles", 0));
         } catch (SQLException e) {
             e.printStackTrace();
         }
