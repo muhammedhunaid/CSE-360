@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -14,70 +15,100 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox alignment="CENTER" prefHeight="998.0" prefWidth="843.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.CEArticleController">
+<HBox alignment="CENTER" prefHeight="854.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.CEArticleController">
    <children>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="893.0" prefWidth="524.0" spacing="10.0">
-         <children>
-            <Label fx:id="title_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="338.0" text="Create/Edit Article">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <TextField fx:id="title" promptText="Title" />
-            <TextField fx:id="description" promptText="Desciption" />
-            <TextArea fx:id="body" prefHeight="155.0" prefWidth="524.0" promptText="Body" />
-            <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0" spacing="20.0">
+      <ScrollPane>
+         <content>
+            <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="893.0" prefWidth="645.0" spacing="10.0">
                <children>
-                  <MenuButton fx:id="level" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Level">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#beginner" text="beginner" />
-                      <MenuItem mnemonicParsing="false" onAction="#intermediate" text="intermediate" />
-                        <MenuItem mnemonicParsing="false" onAction="#advanced" text="advanced" />
-                        <MenuItem mnemonicParsing="false" onAction="#expert" text="expert" />
-                    </items>
-                  </MenuButton>
-                  <CheckBox fx:id="admin" mnemonicParsing="false" text="Admin" />
-                  <CheckBox fx:id="instructor" mnemonicParsing="false" text="Instructor" />
-                  <CheckBox fx:id="student" mnemonicParsing="false" text="Student" />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="248.0" prefWidth="524.0" spacing="10.0">
-               <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="248.0" prefWidth="279.0">
+                  <Label fx:id="title_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="338.0" text="Create/Edit Article">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="title" promptText="Title" />
+                  <TextField fx:id="authors" promptText="Authors" />
+                  <TextField fx:id="description" promptText="Desciption" />
+                  <TextArea fx:id="body" prefHeight="155.0" prefWidth="524.0" promptText="Body" />
+                  <TextField fx:id="keywords" promptText="Keywords" />
+                  <HBox alignment="CENTER" prefHeight="39.0" prefWidth="600.0" spacing="20.0">
                      <children>
-                        <TableView fx:id="group_table" prefHeight="230.0" prefWidth="250.0">
-                          <columns>
-                            <TableColumn fx:id="group_col" prefWidth="256.0" text="Group" />
-                          </columns>
-                        </TableView>
-                        <HBox alignment="CENTER" spacing="10.0">
+                        <MenuButton fx:id="level" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Level">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#beginner" text="beginner" />
+                            <MenuItem mnemonicParsing="false" onAction="#intermediate" text="intermediate" />
+                              <MenuItem mnemonicParsing="false" onAction="#advanced" text="advanced" />
+                              <MenuItem mnemonicParsing="false" onAction="#expert" text="expert" />
+                          </items>
+                        </MenuButton>
+                        <CheckBox fx:id="admin" mnemonicParsing="false" text="Admin" />
+                        <CheckBox fx:id="instructor" mnemonicParsing="false" text="Instructor" />
+                        <CheckBox fx:id="student" mnemonicParsing="false" text="Student" />
+                     </children>
+                  </HBox>
+                  <VBox alignment="CENTER" prefHeight="317.0" prefWidth="645.0" spacing="5.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="319.0" prefWidth="645.0" spacing="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="88.0" text="Add Group" />
-                              <Button mnemonicParsing="false" onAction="#filter" prefHeight="25.0" prefWidth="90.0" text="Filter Articles" />
+                              <VBox alignment="TOP_CENTER" prefHeight="317.0" prefWidth="293.0">
+                                 <children>
+                                    <HBox spacing="5.0">
+                                       <children>
+                                          <TextField fx:id="search_group" prefHeight="25.0" prefWidth="207.0" promptText="Enter Group ID" />
+                                          <Button mnemonicParsing="false" onAction="#searchGroup" prefHeight="25.0" prefWidth="74.0" text="Search ID" />
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="group_table" prefHeight="264.0" prefWidth="293.0">
+                                      <columns>
+                                          <TableColumn fx:id="group_id_col" prefWidth="128.0" text="ID" />
+                                        <TableColumn fx:id="group_col" prefWidth="150.0" text="Group" />
+                                      </columns>
+                                    </TableView>
+                                    <HBox alignment="CENTER" prefWidth="284.0" spacing="10.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="123.0" text="Add Group" />
+                                          <Button mnemonicParsing="false" onAction="#removeGroup" prefHeight="25.0" prefWidth="117.0" text="Remove Group" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="TOP_CENTER" prefHeight="317.0" prefWidth="329.0">
+                                 <children>
+                                    <HBox alignment="CENTER" prefWidth="339.0" spacing="5.0">
+                                       <children>
+                                          <TextField fx:id="search_article" prefHeight="25.0" prefWidth="214.0" promptText="Enter Article ID" />
+                                          <Button mnemonicParsing="false" onAction="#searchArticle" prefHeight="25.0" prefWidth="74.0" text="Search ID" />
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="article_table" prefHeight="267.0" prefWidth="329.0">
+                                       <columns>
+                                          <TableColumn fx:id="article_id_col" prefWidth="119.0" text="ID" />
+                                          <TableColumn fx:id="article_col" prefWidth="96.0" text="Article" />
+                                          <TableColumn fx:id="authors_col" prefWidth="122.0" text="Author" />
+                                       </columns>
+                                    </TableView>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="125.0" text="Add Article" />
+                                          <Button mnemonicParsing="false" onAction="#removeArticle" prefHeight="25.0" prefWidth="122.0" text="Remove Article" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
                      </children>
                   </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="248.0" prefWidth="278.0">
-                     <children>
-                        <TableView fx:id="article_table" prefHeight="223.0" prefWidth="250.0">
-                           <columns>
-                              <TableColumn fx:id="article_col" prefWidth="263.0" text="Article" />
-                           </columns>
-                        </TableView>
-                        <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="88.0" text="Add Article" />
-                     </children>
-                  </VBox>
+                  <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="40.0" prefWidth="524.0">
+                     <items>
+                        <Label fx:id="article_links" prefHeight="17.0" prefWidth="559.0" text="Article Links: " />
+                        <Label fx:id="group_links" prefHeight="17.0" prefWidth="559.0" text="Group Links: " />
+                     </items>
+                  </SplitPane>
+                  <Button mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="108.0" text="Submit" />
                </children>
-            </HBox>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="40.0" prefWidth="524.0">
-               <items>
-                  <Label fx:id="article_links" prefHeight="17.0" prefWidth="559.0" text="Article Links: " />
-                  <Label fx:id="group_links" prefHeight="17.0" prefWidth="559.0" text="Group Links: " />
-               </items>
-            </SplitPane>
-            <Button mnemonicParsing="false" onAction="#submit" prefHeight="25.0" prefWidth="108.0" text="Submit" />
-         </children>
-      </VBox>
+            </VBox>
+         </content>
+      </ScrollPane>
    </children>
 </HBox>

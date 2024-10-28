@@ -5,7 +5,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import asu.cse360project.App;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 
@@ -81,10 +80,10 @@ public class CreateAccountController implements Initializable{
         if(valid_pw && valid_uname && same) {
             // Add user to database based on whether setting up admin or regular user
             if(data.setting_up_admin) {
-                data.db.addUser(username, password, "admin"); // Add as admin
+                data.user_db.addUser(username, password, "admin"); // Add as admin
                 data.setting_up_admin = false; // Switch off admin setup
             } else {
-                App.databaseHelper.register(currentUser.getUsername(), username, password); // Register user
+                data.user_db.register(currentUser.getUsername(), username, password); // Register user
             }          
             
             // Temporarily display "Account created" message before changing to login screen
