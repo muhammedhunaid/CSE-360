@@ -3,6 +3,11 @@ package asu.cse360project.DatabaseHelpers;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 import asu.cse360project.User;
 import javafx.collections.ObservableList;
@@ -300,7 +305,10 @@ public class UserHelper{
 			throw e; // Rethrow the exception if necessary
 		}
 	}
-	
+
+	//Suggestions: don't return the ObservableList because all the changes performed here will be visible in the main method. - Manas
+	//the only parameter is the ObservableList containing Users. We do not need to return the ObservableList, because all the changes performed here
+	//will be reflected in main method or any other function which has a reference to the all_users obseravableList.
 	public ObservableList<User> ListUsers(ObservableList<User> all_Users) throws SQLException {
 		// SQL query to select all users
 		String sql = "SELECT * FROM cse360users"; 

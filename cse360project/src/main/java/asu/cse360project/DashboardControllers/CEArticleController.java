@@ -147,7 +147,7 @@ public class CEArticleController implements Initializable {
             refrences.add(selectedArticle.getId());
             article_links.setText("Article Links: " + refrences.toString());
         }
-    }   
+    }
 
     @FXML
     void addGroup(ActionEvent event) {

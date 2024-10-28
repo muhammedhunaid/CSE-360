@@ -10,7 +10,6 @@ import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 
 /**

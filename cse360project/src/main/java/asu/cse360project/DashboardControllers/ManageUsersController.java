@@ -4,6 +4,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import asu.cse360project.Article;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
@@ -32,6 +33,7 @@ public class ManageUsersController implements Initializable {
     private User selectedUser = null;
     Alert alert;
     ObservableList<User> all_Users; // List to hold all users
+    ObservableList<Article> all_articles;
 
     // FXML elements for the UI
     @FXML private RadioButton admin_btn;
@@ -69,6 +71,9 @@ public class ManageUsersController implements Initializable {
 
         // Load all users from the database
         all_Users = FXCollections.observableArrayList();
+
+        //Load all the articles from the table articles in the database
+        all_articles = FXCollections.observableArrayList();
         try {
             all_Users = data.user_db.ListUsers(all_Users);
         } catch (SQLException e) {
