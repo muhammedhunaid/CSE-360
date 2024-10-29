@@ -1,63 +1,45 @@
-package asu.cse360project;
+package asu.cse360project.DatabaseHelpers;
+
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
+import asu.cse360project.User;
 import javafx.collections.ObservableList;
 
-public class DatabaseHelper {
-    // JDBC driver name and database URL
-    static final String JDBC_DRIVER = "org.h2.Driver";   // H2 database JDBC driver
-    static final String DB_URL = "jdbc:h2:~/cse360ProjectDatabase";  // H2 database connection URL
-
-    // Database credentials
-    static final String USER = "sa"; // Default username for H2
-    static final String PASS = ""; // Default password for H2 (empty)
+public class UserHelper{
 
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
-    // PreparedStatement pstmt; // Uncomment if needed for additional prepared statements
 
-    // Method to establish a connection to the database
-    public void connectToDatabase() throws SQLException {
-        try {
-            Class.forName(JDBC_DRIVER); // Load the JDBC driver for H2
-            System.out.println("Connecting to database..."); // Print connection status
-            connection = DriverManager.getConnection(DB_URL, USER, PASS); // Establish the connection
-            statement = connection.createStatement(); // Create a statement for executing SQL commands
-            createTables();  // Call method to create necessary tables if they don't already exist
-        } catch (ClassNotFoundException e) {
-            System.err.println("JDBC Driver not found: " + e.getMessage()); // Handle the case where the driver isn't found
-        }
+    public UserHelper(Connection connection, Statement statement){
+        this.connection = connection;
+        this.statement = statement;
     }
-
+    
     // Method to create tables in the database
-    private void createTables() throws SQLException {
-        // SQL command to create the cse360users table if it doesn't exist
-        String userTable = 
-                "CREATE TABLE IF NOT EXISTS cse360users ("
-                + "id INT AUTO_INCREMENT PRIMARY KEY, " // Primary key with auto-incrementing ID
-                + "username VARCHAR(255) UNIQUE, " // Unique username
-                + "password VARCHAR(255), " // Password for user authentication
-                + "role VARCHAR(30), " // User role (e.g., admin, student)
-                + "first VARCHAR(255), " // User's first name
-                + "middle VARCHAR(255), " // User's middle name
-                + "last VARCHAR(255), " // User's last name
-                + "preffered VARCHAR(255), " // User's preferred name
-                + "email VARCHAR(255) UNIQUE, " // Unique email address for user
-                + "otp_expires DATETIME)"; // Expiration date for one-time passwords (OTP)
-        statement.execute(userTable); // Execute the SQL command to create the table
-    }
-
-    // Method to check if the database is empty
-    public boolean isDatabaseEmpty() throws SQLException {
-        String query = "SELECT COUNT(*) AS count FROM cse360users"; // SQL query to count the number of users
-        ResultSet resultSet = statement.executeQuery(query); // Execute the query and store the result
-        if (resultSet.next()) { // Move to the first row of the result
-            return resultSet.getInt("count") == 0; // Return true if there are no users (count == 0)
-        }
-        return true; // Return true if the result set is empty
-    }
+	public void createTables() throws SQLException {
+		// SQL command to create the cse360users table if it doesn't exist
+		
+		String userTable = 
+				"CREATE TABLE IF NOT EXISTS cse360users ("
+				+ "id INT AUTO_INCREMENT PRIMARY KEY, " // Primary key with auto-incrementing ID
+				+ "username VARCHAR(255) UNIQUE, " // Unique username
+				+ "password VARCHAR(255), " // Password for user authentication
+				+ "role VARCHAR(30), " // User role (e.g., admin, student)
+				+ "first VARCHAR(255), " // User's first name
+				+ "middle VARCHAR(255), " // User's middle name
+				+ "last VARCHAR(255), " // User's last name
+				+ "preffered VARCHAR(255), " // User's preferred name
+				+ "email VARCHAR(255) UNIQUE, " // Unique email address for user
+				+ "otp_expires DATETIME)"; // Expiration date for one-time passwords (OTP)
+		statement.execute(userTable); // Execute the SQL command to create the table
+	}
 
     // Method to insert a new user into the database
     public void insertUser(String invite_code, String role) {
@@ -289,19 +271,6 @@ public class DatabaseHelper {
 		} 
 	}
 	
-	public void closeConnection() {
-		try { 
-			if (statement != null) statement.close(); // Close the statement if it exists
-		} catch (SQLException se2) { 
-			se2.printStackTrace(); // Print stack trace if closing fails
-		} 
-		try { 
-			if (connection != null) connection.close(); // Close the connection if it exists
-		} catch (SQLException se) { 
-			se.printStackTrace(); // Print stack trace if closing fails
-		} 
-	}
-	
 	public void register(String invite_code, String username, String password) throws SQLException {
 		// SQL query to update a user's username and password based on invite code
 		String updateUserQuery = "UPDATE cse360users SET username = ?, password = ? WHERE username = ?";
@@ -336,7 +305,10 @@ public class DatabaseHelper {
 			throw e; // Rethrow the exception if necessary
 		}
 	}
-	
+
+	//Suggestions: don't return the ObservableList because all the changes performed here will be visible in the main method. - Manas
+	//the only parameter is the ObservableList containing Users. We do not need to return the ObservableList, because all the changes performed here
+	//will be reflected in main method or any other function which has a reference to the all_users obseravableList.
 	public ObservableList<User> ListUsers(ObservableList<User> all_Users) throws SQLException {
 		// SQL query to select all users
 		String sql = "SELECT * FROM cse360users"; 
@@ -351,4 +323,4 @@ public class DatabaseHelper {
 	
 		return all_Users; // Return the list of users
 	}
-}	
+}

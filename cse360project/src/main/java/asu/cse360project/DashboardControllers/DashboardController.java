@@ -50,7 +50,7 @@ public class DashboardController implements Initializable {
     @FXML
     void manageArticles(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea("create_edit_article");
+        Utils.setContentArea("group_dashboard");
     }
 
     @FXML

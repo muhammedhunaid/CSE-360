@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 
-import asu.cse360project.App;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import javafx.event.ActionEvent;
@@ -50,7 +49,7 @@ public class LoginController implements Initializable {
         String password = password_textfield.getText().toString();
 
         // Attempt to log in using the provided username and password
-        User curr_user = App.databaseHelper.login(username, password);
+        User curr_user = data.user_db.login(username, password);
 
         // If a valid user is found
         if (curr_user != null) {
@@ -60,7 +59,7 @@ public class LoginController implements Initializable {
             // Check if the user needs to reset their password
             if (curr_user.need_password_reset()) {   
                 // Check if the one-time password (OTP) has expired
-                Boolean otp_expired = App.databaseHelper.isOtpExpired(curr_user.getUsername());
+                Boolean otp_expired = data.user_db.isOtpExpired(curr_user.getUsername());
                 if (otp_expired) {   
                     // Display error message if OTP has expired
                     Utils.setText(login_error, "One time password has expired," + curr_user.getPwReset(), Color.RED);
@@ -107,7 +106,7 @@ public class LoginController implements Initializable {
         String invite_code = invite_code_textfield.getText().toString();
 
         // Check if the invite code is valid
-        User new_User = App.databaseHelper.checkInviteCode(invite_code);
+        User new_User = data.user_db.checkInviteCode(invite_code);
 
         // If a valid invite code is found, navigate to the account creation screen
         if (new_User != null) {

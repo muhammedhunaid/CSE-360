@@ -5,7 +5,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import asu.cse360project.App;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
@@ -87,7 +86,7 @@ public class SetupAccountController implements Initializable {
         if (valid_email && valid_first && valid_middle && valid_last && 
             ((choose_pref_name && valid_pref_name) || !choose_pref_name)) {
             // If valid, finalize account setup in the database
-            App.databaseHelper.finishAccountSetup(current_user.getUsername(), first_name, middle_name, last_name, pref_name, email);
+            app_data.user_db.finishAccountSetup(current_user.getUsername(), first_name, middle_name, last_name, pref_name, email);
             
             // Navigate to role selection or dashboard based on user's roles
             if (current_user.hasMultipleRoles()) {

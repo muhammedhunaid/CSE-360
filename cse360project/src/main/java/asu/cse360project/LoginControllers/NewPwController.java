@@ -5,7 +5,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import asu.cse360project.App;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
@@ -62,7 +61,7 @@ public class NewPwController implements Initializable {
 
         // If the password is valid and both entries match, reset the password in the database
         if (valid_pw && same) {
-            App.databaseHelper.resetPassword(curr_user.getUsername(), pw); // Reset password in the database
+            data.user_db.resetPassword(curr_user.getUsername(), pw); // Reset password in the database
             Utils.setRoot("LoginScenes/login"); // Navigate to the login scene
             data.setAppUser(null); // Clear the current user from the application context
         }

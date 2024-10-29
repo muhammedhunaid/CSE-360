@@ -4,23 +4,18 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import asu.cse360project.App;
+import asu.cse360project.Article;
+import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -32,11 +27,13 @@ import javafx.scene.text.Text;
  */
 public class ManageUsersController implements Initializable {
 
+    Singleton data = Singleton.getInstance();
     // Variables to keep track of user actions and selected user
     boolean adding_user = false;
     private User selectedUser = null;
     Alert alert;
     ObservableList<User> all_Users; // List to hold all users
+    ObservableList<Article> all_articles;
 
     // FXML elements for the UI
     @FXML private RadioButton admin_btn;
@@ -55,6 +52,8 @@ public class ManageUsersController implements Initializable {
     // Initialization method to set up the UI and load user data
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+
+        Singleton data = Singleton.getInstance();
         // Disable role change box and error label initially
         Utils.disableNode(change_role_box);
         Utils.disableNode(error_label);
@@ -72,8 +71,11 @@ public class ManageUsersController implements Initializable {
 
         // Load all users from the database
         all_Users = FXCollections.observableArrayList();
+
+        //Load all the articles from the table articles in the database
+        all_articles = FXCollections.observableArrayList();
         try {
-            all_Users = App.databaseHelper.ListUsers(all_Users);
+            all_Users = data.user_db.ListUsers(all_Users);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -166,9 +168,9 @@ public class ManageUsersController implements Initializable {
         String invite_code = Utils.generateInviteCode(5);
         Utils.setLabel(error_label, "Invite Code: " + invite_code, Color.GREEN);
         adding_user = false; // Reset adding flag
-        App.databaseHelper.insertUser(invite_code, role); // Add user to database
+        data.user_db.insertUser(invite_code, role); // Add user to database
         try {
-            all_Users.add(App.databaseHelper.getUser(invite_code)); // Add user to list and refresh
+            all_Users.add(data.user_db.getUser(invite_code)); // Add user to list and refresh
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -178,7 +180,7 @@ public class ManageUsersController implements Initializable {
     {
         if (selectedUser != null) {
             try {
-                App.databaseHelper.changeRole(selectedUser.getUsername(), role); // Update user role in database
+                data.user_db.changeRole(selectedUser.getUsername(), role); // Update user role in database
                 int user_index = all_Users.indexOf(selectedUser);
                 all_Users.get(user_index).setRole(role); // Update role in the list
                 table.refresh(); // Refresh table to show changes
@@ -198,7 +200,7 @@ public class ManageUsersController implements Initializable {
                 if (response == ButtonType.OK) {
                     // Remove user from list and database
                     all_Users.remove(all_Users.indexOf(selectedUser));
-                    App.databaseHelper.deleteUser(selectedUser.getUsername());
+                    data.user_db.deleteUser(selectedUser.getUsername());
                     Utils.setLabel(error_label, "User Removed", Color.BLACK); // Show success message
                 } else {
                     Utils.setLabel(error_label, "User not Removed", Color.BLACK); // Show message if no deletion is made
@@ -220,7 +222,7 @@ public class ManageUsersController implements Initializable {
                     String one_time_pw = Utils.generateInviteCode(10); // Generate a one-time password
                     Utils.setLabel(error_label, "One time Password: " + one_time_pw, Color.GREEN); // Display OTP
                     try {
-                        App.databaseHelper.resetOTPPassword(selectedUser.getUsername(), one_time_pw); // Reset password in the database
+                        data.user_db.resetOTPPassword(selectedUser.getUsername(), one_time_pw); // Reset password in the database
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
