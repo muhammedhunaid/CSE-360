@@ -1,8 +1,9 @@
 package asu.cse360project;
 
 import java.util.ArrayList; 
+import java.io.Serializable;
 
-public class Article {
+public class Article implements Serializable{
     private String title;
     private String authors;
     private String abstractText;
@@ -13,10 +14,11 @@ public class Article {
     private String permissions;
     private ArrayList<Integer> groups;
     private ArrayList<Long> references;
+    private ArrayList<String> group_names;
 
 
     // Constructor to initialize the Article object
-    public Article(String title, String authors, String abstractText, String keywords, String body, long id, String level, ArrayList<Integer> groups, ArrayList<Long> references, String permissions) {
+    public Article(String title, String authors, String abstractText, String keywords, String body, long id, String level, ArrayList<Integer> groups, ArrayList<Long> references, String permissions, ArrayList<String> group_names) {
         this.title = title;
         this.authors = authors;
         this.abstractText = abstractText;
@@ -24,6 +26,7 @@ public class Article {
         this.body = body;
         this.references = references;
         this.groups = groups;
+        this.group_names = group_names;
         this.id = id;
         this.level = level;
         this.permissions = permissions;
@@ -34,6 +37,10 @@ public class Article {
         this.title = title;
         this.authors = authors;
         this.id = id;
+    }
+
+    public ArrayList<String> getGroup_names() {
+        return group_names;
     }
 
     public String getLevel() {
@@ -96,6 +103,10 @@ public class Article {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setGroup_names(ArrayList<String> group_names) {
+        this.group_names = group_names;
     }
 
     public void setPermissions(String permissions) {

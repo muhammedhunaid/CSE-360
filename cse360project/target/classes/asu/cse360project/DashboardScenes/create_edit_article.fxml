@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox alignment="CENTER" prefHeight="854.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.CEArticleController">
+<HBox alignment="CENTER" prefHeight="854.0" prefWidth="843.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.CEArticleController">
    <children>
       <ScrollPane>
          <content>

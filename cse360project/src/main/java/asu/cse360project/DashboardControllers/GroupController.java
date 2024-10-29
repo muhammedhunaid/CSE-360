@@ -38,6 +38,8 @@ public class GroupController implements Initializable {
     Alert alert;
     ObservableList<Group> all_Groups; // List to hold all group names
     ArrayList<Integer> selected_groups = new ArrayList<>();
+
+    ArrayList<Group> a = new ArrayList<>();
     
     private Group selectedGroup = null;
 	
@@ -67,14 +69,7 @@ public class GroupController implements Initializable {
         article_ids_col.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         // Load all users from the database
-        try {
-        	all_Groups = data.group_articles_db.getAllGroups();
-            all_Groups.add(0, new Group("All Articles", -1));
-            all_Groups.add(1, new Group("Ungrouped Articles", 0));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        table.setItems(all_Groups);
+       setTable();
 
         table.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
@@ -98,6 +93,18 @@ public class GroupController implements Initializable {
             }
         });
     }
+
+    private void setTable()
+    {
+        try {
+        	all_Groups = data.group_articles_db.getAllGroups();
+            all_Groups.add(0, new Group("All Articles", -1));
+            all_Groups.add(1, new Group("Ungrouped Articles", 0));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        table.setItems(all_Groups);
+    }
     
     // Method to search for a user in the table by username
     @FXML
@@ -117,16 +124,23 @@ public class GroupController implements Initializable {
     
     @FXML
     void delete(ActionEvent event) throws SQLException {
-    	if(selectedGroup != null)
+    	if(selectedGroup != null && selectedGroup.getId() > 0)
         {
-            all_Groups.remove(all_Groups.indexOf(selectedGroup));
             data.group_articles_db.deleteGroup(selectedGroup.getId());
+            all_Groups.remove(all_Groups.indexOf(selectedGroup));
         }
     }
 
     @FXML
-    void hi(ActionEvent event) {
+    void backup(ActionEvent event) throws SQLException {
+        data.group_articles_db.backup(selected_groups, "a");
+    }
 
+    @FXML
+    void restore(ActionEvent event) throws SQLException {
+        //data.group_articles_db.restoreAll("backup");
+        data.group_articles_db.restoreMerge("Backups/Groups/a");
+        setTable();
     }
 
     @FXML
@@ -168,11 +182,6 @@ public class GroupController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-    
-    @FXML
-    void goBackDashboard(ActionEvent event) throws IOException {
-    	//Utils.setRoot("dashboard");
     }
 
     @FXML

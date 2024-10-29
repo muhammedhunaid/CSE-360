@@ -6,9 +6,17 @@ import asu.cse360project.Article;
 import asu.cse360project.Group;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+
+import java.util.List;
 import java.util.ArrayList; 
 
-public class GroupArticlesHelper {	
+public class GroupArticlesHelper extends DatabaseHelper{	
 
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
@@ -88,6 +96,17 @@ public class GroupArticlesHelper {
         return getGroup(groupName);
     }
 
+    public Group addGroup(String groupName, int group_id) throws SQLException {
+        String insertGroupSQL = "INSERT INTO Groups (group_id, group_name) VALUES (?, ?);";
+        PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL);
+        pstmt.setInt(1, group_id);
+        pstmt.setString(2, groupName);
+        pstmt.executeUpdate();
+
+        return getGroup(groupName);
+    }
+
+
      private Group getGroup(String groupName) throws SQLException {
         String query = "SELECT group_id, group_name FROM Groups WHERE group_name = ?;";
         Group group = null;
@@ -123,20 +142,13 @@ public class GroupArticlesHelper {
     }
 
     public void deleteGroup(int groupId) throws SQLException {
-        String deleteArticleGroupSQL = "DELETE FROM Article_Groups WHERE group_id = ?;";
         String deleteGroupSQL = "DELETE FROM Groups WHERE group_id = ?;";
 
         // Delete from the group article association table
-        try (PreparedStatement pstmtDeleteAssociations = connection.prepareStatement(deleteArticleGroupSQL)) {
-            pstmtDeleteAssociations.setLong(1, groupId);
-            pstmtDeleteAssociations.executeUpdate();
+        try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
+            pstmt.setInt(1, groupId);
+            pstmt.executeUpdate();
             System.out.println("Group removed");
-        }
-
-        // Delete the group from the Groups table
-        try (PreparedStatement pstmtDeleteGroup = connection.prepareStatement(deleteGroupSQL)) {
-            pstmtDeleteGroup.setInt(1, groupId);
-            pstmtDeleteGroup.executeUpdate();
         }
     }
 
@@ -205,8 +217,9 @@ public void createArticle(Article newArticle) throws Exception {
                     String permissions = rs.getString("permissions");
                     ArrayList<Integer> groups = getArticleGroups(id);
                     ArrayList<Long> refrences = getArticleRefs(id);
+                    ArrayList<String> groups_names = getArticleGroupNames(id);
 
-                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
+                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
                     articles.add(article);
                 }
             }
@@ -214,22 +227,31 @@ public void createArticle(Article newArticle) throws Exception {
         return articles;
     }
     
-    public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> group_id) throws SQLException {
+    public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
 
-        if(group_id.contains(-1))
+        if(groups.contains(-1))
         {
             return AddAllArticles();
         }
 
-        if(group_id.contains(0))
+        if(groups.contains(0))
         {
-            return ListAllUnGroupedArticles();
+            articles.addAll(ListAllUnGroupedArticles());
         }
 
-        for(Integer grp_id: group_id)
+        for(Integer grp_id: groups)
         {
-            articles.addAll(ListArticles(grp_id));
+            articles = addUnique(articles, ListArticles(grp_id));
+        }
+        return articles;
+    }
+
+    private ObservableList<Article> addUnique(ObservableList<Article> articles, ObservableList<Article> new_articles) {
+        for(Article a: new_articles) {
+            if (!articles.contains(a)) {
+                articles.add(a);
+            }
         }
         return articles;
     }
@@ -257,17 +279,14 @@ public void createArticle(Article newArticle) throws Exception {
                     String permissions = rs.getString("permissions");
                     ArrayList<Integer> groups = getArticleGroups(id);
                     ArrayList<Long> refrences = getArticleRefs(id);
+                    ArrayList<String> groups_names = getArticleGroupNames(id);
 
-                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
+                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
                     articles.add(article);
                 }
             }
 
         return articles;
-    }
-
-    public void BackupAll() {
-        //SCRIPT TO 'backup.zip';
     }
 
     private ObservableList<Article> AddAllArticles() throws SQLException {
@@ -289,8 +308,9 @@ public void createArticle(Article newArticle) throws Exception {
                 String permissions = rs.getString("permissions");
                 ArrayList<Integer> groups = getArticleGroups(id);
                 ArrayList<Long> refrences = getArticleRefs(id);
+                ArrayList<String> groups_names = getArticleGroupNames(id);
 
-                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
+                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
                 articles.add(article);
             }
         }
@@ -315,6 +335,28 @@ public void createArticle(Article newArticle) throws Exception {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
                 groups.add(rs.getInt("group_id"));
+            }
+        }
+        return groups;
+    }
+
+    private ArrayList<String> getArticleGroupNames(Long id) throws SQLException {
+        ArrayList<String> groups = new ArrayList<>();
+        String query = 
+            "SELECT g.group_name " + 
+            "FROM Groups g " + 
+            "JOIN Article_Groups ag ON g.group_id = ag.group_id " +
+            "JOIN articles a ON ag.article_id = a.article_id " +
+            "WHERE a.article_id = ?;";
+        
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set the group name parameter
+        stmt.setLong(1, id);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Article objects
+            while (rs.next()) {
+                groups.add(rs.getString("group_name"));
             }
         }
         return groups;
@@ -438,5 +480,142 @@ public void createArticle(Article newArticle) throws Exception {
         PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
         pstmtLinks.setLong(1, id);  // Set the article ID
         pstmtLinks.executeUpdate();
+    }
+
+    public void backup(ArrayList<Integer> groups, String file_name) throws SQLException {
+        if (groups.contains(-1))
+        {
+            backUpAll(file_name);
+            return;
+        }
+
+        ObservableList<Article> observale_articles_list = ListMultipleGroupsArticles(groups);
+        ArrayList<Article> article_list = new ArrayList<>(observale_articles_list);
+        writeArticlesToFile(article_list, file_name);
+    }
+
+    public void restoreMerge(String file_name) throws SQLException {
+        ArrayList<Article> articles = readArticlesFromFile(file_name);
+
+        for(Article a: articles) {
+
+            if(!articleExists(a.getId()))
+            {
+                checkGroups(a);
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+            }
+        }
+    }
+    
+    private void restoreByGroup(String file_name) throws SQLException {
+        ArrayList<Article> articles = readArticlesFromFile(file_name);
+
+        for(Article a: articles) {
+            checkGroups(a);
+            if(articleExists(a.getId()))
+            {
+                updateArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+            }else{
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+            }
+        }  
+    }
+
+    private void checkGroups(Article a) throws SQLException {
+        for(int i = 0; i < a.getGroups().size(); i++) {
+            if(!groupExists(a.getGroups().get(i))) {
+                addGroup(a.getGroup_names().get(i), a.getGroups().get(i));
+            }
+        }
+    }
+
+    public void backUpAll(String file_name) throws SQLException {
+        String query =  "SCRIPT TO 'Backups/All/" + file_name + ".zip'";
+        PreparedStatement stmt = connection.prepareStatement(query);        
+        stmt.executeQuery();
+    }
+
+    public void restoreAll(String file_name) throws SQLException {
+        String dropTables =  "DROP ALL OBJECTS;";
+        PreparedStatement stmt = connection.prepareStatement(dropTables);   
+        stmt.executeUpdate();   
+
+        String query =  "RUNSCRIPT FROM '" + file_name + ".zip'";
+        stmt = connection.prepareStatement(query);
+        stmt.executeUpdate();
+    }
+
+    public void writeArticlesToFile(ArrayList<Article> articles, String fileName) {
+        try (FileOutputStream fos = new FileOutputStream("Backups/Groups/" + fileName);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            
+            oos.writeObject(articles);
+            System.out.println("Articles have been written to " + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<Article> readArticlesFromFile(String fileName) {
+        ArrayList<Article> articles = null;
+        try (FileInputStream fis = new FileInputStream(fileName);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            
+            articles = (ArrayList<Article>) ois.readObject();
+            System.out.println("Articles have been read from " + fileName);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return articles;
+    }
+
+    public boolean articleExists(Long articleId) {
+        String query = "SELECT EXISTS (SELECT 1 FROM Articles WHERE article_id = ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setLong(1, articleId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBoolean(1); // Returns true if exists, false otherwise
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Default return value if there was an exception
+    }
+
+    public boolean groupExists(int group_id) {
+        String query = "SELECT EXISTS (SELECT 1 FROM Groups WHERE group_id = ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, group_id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBoolean(1); // Returns true if exists, false otherwise
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Default return value if there was an exception
+    }
+
+    public void addArticle(Long articleId, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
+    
+        String insertArticleQuery = "INSERT INTO Articles (article_id, title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+        try (PreparedStatement articleStmt = connection.prepareStatement(insertArticleQuery, Statement.RETURN_GENERATED_KEYS)) {
+
+            // Insert the article
+            articleStmt.setLong(1, articleId);
+            articleStmt.setString(2, title);
+            articleStmt.setString(3, abstractTxt);
+            articleStmt.setString(4, keywords);
+            articleStmt.setString(5, body);
+            articleStmt.setString(6, level);
+            articleStmt.setString(7, authors);
+            articleStmt.setString(8, permissions);
+            articleStmt.executeUpdate();
+           linkGroups(articleId, groups);
+           linkArticles(articleId, links);
+        }
     }
 }

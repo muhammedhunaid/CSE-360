@@ -19,14 +19,10 @@
             <VBox fx:id="admin_controlls">
                <children>
                   <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="41.0" prefWidth="200.0" text="Add Group" />
-                  <Button mnemonicParsing="false" onAction="#hi" prefHeight="41.0" prefWidth="200.0" text="Publish Work" />
-                  <Button mnemonicParsing="false" onAction="#hi" prefHeight="41.0" prefWidth="200.0" text="Save Work" />
-                  <Button mnemonicParsing="false" onAction="#hi" prefHeight="41.0" prefWidth="200.0" text="Restore Work" />
+                  <Button mnemonicParsing="false" onAction="#backup" prefHeight="41.0" prefWidth="200.0" text="Backup" />
+                  <Button mnemonicParsing="false" onAction="#restore" prefHeight="41.0" prefWidth="200.0" text="Restore" />
                   <Button mnemonicParsing="false" onAction="#delete" prefHeight="41.0" prefWidth="200.0" text="Delete" />
                   <Button mnemonicParsing="false" onAction="#view" prefHeight="41.0" prefWidth="200.0" text="View" />
-                  
-                  
-                  <Button mnemonicParsing="false" onAction="#goBackDashboard" prefHeight="41.0" prefWidth="200.0" text="Back to Dashboard" />
                   
                </children>
             </VBox>
@@ -55,7 +51,6 @@
                      <children>
                         <Button mnemonicParsing="false" onAction="#selectGroup" prefHeight="25.0" prefWidth="90.0" text="Select Group" />
                         <Button mnemonicParsing="false" onAction="#removeGroup" text="Remove Group" />
-                        <Button layoutX="239.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeGroup" text="Remove Group" />
                      </children>
                   </HBox>
                   <HBox>

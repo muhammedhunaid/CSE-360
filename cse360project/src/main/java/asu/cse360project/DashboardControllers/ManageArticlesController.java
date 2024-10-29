@@ -97,7 +97,7 @@ public class ManageArticlesController implements Initializable {
     }
 
     void viewArticle() {
-        //article_id.setText(String.valueOf(selectedArticle.getId()));
+        article_id.setText(String.valueOf(selectedArticle.getId()));
         title.setText(selectedArticle.getTitle());
         authors.setText(selectedArticle.getAuthors());
         abstractText.setText(selectedArticle.getAbstractText());
