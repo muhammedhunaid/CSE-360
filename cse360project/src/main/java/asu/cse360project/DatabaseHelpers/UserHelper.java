@@ -3,11 +3,6 @@ package asu.cse360project.DatabaseHelpers;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
 
 import asu.cse360project.User;
 import javafx.collections.ObservableList;
@@ -37,7 +32,8 @@ public class UserHelper{
 				+ "last VARCHAR(255), " // User's last name
 				+ "preffered VARCHAR(255), " // User's preferred name
 				+ "email VARCHAR(255) UNIQUE, " // Unique email address for user
-				+ "otp_expires DATETIME)"; // Expiration date for one-time passwords (OTP)
+				+ "otp_expires DATETIME," // Expiration date for one-time passwords (OTP)
+				+ "backup_files TEXT DEFAULT '')"; // backup files for account
 		statement.execute(userTable); // Execute the SQL command to create the table
 	}
 
@@ -291,6 +287,22 @@ public class UserHelper{
 			throw e; // Rethrow the exception if necessary
 		}
 	}
+
+	public void updateBackupFiles(String username, String file_name) throws SQLException {
+		// SQL query to update a user's username and password based on invite code
+		String updateBackupQuery = 
+						"UPDATE cse360users " + 
+						"SET backup_files = CONCAT(backup_files, ?, ',') " +
+						"WHERE username = ?;";
+		try (PreparedStatement pstmt = connection.prepareStatement(updateBackupQuery)) {
+			pstmt.setString(1, file_name); // Set new username
+			pstmt.setString(2, username); // Set new password
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("SQL error: " + e.getMessage()); // Log SQL error
+			throw e; // Rethrow the exception if necessary
+		}
+	}
 	
 	public void resetPassword(String username, String password) throws SQLException {
 		// SQL query to update a user's password
@@ -322,5 +334,37 @@ public class UserHelper{
 		} 
 	
 		return all_Users; // Return the list of users
+	}
+
+	public String getUserBackups(String username) {
+        String query = "SELECT backup_files FROM cse360users WHERE username = ?";
+        String backupFiles = null;
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            
+            if (resultSet.next()) {
+                backupFiles = resultSet.getString("backup_files");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return backupFiles;
+    }
+
+	public void deleteBackupFile(String username, String file) {
+		String query = "UPDATE cse360users SET backup_files = REPLACE(backup_files, ?, '') WHERE backup_files LIKE ? AND username = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, file);
+			statement.setString(2, "%" + file + "%");
+			statement.setString(3, username);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
 	}
 }

@@ -483,12 +483,6 @@ public void createArticle(Article newArticle) throws Exception {
     }
 
     public void backup(ArrayList<Integer> groups, String file_name) throws SQLException {
-        if (groups.contains(-1))
-        {
-            backUpAll(file_name);
-            return;
-        }
-
         ObservableList<Article> observale_articles_list = ListMultipleGroupsArticles(groups);
         ArrayList<Article> article_list = new ArrayList<>(observale_articles_list);
         writeArticlesToFile(article_list, file_name);
@@ -507,7 +501,7 @@ public void createArticle(Article newArticle) throws Exception {
         }
     }
     
-    private void restoreByGroup(String file_name) throws SQLException {
+    public void restore(String file_name) throws SQLException {
         ArrayList<Article> articles = readArticlesFromFile(file_name);
 
         for(Article a: articles) {
@@ -529,24 +523,8 @@ public void createArticle(Article newArticle) throws Exception {
         }
     }
 
-    public void backUpAll(String file_name) throws SQLException {
-        String query =  "SCRIPT TO 'Backups/All/" + file_name + ".zip'";
-        PreparedStatement stmt = connection.prepareStatement(query);        
-        stmt.executeQuery();
-    }
-
-    public void restoreAll(String file_name) throws SQLException {
-        String dropTables =  "DROP ALL OBJECTS;";
-        PreparedStatement stmt = connection.prepareStatement(dropTables);   
-        stmt.executeUpdate();   
-
-        String query =  "RUNSCRIPT FROM '" + file_name + ".zip'";
-        stmt = connection.prepareStatement(query);
-        stmt.executeUpdate();
-    }
-
     public void writeArticlesToFile(ArrayList<Article> articles, String fileName) {
-        try (FileOutputStream fos = new FileOutputStream("Backups/Groups/" + fileName);
+        try (FileOutputStream fos = new FileOutputStream("Backups/" + fileName);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             
             oos.writeObject(articles);
@@ -559,7 +537,7 @@ public void createArticle(Article newArticle) throws Exception {
     @SuppressWarnings("unchecked")
     public ArrayList<Article> readArticlesFromFile(String fileName) {
         ArrayList<Article> articles = null;
-        try (FileInputStream fis = new FileInputStream(fileName);
+        try (FileInputStream fis = new FileInputStream("Backups/" + fileName);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             
             articles = (ArrayList<Article>) ois.readObject();

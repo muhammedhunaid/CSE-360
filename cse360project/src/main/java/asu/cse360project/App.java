@@ -48,12 +48,6 @@ public class App extends Application {
             Utils.setRoot("LoginScenes/create_account"); // Load the account creation screen for the first admin
         }
 
-        
-        User a = new User();
-        a.setLoginRole("admin");
-        data.setAppUser(a);
-        Utils.setRoot("DashboardScenes/dashboard");
-
         // Display all in db for debugging purposes
         databaseHelper.getUser_helper().displayUsersByAdmin();
 
