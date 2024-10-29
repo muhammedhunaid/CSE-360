@@ -30,7 +30,7 @@ public class App extends Application {
 
         // Load the login screen from the FXML file and set the scene
         Parent root = FXMLLoader.load(App.class.getResource("LoginScenes/login.fxml"));
-        scene = new Scene(root, 700, 700);
+        scene = new Scene(root, 1000, 1000);
         stage.setScene(scene);
         stage.show();
 

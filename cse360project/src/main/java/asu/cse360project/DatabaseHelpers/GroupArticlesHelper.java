@@ -222,6 +222,11 @@ public void createArticle(Article newArticle) throws Exception {
             return AddAllArticles();
         }
 
+        if(group_id.contains(0))
+        {
+            return ListAllUnGroupedArticles();
+        }
+
         for(Integer grp_id: group_id)
         {
             articles.addAll(ListArticles(grp_id));
@@ -229,6 +234,42 @@ public void createArticle(Article newArticle) throws Exception {
         return articles;
     }
     
+    private ObservableList<Article> ListAllUnGroupedArticles() throws SQLException {
+        ObservableList<Article> articles =  FXCollections.observableArrayList();
+
+        String query = 
+            "SELECT a.* " + 
+            "FROM Articles a " + 
+            "LEFT JOIN Article_Groups ag ON a.article_id = ag.article_id " +
+            "WHERE ag.article_id IS NULL;";
+
+            PreparedStatement stmt = connection.prepareStatement(query);            
+            try (ResultSet rs = stmt.executeQuery()) {
+                // Iterate through the result set and create Article objects
+                while (rs.next()) {
+                    Long id = rs.getLong("article_id");
+                    String title = rs.getString("title");
+                    String authors = rs.getString("authors");
+                    String abstractTxt = rs.getString("abstract");
+                    String body = rs.getString("body");
+                    String keywords = rs.getString("keywords");
+                    String level = rs.getString("level");
+                    String permissions = rs.getString("permissions");
+                    ArrayList<Integer> groups = getArticleGroups(id);
+                    ArrayList<Long> refrences = getArticleRefs(id);
+
+                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions);
+                    articles.add(article);
+                }
+            }
+
+        return articles;
+    }
+
+    public void BackupAll() {
+        //SCRIPT TO 'backup.zip';
+    }
+
     private ObservableList<Article> AddAllArticles() throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
 
