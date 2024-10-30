@@ -36,12 +36,11 @@ public class ManageArticlesController implements Initializable {
 
     @FXML private Text title;
     @FXML private Text authors;
-    @FXML private Text abstractText;
+    @FXML private Text description;
     @FXML private Text keywords;
     @FXML private Text body;
-    @FXML private Text groups;
     @FXML private Text references;
-    @FXML private Label article_id;
+    @FXML private Text header;
 
     @FXML private Button delete;
     @FXML private Button add;
@@ -97,14 +96,17 @@ public class ManageArticlesController implements Initializable {
     }
 
     void viewArticle() {
-        article_id.setText(String.valueOf(selectedArticle.getId()));
+        String headTxt = "id: " + String.valueOf(selectedArticle.getId());
+        headTxt += "    Groups: " + selectedArticle.getGroup_names().toString();
+        headTxt += "    Level: " + selectedArticle.getLevel(); 
+        headTxt += "    Permissions: " + selectedArticle.getPermissions();   
+        header.setText(headTxt); 
         title.setText(selectedArticle.getTitle());
-        authors.setText(selectedArticle.getAuthors());
-        abstractText.setText(selectedArticle.getAbstractText());
-        body.setText(selectedArticle.getBody());
-        keywords.setText(selectedArticle.getKeywords());  
-        references.setText(selectedArticle.getReferences().toString());      
-        groups.setText(selectedArticle.getGroups().toString());    
+        authors.setText("Authors: " + selectedArticle.getAuthors());
+        description.setText("Desciption: " + selectedArticle.getAbstractText());
+        body.setText("Body: " + selectedArticle.getBody());
+        keywords.setText("Keywords: " + selectedArticle.getKeywords());  
+        references.setText("Refrences: " + selectedArticle.getReferences().toString());        
     }
 
     @FXML

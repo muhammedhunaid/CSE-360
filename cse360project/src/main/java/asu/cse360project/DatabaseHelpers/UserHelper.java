@@ -359,7 +359,7 @@ public class UserHelper{
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, file);
-			statement.setString(2, "%" + file + "%");
+			statement.setString(2, "%" + file + ",%");
 			statement.setString(3, username);
             statement.executeUpdate();
         } catch (SQLException e) {

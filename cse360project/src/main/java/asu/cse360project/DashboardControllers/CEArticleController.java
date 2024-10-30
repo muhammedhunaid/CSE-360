@@ -79,6 +79,8 @@ public class CEArticleController implements Initializable {
         
         try {
             groups_list = data.group_articles_db.getAllGroups();
+            groups_list.add(0, new Group("All Articles", -1));
+            groups_list.add(1, new Group("Ungrouped Articles", 0));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -88,9 +90,10 @@ public class CEArticleController implements Initializable {
         group_table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedGroup = newSelection;
-
+                ArrayList<Integer> g = new ArrayList<>();
+                g.add(selectedGroup.getId());
                 try {
-                    articles_list = data.group_articles_db.ListArticles(selectedGroup.getId());
+                    articles_list = data.group_articles_db.ListMultipleGroupsArticles(g);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

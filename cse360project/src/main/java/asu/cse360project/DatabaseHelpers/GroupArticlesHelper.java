@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
-import java.util.List;
 import java.util.ArrayList; 
 
 public class GroupArticlesHelper extends DatabaseHelper{	
@@ -60,7 +59,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
     public void createArticleGroupsTable() throws SQLException {
         String createArticleGroupsTableSQL =
             "CREATE TABLE IF NOT EXISTS Article_Groups (" +
-                "article_id INT," +
+                "article_id BIGINT," +
                 "group_id INT," +
                 "PRIMARY KEY (article_id, group_id)," +
                 "FOREIGN KEY (article_id) REFERENCES Articles(article_id) ON DELETE CASCADE," +
@@ -71,8 +70,8 @@ public class GroupArticlesHelper extends DatabaseHelper{
     public void createArticleLinksTable() throws SQLException {
         String createArticleLinksTableSQL = 
             "CREATE TABLE IF NOT EXISTS Article_Links (" +
-                "article_id INT," +
-                "linked_article_id INT," +
+                "article_id BIGINT," +
+                "linked_article_id BIGINT," +
                 "PRIMARY KEY (article_id, linked_article_id)," +
                 "FOREIGN KEY (article_id) REFERENCES Articles(article_id) ON DELETE CASCADE," +
                 "FOREIGN KEY (linked_article_id) REFERENCES Articles(article_id) ON DELETE CASCADE)";
@@ -89,20 +88,20 @@ public class GroupArticlesHelper extends DatabaseHelper{
     //add group to groups table
     public Group addGroup(String groupName) throws SQLException {
         String insertGroupSQL = "INSERT INTO Groups (group_name) VALUES (?);";
-        PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL);
-        pstmt.setString(1, groupName);
-        pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
+            pstmt.setString(1, groupName);
+            pstmt.executeUpdate();
+        }
         return getGroup(groupName);
     }
 
     public Group addGroup(String groupName, int group_id) throws SQLException {
         String insertGroupSQL = "INSERT INTO Groups (group_id, group_name) VALUES (?, ?);";
-        PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL);
-        pstmt.setInt(1, group_id);
-        pstmt.setString(2, groupName);
-        pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
+            pstmt.setInt(1, group_id);
+            pstmt.setString(2, groupName);
+            pstmt.executeUpdate();
+        }
         return getGroup(groupName);
     }
 
@@ -130,13 +129,14 @@ public class GroupArticlesHelper extends DatabaseHelper{
     public ObservableList<Group> getAllGroups() throws SQLException {
         ObservableList<Group> groups = FXCollections.observableArrayList();
         String query = "SELECT * FROM Groups;";
-        PreparedStatement pstmt = connection.prepareStatement(query);
-        ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
 
-        while (rs.next()) {
-            String groupName = rs.getString("group_name");
-            Integer groupID = rs.getInt("group_id");
-            groups.add(new Group(groupName, groupID));
+            while (rs.next()) {
+                String groupName = rs.getString("group_name");
+                Integer groupID = rs.getInt("group_id");
+                groups.add(new Group(groupName, groupID));
+            }
         }
         return groups;
     }
@@ -151,44 +151,6 @@ public class GroupArticlesHelper extends DatabaseHelper{
             System.out.println("Group removed");
         }
     }
-
-    //Method to insert a new article into the database with encrypted fields for title, authors, abstract, keywords, body, and references
-public void createArticle(Article newArticle) throws Exception {
-
-		String title = newArticle.getTitle();
-		String authors = newArticle.getAuthors();
-		String abstractInfo = newArticle.getAbstractText();
-		String keywords = newArticle.getKeywords();
-		String body = newArticle.getBody();
-
-		//sql command for inserting the article into the table
-		String insertArticle = "INSERT INTO articles (title, authors, abstract, keywords, body) VALUES (?, ?, ?, ?, ?, ?)";
-
-		//defining the Initialization Vector for the encryptions
-
-	    //byte[] IV = EncryptionUtils.getInitializationVector("team35".toCharArray());
-
-		//adding the sql insert statements
-		try (PreparedStatement pstmt = connection.prepareStatement(insertArticle)) {
-
-			//encrypt the title, authors, abstract, body, referenes and then push them into the table
-			pstmt.setString(1, title);
-			pstmt.setString(2, authors);
-			pstmt.setString(3, abstractInfo);
-			pstmt.setString(4, keywords);
-			pstmt.setString(5, body);
-
-			//executing sql statement for insertion of the article
-			pstmt.executeUpdate();
-
-			//clear the article from the system memory after storing the information in DB
-			newArticle.clearArticle();
-
-		} catch (Error e) {
-			System.out.println("error: " + e.getMessage()); // Log SQL error
-			throw e; // Rethrow the exception if necessary
-		}
-	}
 
     public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
@@ -415,12 +377,26 @@ public void createArticle(Article newArticle) throws Exception {
         }
     }
 
+    private void addDummyArticle(Long article_id) throws SQLException
+    {
+        String insertArticleQuery = "INSERT INTO articles (article_id) VALUES (?)";
+
+        try (PreparedStatement articleStmt = connection.prepareStatement(insertArticleQuery)) {
+            articleStmt.setLong(1, article_id);
+            articleStmt.executeUpdate();
+        }
+    }
+
     private void linkArticles(long articleId, ArrayList<Long> links) throws SQLException {
         String linkArticlesQuery = "INSERT INTO Article_Links (article_id, linked_article_id) VALUES (?, ?)";
         
 
         for(long link: links)
         {
+            if(!articleExists(link))
+            {
+                addDummyArticle(link);
+            }
             PreparedStatement linkStmt = connection.prepareStatement(linkArticlesQuery);
             linkStmt.setLong(1, articleId);
             linkStmt.setLong(2, link);
@@ -442,7 +418,7 @@ public void createArticle(Article newArticle) throws Exception {
 
     public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
         String sql = "UPDATE articles SET title = ?, abstract = ?, keywords = ?, body = ?, level = ?, authors = ?, permissions = ? WHERE article_id = ?";
-        PreparedStatement pstmt = connection.prepareStatement(sql);
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
             pstmt.setString(1, title);
             pstmt.setString(2, abstractTxt);
@@ -458,28 +434,32 @@ public void createArticle(Article newArticle) throws Exception {
             removeGroupLinks(id);
 
             linkGroups(id, groups);
-            linkArticles(id, links);    
+            linkArticles(id, links); 
+        }  
     }
 
     private void removeGroupLinks(Long id) throws SQLException {
         String deleteLinksSQL = "DELETE FROM Article_Groups WHERE article_id = ?";
-        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
-        pstmtLinks.setLong(1, id);  // Set the article ID
-        pstmtLinks.executeUpdate();
+        try (PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL)) {
+            pstmtLinks.setLong(1, id);  // Set the article ID
+            pstmtLinks.executeUpdate();
+        }
     }
 
     private void removeArticleLinks(Long id) throws SQLException {
         String deleteLinksSQL = "DELETE FROM Article_Links WHERE article_id = ?";
-        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
-        pstmtLinks.setLong(1, id);  // Set the article ID
-        pstmtLinks.executeUpdate();
+        try (PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL)) {
+            pstmtLinks.setLong(1, id);  // Set the article ID
+            pstmtLinks.executeUpdate();
+        }
     }
 
     public void deleteArticle(Long id) throws SQLException {
         String deleteLinksSQL = "DELETE FROM Articles WHERE article_id = ?";
-        PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL);
-        pstmtLinks.setLong(1, id);  // Set the article ID
-        pstmtLinks.executeUpdate();
+        try (PreparedStatement pstmtLinks = connection.prepareStatement(deleteLinksSQL)) {
+            pstmtLinks.setLong(1, id);  // Set the article ID
+            pstmtLinks.executeUpdate();
+        }
     }
 
     public void backup(ArrayList<Integer> groups, String file_name) throws SQLException {
@@ -582,6 +562,10 @@ public void createArticle(Article newArticle) throws Exception {
     
         try (PreparedStatement articleStmt = connection.prepareStatement(insertArticleQuery, Statement.RETURN_GENERATED_KEYS)) {
 
+            if(articleExists(articleId))
+            {
+                updateArticle(articleId, title, abstractTxt, keywords, body, level, authors, permissions, groups, links);
+            }
             // Insert the article
             articleStmt.setLong(1, articleId);
             articleStmt.setString(2, title);
