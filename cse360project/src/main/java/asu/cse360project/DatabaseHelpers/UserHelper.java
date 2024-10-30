@@ -70,7 +70,7 @@ public class UserHelper{
             // Execute the delete and get the number of rows affected
             int rowsDeleted = deleteStmt.executeUpdate(); 
             if (rowsDeleted > 0) {
-                System.out.println("User deleted successfully."); // Print success message
+                System.out.println(username + " User deleted successfully."); // Print success message
             } else {
                 System.out.println("No user found with the given username."); // Print message if user not found
             }
@@ -93,7 +93,7 @@ public class UserHelper{
             // Execute the insert and get the number of rows affected
             int rowsInserted = insertStmt.executeUpdate(); 
             if (rowsInserted > 0) {
-                System.out.println("User inserted successfully."); // Print success message
+                System.out.println(username + "User inserted successfully."); // Print success message
             } else {
                 System.out.println("Failed to insert user."); // Print failure message
             }
@@ -130,17 +130,26 @@ public class UserHelper{
         }
     }
 
-    // Method to change the role of a user
-    public void changeRole(String username, String role) throws SQLException {
-        String updateUserQuery = "UPDATE cse360users SET role = ? WHERE username = ?"; // SQL update query
-        try (PreparedStatement pstmt = connection.prepareStatement(updateUserQuery)) { // Create prepared statement
-            pstmt.setString(1, role); // Set new role
-            pstmt.setString(2, username); // Set username for the WHERE clause
-            pstmt.executeUpdate(); // Execute the update
-        }
-    }
+	// Method to change the role of a user
+	public boolean changeRole(String username, String role) throws SQLException {
+		String updateUserQuery = "UPDATE cse360users SET role = ? WHERE username = ?"; // SQL update query
+		try (PreparedStatement pstmt = connection.prepareStatement(updateUserQuery)) { // Create prepared statement
+			pstmt.setString(1, role); // Set new role
+			pstmt.setString(2, username); // Set username for the WHERE clause
 
-    // Method for user login validation
+			int rowsAffected = pstmt.executeUpdate(); // Execute the update and get affected rows
+			if (rowsAffected > 0) {
+				System.out.println("Role of user " + username + " changed successfully.");
+				return true;
+			} else {
+				System.out.println("Username " + username + " not found. No role change applied.");
+				return false;
+			}
+		}
+	}
+
+
+	// Method for user login validation
     public User login(String username, String password) throws SQLException {
         String query = "SELECT * FROM cse360users WHERE username = ? AND password = ?"; // SQL query to find the user
         try (PreparedStatement pstmt = connection.prepareStatement(query)) { // Create prepared statement
@@ -243,8 +252,9 @@ public class UserHelper{
 		}
 		return false; // If an error occurs, assume user doesn't exist
 	}
-	
-	public void displayUsersByAdmin() throws SQLException {
+
+	//method which will help us see the database as an admin
+	public int displayUsersByAdmin() throws SQLException {
 		// SQL query to select all users
 		String sql = "SELECT * FROM cse360users"; 
 		Statement stmt = connection.createStatement(); // Create a statement object
@@ -263,8 +273,10 @@ public class UserHelper{
 			System.out.print(", uname: " + username); 
 			System.out.print(", role: " + role); 
 			System.out.println(", pw: " + pw); 
-			System.out.println(", otp: " + otp); 
-		} 
+			System.out.println(", otp: " + otp);
+		}
+
+		return 1;
 	}
 	
 	public void register(String invite_code, String username, String password) throws SQLException {
