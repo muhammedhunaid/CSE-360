@@ -12,9 +12,20 @@ import java.io.IOException;
 import java.sql.SQLException;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 
-/**
- * JavaFX App: JavaFX driver class that initializes and starts the application
+/*******
+ * <p> App. </p>
+ * 
+ * <p> Description: A class to control the main JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 JavaFX "Main" class for the application
+ * 
  */
+
+
 public class App extends Application {
 
     // The main JavaFX scene that will be displayed
