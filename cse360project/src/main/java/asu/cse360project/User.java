@@ -2,6 +2,20 @@ package asu.cse360project;
 
 // Class representing a user in the application
 public class User {
+    /**
+     * 
+     * <p> Description: This class provides methods to get and set user details, check user roles, and manage login roles. User class represents a user with specific details such as username, role, first name, and password reset status </p>
+     * 
+     * <p> Copyright: Tu35 © 2024 </p>
+     * 
+     * @author Tu35
+     * 
+     * @version 2.00 2024-10-30 Updated for phase 2
+     * @version 1.00 2024-10-03 Created for phase 1
+     * 
+     * 
+     */
+    
     private String username; // User's username
     private String role; // User's role (e.g., admin, instructor, student)
     private String first_name; // User's first name
