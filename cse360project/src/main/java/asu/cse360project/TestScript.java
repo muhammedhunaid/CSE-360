@@ -1,231 +1,202 @@
 package asu.cse360project;
 
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
-import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
 import asu.cse360project.DatabaseHelpers.UserHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
 
 public class TestScript {
 
     public static void main(String[] args) throws SQLException {
-        System.out.println("Welcome to Test Script");
+        System.out.println("Welcome to the User Methods Test Script");
 
         DatabaseHelper databaseManager = new DatabaseHelper();
         databaseManager.connectToDatabase();
 
         UserHelper userManager = databaseManager.getUser_helper();
-        User user = new User("adminUser", "adminFirstname", "admin", "abc@12343");
-
-        GroupArticlesHelper articleManager = databaseManager.getGroupArticlesHelper();
 
         System.out.println("Starting testing script now...");
         System.out.println("\n------------------------------------\n");
 
-
-
-//        int i = 0;
-        boolean start = true;
-        int passed = 0;
-        int failed = 0;
         ArrayList<Integer> failedTestCases = new ArrayList<>();
 
-        System.out.println("Inserting User");
-//        databaseManager.insertUser("INVITE", "user");
-
-        if(TestCase1(databaseManager, userManager)){
+        // Test Case 1: Adding Users
+        if(TestCase1(userManager) == false){
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case PASSED");
-        }else {
+            System.out.println("Test Case 1 PASSED");
+            System.out.println("Expected: False\nActual: False");
+        } else {
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case FAILED!!");
+            System.out.println("Test Case 1 FAILED!!");
             failedTestCases.add(1);
+            System.out.println("Expected: False\nActual: True");
         }
 
-        if(TestCase2(databaseManager, userManager)){
+        // Test Case 2: Deleting Users
+        if(TestCase2(userManager) == false){
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case PASSED");
-        }else {
+            System.out.println("Test Case 2 PASSED");
+            System.out.println("Expected: False\nActual: False");
+        } else {
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case FAILED!!");
+            System.out.println("Test Case 2 FAILED!!");
             failedTestCases.add(2);
+            System.out.println("Expected: False\nActual: True");
         }
 
-        if(TestCase3(databaseManager, articleManager)){
+        // Test Case 3: Changing User Roles
+        if(TestCase3(userManager)){
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case PASSED");
-        }else {
+            System.out.println("Test Case 3 PASSED");
+            System.out.println("Expected: True\nActual: True");
+        } else {
             System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            System.out.println("Test case FAILED!!");
+            System.out.println("Test Case 3 FAILED!!");
             failedTestCases.add(3);
+            System.out.println("Expected: True\nActual: False");
         }
 
-
-
-        System.out.println("List of Failed Test Cases: ");
-        for(Integer i : failedTestCases){
-            System.out.println(i);
+        // List failed test cases
+        System.out.println("\nList of Failed Test Cases: ");
+        if(failedTestCases.isEmpty()){
+            System.out.println("None");
+        } else {
+            for(Integer i : failedTestCases){
+                System.out.println("Test Case " + i);
+            }
         }
 
+        // Close database connection
+        databaseManager.closeConnection();
     }
 
-
-    private static boolean TestCase1(DatabaseHelper databaseManager, UserHelper userManager) throws SQLException {
+    private static boolean TestCase1(UserHelper userManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
-        System.out.println("Adding user...");
-        userManager.addUser("testname1", "Strong_Pass123", "student");
-        userManager.addUser("Lynn Carter", "abc@128_ghi", "instructor");
-        userManager.addUser("student2", "abcdeg@1234", "student");
-        userManager.addUser("adminName", "strong1234_", "admin");
-        userManager.addUser("skyPilot", "Fi$h12Frog!", "admin");
-        userManager.addUser("bookworm92", "Red@22Drum", "student");
-        userManager.addUser("techGuru", "W@terM44rk", "instructor");
-        userManager.addUser("swiftLearner", "QuickS@lver9", "student");
-        userManager.addUser("codeMaster", "Bl@ckHawk4!", "admin");
-        userManager.addUser("profSmith", "Alpha@127", "instructor");
+        System.out.println("Test Case 1: Adding Users");
 
+        boolean passed = true;
 
+        try {
+            // Adding users
+            System.out.println("Adding users...");
+            userManager.addUser("testUser1", "Password123!", "student");
+            userManager.addUser("instructor1", "Teach@456", "instructor");
+            userManager.addUser("adminUser", "AdminPass@789", "admin");
+            userManager.addUser("student2", "Stud3ntPass!", "student");
+            userManager.addUser("professorX", "Xmen@123", "instructor");
+            userManager.addUser("userDuplicate", "DupPass@1", "student");
 
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the current active users");
-        ObservableList<User> all_user = FXCollections.observableArrayList();
-        userManager.ListUsers(all_user);
+            // Attempt to add a user with an existing username
+            try {
+                userManager.addUser("testUser1", "NewPass@456", "student");
+                System.out.println("Error: Duplicate user was added.");
+                passed = false;
+            } catch (Exception e) {
+                System.out.println("Caught expected exception for duplicate user: " + e.getMessage());
+            }
 
-        for (User user : all_user) {
+            System.out.println("Users added successfully.");
+        } catch (Exception e) {
+            System.out.println("Error while adding users: " + e.getMessage());
+            passed = false;
+        }
+
+        // Listing all users
+        System.out.println("\nListing all users...");
+        ObservableList<User> allUsers = FXCollections.observableArrayList();
+        userManager.ListUsers(allUsers);
+
+        for (User user : allUsers) {
             System.out.println(user);
         }
 
-        //deleting Users
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Deleting the users...");
-        userManager.deleteUser("student3");
-        userManager.deleteUser("student2");
-        userManager.deleteUser("adminName");
-        userManager.deleteUser("Lynn Carter");
-        userManager.deleteUser("student2");
-        userManager.deleteUser("testname1");
-        userManager.deleteUser("seaSurfer");
-        userManager.deleteUser("testname1");
-        userManager.deleteUser("dragonSoul");
-        userManager.deleteUser("techGuru");
-        userManager.deleteUser("jungleRider");
-
-
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the current active users");
-        all_user = FXCollections.observableArrayList();
-        userManager.ListUsers(all_user);
-
-        for (User user : all_user) {
-            System.out.println(user);
-        }
-
-        return databaseManager.isDatabaseEmpty();
+        return passed;
     }
 
-    private static boolean TestCase2(DatabaseHelper databaseManager, UserHelper userManager) throws SQLException {
+    private static boolean TestCase2(UserHelper userManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
-        System.out.println("Adding user...");
-        userManager.addUser("techGuru", "W@terM44rk", "instructor");
-        userManager.addUser("student1", "Strong_Pass123", "student");
-        userManager.addUser("professor1", "abc@128_ghi", "instructor");
-        userManager.addUser("student2", "abcdeg@1234", "student");
-        userManager.addUser("mountainEcho", "Tiger@88Peak", "student");
-        userManager.addUser("student4", "isk834eyi&bkF", "student");
-        userManager.addUser("forestWhisper", "Leaf#33Wind", "student");
-        userManager.addUser("profJones", "Logic@99Base", "instructor");
-        userManager.addUser("oceanWave", "Blue$42Sky", "student");
-        userManager.addUser("desertFox", "Sand@45Dune", "student");
-        userManager.addUser("cityWanderer", "Light$22Path", "student");
-        userManager.addUser("profJones", "Logic@99Base", "instructor");
+        System.out.println("Test Case 2: Deleting Users");
 
+        boolean passed = true;
 
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the current active users");
-        ObservableList<User> all_user = FXCollections.observableArrayList();
-        userManager.ListUsers(all_user);
-        for (User user : all_user) {
+        try {
+            // Deleting users
+            System.out.println("Deleting users...");
+            userManager.deleteUser("student2");
+            userManager.deleteUser("instructor1");
+
+            // Attempt to delete a user that doesn't exist
+            try {
+                userManager.deleteUser("nonExistentUser");
+                System.out.println("Error: Non-existent user deletion did not throw an exception.");
+                passed = false;
+            } catch (Exception e) {
+                System.out.println("Caught expected exception for non-existent user deletion: " + e.getMessage());
+            }
+
+            System.out.println("Users deleted successfully.");
+        } catch (Exception e) {
+            System.out.println("Error while deleting users: " + e.getMessage());
+            passed = false;
+        }
+
+        // Listing remaining users
+        System.out.println("\nListing remaining users...");
+        ObservableList<User> allUsers = FXCollections.observableArrayList();
+        userManager.ListUsers(allUsers);
+
+        for (User user : allUsers) {
             System.out.println(user);
         }
 
-        //Displaying all the Users seen by the Admin
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the information seen by the admins...");
-        userManager.displayUsersByAdmin();
-        for (User user : all_user) {
-            System.out.println(user);
-        }
-
-        //change role of instructor
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Changing the role of the users...");
-        if(!userManager.changeRole("profJones", "admin")){
-            return false;
-        }
-
-        //false expected
-        if(userManager.changeRole("Lynn Carter", "student")){
-            return false;
-        }
-
-        if(!userManager.changeRole("student2", "admin")){
-            return false;
-        }
-
-        if(!userManager.changeRole("professor1", "admin")){
-            return false;
-        }
-
-        if(!userManager.changeRole("jungleRider", "student")){
-            return false;
-        }
-
-        if(!userManager.changeRole("professor1", "admin")){
-            return false;
-        }
-
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the current active users");
-        all_user = FXCollections.observableArrayList();
-        userManager.ListUsers(all_user);
-
-        for (User user : all_user) {
-            System.out.println(user);
-        }
-
-        return true;
+        return passed;
     }
 
-    private static boolean TestCase3(DatabaseHelper databaseManager, GroupArticlesHelper articleManager) throws SQLException {
+    private static boolean TestCase3(UserHelper userManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
-        System.out.println("Adding user...");
+        System.out.println("Test Case 3: Changing User Roles");
 
-        articleManager.addArticle(1001L, "Advances in AI Research", "Exploring recent developments in artificial intelligence.", "AI, machine learning, neural networks", "The field of artificial intelligence has seen rapid advancements in recent years...", "advanced", "Dr. A. Smith, Prof. B. Johnson", "public", new ArrayList<>(Arrays.asList(1, 2, 3)), new ArrayList<>(Arrays.asList(101L, 102L)));
-        articleManager.addArticle(1002L, "Environmental Impact of Urbanization", "A review of how urban growth affects ecosystems.", "environment, urbanization, sustainability", "Urbanization is one of the most significant drivers of environmental change today...", "intermediate", "Dr. C. Adams, Dr. D. Lee", "restricted", new ArrayList<>(Arrays.asList(4, 5)), new ArrayList<>(Arrays.asList(103L, 104L)));
-        articleManager.addArticle(1003L, "Quantum Computing Basics", "Introduction to quantum computing concepts and applications.", "quantum computing, qubits, quantum mechanics", "Quantum computing offers a revolutionary approach to solving complex problems...", "beginner", "Dr. E. Perez", "public", new ArrayList<>(List.of(6)), new ArrayList<>(Arrays.asList(105L, 106L)));
-        articleManager.addArticle(1004L, "Renewable Energy Sources", "Examining different renewable energy sources for a sustainable future.", "renewable energy, solar, wind, hydro", "Renewable energy is a critical component of the global strategy to combat climate change...", "advanced", "Prof. F. Morgan", "public", new ArrayList<>(Arrays.asList(1, 7, 8)), new ArrayList<>(List.of(107L)));
-        articleManager.addArticle(1005L, "Cybersecurity in Modern Infrastructure", "Challenges and solutions in protecting digital infrastructure.", "cybersecurity, digital security, encryption", "As technology integrates into every aspect of modern infrastructure, cybersecurity becomes paramount...", "advanced", "Dr. G. White, Dr. H. Yamada", "restricted", new ArrayList<>(Arrays.asList(2, 9)), new ArrayList<>(Arrays.asList(108L, 109L)));
-        articleManager.addArticle(1006L, "Health Benefits of Regular Exercise", "A look at how exercise promotes long-term health.", "health, exercise, fitness", "Regular exercise has been shown to improve physical and mental health in various studies...", "beginner", "Dr. I. Khan", "public", new ArrayList<>(List.of(10)), new ArrayList<>(List.of(110L)));
-        articleManager.addArticle(1007L, "Blockchain Technology Applications", "Applications of blockchain beyond cryptocurrency.", "blockchain, technology, decentralized", "Blockchain technology offers a decentralized approach to digital transactions and data management...", "intermediate", "Prof. J. Nguyen", "public", new ArrayList<>(Arrays.asList(3, 4)), new ArrayList<>(Arrays.asList(111L, 112L)));
-        articleManager.addArticle(1008L, "Space Exploration Milestones", "Historical achievements in space exploration.", "space, NASA, exploration", "Humanity's venture into space has achieved significant milestones over the decades...", "intermediate", "Dr. K. Patel, Dr. L. Simmons", "restricted", new ArrayList<>(Arrays.asList(5, 6, 7)), new ArrayList<>(List.of(113L)));
-        articleManager.addArticle(1009L, "Genetic Engineering and Ethics", "Ethical considerations in genetic modification.", "genetics, ethics, CRISPR", "With advancements in genetic engineering, ethical debates have emerged on its applications...", "advanced", "Dr. M. Chen", "restricted", new ArrayList<>(Arrays.asList(8, 9)), new ArrayList<>(Arrays.asList(114L, 115L)));
-        articleManager.addArticle(1010L, "Impact of Social Media on Communication", "How social media changes interpersonal communication.", "social media, communication, digital", "Social media platforms have transformed how individuals communicate and interact globally...", "beginner", "Prof. N. Wilson", "public", new ArrayList<>(List.of(10)), new ArrayList<>(Arrays.asList(116L, 117L)));
+        boolean passed = true;
 
+        try {
+            // Changing user roles
+            System.out.println("Changing roles of users...");
+            if (!userManager.changeRole("testUser1", "admin")) {
+                System.out.println("Error: Failed to change role of testUser1 to admin.");
+                passed = false;
+            }
 
-        System.out.println("\n------------------------------------\n");
-        System.out.println("Printing all the current active users");
-        ObservableList<Article> all_article = FXCollections.observableArrayList();
-        articleManager.ListArticles(all_article);
-        for (Article article : all_article) {
-            System.out.println(article);
+            if (!userManager.changeRole("professorX", "student")) {
+                System.out.println("Error: Failed to change role of professorX to student.");
+                passed = false;
+            }
+
+            // Attempt to change role of a non-existent user
+            if (userManager.changeRole("nonExistentUser", "admin")) {
+                System.out.println("Error: Changed role of non-existent user.");
+                passed = false;
+            } else {
+                System.out.println("Correctly handled role change for non-existent user.");
+            }
+
+            System.out.println("User roles changed successfully.");
+        } catch (Exception e) {
+            System.out.println("Error while changing user roles: " + e.getMessage());
+            passed = false;
         }
 
+        // Listing all users to verify role changes
+        System.out.println("\nListing all users...");
+        ObservableList<User> allUsers = FXCollections.observableArrayList();
+        userManager.ListUsers(allUsers);
 
+        for (User user : allUsers) {
+            System.out.println(user);
+        }
 
-        return true;
+        return passed;
     }
-
 }

@@ -152,7 +152,43 @@ public class GroupArticlesHelper extends DatabaseHelper{
         }
     }
 
-    public ObservableList<Article> ListArticles(int group_id) throws SQLException {
+    public void listAllArticles(ObservableList<Article> articles) throws SQLException {
+        String query = "SELECT * FROM Articles;";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            // Clear the ObservableList to avoid duplicate entries
+            articles.clear();
+
+            // Retrieve each row and populate the Article object
+            while (rs.next()) {
+                Long id = rs.getLong("article_id");
+                String title = rs.getString("title");
+                String authors = rs.getString("authors");
+                String abstractTxt = rs.getString("abstract");
+                String body = rs.getString("body");
+                String keywords = rs.getString("keywords");
+                String level = rs.getString("level");
+                String permissions = rs.getString("permissions");
+
+
+                ArrayList<Integer> groups = getArticleGroups(id);
+                ArrayList<Long> references = getArticleRefs(id);
+                ArrayList<String> groupNames = getArticleGroupNames(id);
+
+                // Create a new Article object and add it to the ObservableList
+                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, references, permissions, groupNames);
+                articles.add(article);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Re-throw the exception for handling by calling code
+        }
+    }
+
+
+public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
 
         String query = 
