@@ -12,9 +12,20 @@ import java.io.IOException;
 import java.sql.SQLException;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 
-/**
- * JavaFX App: JavaFX driver class that initializes and starts the application
+/*******
+ * <p> App. </p>
+ * 
+ * <p> Description: A class to control the main JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 JavaFX "Main" class for the application
+ * 
  */
+
+
 public class App extends Application {
 
     // The main JavaFX scene that will be displayed
@@ -47,12 +58,6 @@ public class App extends Application {
             data.setting_up_admin = true;
             Utils.setRoot("LoginScenes/create_account"); // Load the account creation screen for the first admin
         }
-
-        
-        User a = new User();
-        a.setLoginRole("admin");
-        data.setAppUser(a);
-        Utils.setRoot("DashboardScenes/dashboard");
 
         // Display all in db for debugging purposes
         databaseHelper.getUser_helper().displayUsersByAdmin();

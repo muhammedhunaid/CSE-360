@@ -90,10 +90,10 @@ public class SetupAccountController implements Initializable {
             
             // Navigate to role selection or dashboard based on user's roles
             if (current_user.hasMultipleRoles()) {
-                Utils.setRoot("LoginControllers/select_role"); // Redirect to role selection if user has multiple roles
+                Utils.setRoot("LoginScenes/select_role"); // Redirect to role selection if user has multiple roles
             } else {
                 current_user.setLoginRole(current_user.getRole()); // Set user's login role
-                Utils.setRoot("DashboardControllers/dashboard"); // Redirect to dashboard
+                Utils.setRoot("DashboardScenes/dashboard"); // Redirect to dashboard
             }
         }
     }
