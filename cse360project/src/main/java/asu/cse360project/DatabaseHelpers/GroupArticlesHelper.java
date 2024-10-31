@@ -15,16 +15,30 @@ import java.io.ObjectInputStream;
 
 import java.util.ArrayList; 
 
+/**
+ * This class provides methods to interact with the database for Group and Article related operations.
+ */
 public class GroupArticlesHelper extends DatabaseHelper{	
 
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
 
+    /**
+     * Constructor for GroupArticlesHelper class.
+     * @param connection The connection to the database.
+     * @param statement The statement for executing SQL queries.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public GroupArticlesHelper(Connection connection, Statement statement) throws SQLException{
         this.connection = connection;
         this.statement = statement;
     }
 
+    /**
+     * Checks if the Groups database is empty.
+     * @return True if the database is empty, false otherwise.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public boolean isGroupsDatabaseEmpty() throws SQLException {
         String query = "SELECT COUNT(*) AS count FROM Groups"; // SQL query to count the number of users
         ResultSet resultSet = statement.executeQuery(query); // Execute the query and store the result
@@ -34,6 +48,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
         return true; // Return true if the result set is empty
     }
 
+    /**
+     * Creates the Articles table in the database.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public void createArticlesTable() throws SQLException {
         String createArticlesTableSQL = 
             "CREATE TABLE IF NOT EXISTS Articles ( " +
@@ -48,6 +66,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
         statement.execute(createArticlesTableSQL);
     }
 
+    /**
+     * Creates the Groups table in the database.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public void createGroupsTable() throws SQLException {
         String createGroupsTableSQL = 
             "CREATE TABLE IF NOT EXISTS Groups (" +
@@ -56,6 +78,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
         statement.execute(createGroupsTableSQL);
     }
 
+    /**
+     * Creates the Article_Groups table in the database.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public void createArticleGroupsTable() throws SQLException {
         String createArticleGroupsTableSQL =
             "CREATE TABLE IF NOT EXISTS Article_Groups (" +
@@ -67,6 +93,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
         statement.execute(createArticleGroupsTableSQL);
     }
 
+    /**
+     * Creates the Article_Links table in the database.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public void createArticleLinksTable() throws SQLException {
         String createArticleLinksTableSQL = 
             "CREATE TABLE IF NOT EXISTS Article_Links (" +
@@ -78,6 +108,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
         statement.execute(createArticleLinksTableSQL);
     }
 
+    /**
+     * Creates all the tables in the database.
+     * @throws SQLException If an SQL exception occurs.
+     */
     public void createAllTables() throws SQLException {
         createArticlesTable();
         createGroupsTable();
