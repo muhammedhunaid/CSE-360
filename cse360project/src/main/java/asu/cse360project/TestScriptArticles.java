@@ -8,8 +8,16 @@ import javafx.collections.ObservableList;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * This class is used to test the GroupArticlesHelper methods for adding, deleting, and updating articles.
+ */
 public class TestScriptArticles {
 
+    /**
+     * The main method that runs the test script.
+     * @param args The command line arguments.
+     * @throws SQLException If a database access error occurs.
+     */
     public static void main(String[] args) throws SQLException {
         System.out.println("Welcome to the Article Methods Test Script");
 
@@ -158,6 +166,12 @@ public class TestScriptArticles {
         databaseManager.closeConnection();
     }
 
+    /**
+     * Test Case 1: Adding Articles
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase1(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 1: Adding Articles");
@@ -198,6 +212,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 2: Listing Articles
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase2(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 2: Listing Articles");
@@ -222,6 +242,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 3: Updating Articles
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase3(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 3: Updating Articles");
@@ -267,6 +293,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 4: Deleting Articles
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase4(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 4: Deleting Articles");
@@ -313,6 +345,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 5: Adding Article with Missing Required Fields
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase5(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 5: Adding Article with Missing Required Fields");
@@ -368,6 +406,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 6: Updating Non-existent Article
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase6(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 6: Updating Non-existent Article");
@@ -389,6 +433,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 7: Deleting Non-existent Article
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase7(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 7: Deleting Non-existent Article");
@@ -408,6 +458,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 8: Listing Articles When None Exist
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase8(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 8: Listing Articles When None Exist");
@@ -434,6 +490,12 @@ public class TestScriptArticles {
         return passed;
     }
 
+    /**
+     * Test Case 9: Adding a Large Number of Articles
+     * @param articleManager The GroupArticlesHelper instance.
+     * @return True if the test case passed, false if it failed.
+     * @throws SQLException If a database access error occurs.
+     */
     private static boolean TestCase9(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
         System.out.println("Test Case 9: Adding a Large Number of Articles");
