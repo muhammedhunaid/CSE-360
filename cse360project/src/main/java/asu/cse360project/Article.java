@@ -4,6 +4,20 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 public class Article implements Serializable{
+
+    /*******
+     * <p> Article. </p>
+     * 
+     * <p> Description: This class is used to create and manage Article objects, which is used to store information and metadata about the article. </p>
+     * 
+     * <p> Copyright: Tu35 © 2024 </p>
+     * 
+     * @author Tu35
+     * 
+     * @version 1.00	2024-10-30 Created Article class for better organization of the code in Phase 2
+     * 
+     */
+    
     private String title;
     private String authors;
     private String abstractText;
