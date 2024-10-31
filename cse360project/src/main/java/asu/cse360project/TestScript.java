@@ -10,6 +10,19 @@ import java.util.ArrayList;
 
 public class TestScript {
 
+    /*******
+     * <p> TestScript. </p>
+     * 
+     * <p> Description: This class is used to test the UserHelper methods for adding, deleting, and changing user roles.
+     * 
+     * <p> Copyright: Tu35 © 2024 </p>
+     * 
+     * @author Tu35
+     * 
+     * @version 1.00 2024-10-30 Created to test Phase 2.
+     * 
+     */
+
     public static void main(String[] args) throws SQLException {
         System.out.println("Welcome to the User Methods Test Script");
 
