@@ -74,6 +74,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
         String createGroupsTableSQL = 
             "CREATE TABLE IF NOT EXISTS Groups (" +
                 "group_id INT PRIMARY KEY AUTO_INCREMENT," +
+                "special BOOLEAN NOT NULL, " + 
                 "group_name VARCHAR(255) UNIQUE NOT NULL)";
         statement.execute(createGroupsTableSQL);
     }
@@ -89,6 +90,18 @@ public class GroupArticlesHelper extends DatabaseHelper{
                 "group_id INT," +
                 "PRIMARY KEY (article_id, group_id)," +
                 "FOREIGN KEY (article_id) REFERENCES Articles(article_id) ON DELETE CASCADE," +
+                "FOREIGN KEY (group_id) REFERENCES Groups(group_id) ON DELETE CASCADE)";
+        statement.execute(createArticleGroupsTableSQL);
+    }
+
+    public void createUserGroupsTable() throws SQLException {
+        String createArticleGroupsTableSQL =
+            "CREATE TABLE IF NOT EXISTS Article_Groups (" +
+                "user_id BIGINT," +
+                "group_id INT," +
+                "admin BOOLEAN NOT NULL, " + 
+                "PRIMARY KEY (user_id, group_id)," +
+                "FOREIGN KEY (user_id) REFERENCES Articles(user_id) ON DELETE CASCADE," +
                 "FOREIGN KEY (group_id) REFERENCES Groups(group_id) ON DELETE CASCADE)";
         statement.execute(createArticleGroupsTableSQL);
     }
