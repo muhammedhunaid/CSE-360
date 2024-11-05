@@ -96,12 +96,12 @@ public class GroupArticlesHelper extends DatabaseHelper{
 
     public void createUserGroupsTable() throws SQLException {
         String createArticleGroupsTableSQL =
-            "CREATE TABLE IF NOT EXISTS Article_Groups (" +
-                "user_id BIGINT," +
+            "CREATE TABLE IF NOT EXISTS User_Groups (" +
+                "id INT," +
                 "group_id INT," +
                 "admin BOOLEAN NOT NULL, " + 
-                "PRIMARY KEY (user_id, group_id)," +
-                "FOREIGN KEY (user_id) REFERENCES Articles(user_id) ON DELETE CASCADE," +
+                "PRIMARY KEY (id, group_id)," +
+                "FOREIGN KEY (id) REFERENCES cse360users(id) ON DELETE CASCADE," +
                 "FOREIGN KEY (group_id) REFERENCES Groups(group_id) ON DELETE CASCADE)";
         statement.execute(createArticleGroupsTableSQL);
     }
@@ -130,6 +130,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
         createGroupsTable();
         createArticleGroupsTable();
         createArticleLinksTable();
+        createUserGroupsTable();
     }
 
     //add group to groups table

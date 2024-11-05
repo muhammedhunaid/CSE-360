@@ -120,7 +120,7 @@ public class ManageArticlesController implements Initializable {
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + selectedArticle.getBody()); // Set the body
+        body.setText("Body: " + selectedArticle.getBody()); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }
