@@ -5,6 +5,8 @@ import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -144,6 +146,67 @@ public class TestScriptArticles {
             System.out.println("Expected: False\nActual: True");
         }
 
+
+        // Test Case 13: Backup when there are no articles
+        if (TestCase13(articleManager)) {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 13 PASSED");
+            System.out.println("Expected: True\nActual: True");
+        } else {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 13 FAILED!!");
+            failedTestCases.add(13);
+            System.out.println("Expected: True\nActual: False");
+        }
+
+        // Test Case 14: Restore from a corrupted backup file
+        if (TestCase14(articleManager)) {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 14 PASSED");
+            System.out.println("Expected: False\nActual: False");
+        } else {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 14 FAILED!!");
+            failedTestCases.add(14);
+            System.out.println("Expected: False\nActual: True");
+        }
+
+        // Test Case 15: Restore when articles have conflicting IDs
+        if (TestCase15(articleManager)) {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 15 PASSED");
+            System.out.println("Expected: True\nActual: True");
+        } else {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 15 FAILED!!");
+            failedTestCases.add(15);
+            System.out.println("Expected: True\nActual: False");
+        }
+
+        // Test Case 16: Backup to an invalid file path
+        if (TestCase16(articleManager) == false) {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 16 PASSED");
+            System.out.println("Expected: False\nActual: False");
+        } else {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 16 FAILED!!");
+            failedTestCases.add(16);
+            System.out.println("Expected: False\nActual: True");
+        }
+
+        // Test Case 17: Restore from backup file with invalid data
+        if (TestCase17(articleManager) == false) {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 17 PASSED");
+            System.out.println("Expected: False\nActual: False");
+        } else {
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            System.out.println("Test Case 17 FAILED!!");
+            failedTestCases.add(17);
+            System.out.println("Expected: False\nActual: True");
+        }
+
         // List failed test cases
         System.out.println("\nList of Failed Test Cases: ");
         if(failedTestCases.isEmpty()){
@@ -266,6 +329,8 @@ public class TestScriptArticles {
 
         return passed;
     }
+
+    //Write the testcase for backuping the article
 
     private static boolean TestCase4(GroupArticlesHelper articleManager) throws SQLException {
         System.out.println("\n------------------------------------\n");
@@ -510,6 +575,192 @@ public class TestScriptArticles {
             passed = false;
         } else {
             System.out.println("Articles with invalid data were not added, as expected.");
+        }
+
+        return passed;
+    }
+
+    private static boolean TestCase13(GroupArticlesHelper articleManager) throws SQLException {
+        System.out.println("\n------------------------------------\n");
+        System.out.println("Test Case 13: Backup when there are no articles");
+
+        boolean passed = true;
+
+        try {
+            // Ensure the database is empty
+            ObservableList<Article> articles = FXCollections.observableArrayList();
+            articleManager.listAllArticles(articles);
+            for (Article article : articles) {
+                articleManager.deleteArticle(article.getId());
+            }
+
+            // Perform backup
+            System.out.println("Performing backup with no articles...");
+            String backupFileName = "backupFile.txt";
+            ArrayList<Integer> groupIds = new ArrayList<>(); // No groups
+            articleManager.backup(groupIds, backupFileName);
+
+            // Verify backup file exists
+            java.io.File backupFile = new java.io.File("Backups/" + backupFileName);
+            if (backupFile.exists()) {
+                System.out.println("Backup file created successfully: " + backupFileName);
+            } else {
+                System.out.println("Error: Backup file was not created.");
+                passed = false;
+            }
+
+            // Optional: Verify that the backup file contains an empty list
+            // This would involve deserializing the file and checking the contents
+
+        } catch (Exception e) {
+            System.out.println("Error during backup test: " + e.getMessage());
+            passed = false;
+        }
+
+        return passed;
+    }
+
+    private static boolean TestCase14(GroupArticlesHelper articleManager) throws SQLException {
+        System.out.println("\n------------------------------------\n");
+        System.out.println("Test Case 14: Restore from a corrupted backup file");
+
+        boolean passed = false;
+
+        try {
+            // Prepare a corrupted backup file
+            System.out.println("Creating a corrupted backup file...");
+            String backupFileName = "backupFile.txt";
+            try (FileOutputStream fos = new FileOutputStream("Backups/" + backupFileName)) {
+                fos.write("This is not a valid backup file".getBytes());
+            } catch (IOException e) {
+                System.out.println("Error creating corrupted backup file: " + e.getMessage());
+                return false;
+            }
+
+            // Attempt to restore from the corrupted backup file
+            System.out.println("Attempting to restore from corrupted backup file...");
+            articleManager.restore(backupFileName);
+
+            System.out.println("Error: Restore should have failed due to corrupted backup file.");
+        } catch (Exception e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+            passed = true;
+        }
+
+        return passed;
+    }
+
+    private static boolean TestCase15(GroupArticlesHelper articleManager) throws SQLException {
+        System.out.println("\n------------------------------------\n");
+        System.out.println("Test Case 15: Restore when articles have conflicting IDs");
+
+        boolean passed = true;
+
+        try {
+            // Add an article to the database
+            System.out.println("Adding an article to the database...");
+            articleManager.addArticle(8001L, "Existing Article", "Abstract", "Keywords",
+                    "Body content", "Easy", "Author", "Public", new ArrayList<>(), new ArrayList<>());
+
+            // Prepare a backup file with an article that has the same ID but different content
+            System.out.println("Preparing backup file with conflicting article ID...");
+            String backupFileName = "backupFile.txt";
+            ArrayList<Article> backupArticles = new ArrayList<>();
+            backupArticles.add(new Article("Conflicting Article", "Authors", "Different Abstract", "Different Keywords",
+                    "Different Body content", 8001L, "Advanced", new ArrayList<Integer>(),  new ArrayList<Long>(), "Private", new ArrayList<>()));
+
+            // Write backupArticles to file
+            articleManager.writeArticlesToFile(backupArticles, backupFileName);
+
+            // Perform restore
+            System.out.println("Performing restore...");
+            articleManager.restore(backupFileName);
+
+            // Verify that the article was updated
+            ObservableList<Article> articles = FXCollections.observableArrayList();
+            articleManager.listAllArticles(articles);
+            boolean updateVerified = false;
+            for (Article article : articles) {
+                if (article.getId() == 8001L && article.getTitle().equals("Conflicting Article")) {
+                    updateVerified = true;
+                    break;
+                }
+            }
+            if (updateVerified) {
+                System.out.println("Article updated successfully during restore.");
+            } else {
+                System.out.println("Error: Article was not updated during restore.");
+                passed = false;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error during restore test: " + e.getMessage());
+            passed = false;
+        }
+
+        // Clean up
+        articleManager.deleteArticle(8001L);
+
+        return passed;
+    }
+
+    private static boolean TestCase16(GroupArticlesHelper articleManager) throws SQLException {
+        System.out.println("\n------------------------------------\n");
+        System.out.println("Test Case 16: Backup to an invalid file path");
+
+        boolean passed = false;
+
+        try {
+            // Add a sample article
+            System.out.println("Adding a sample article...");
+            articleManager.addArticle(9001L, "Sample Article", "Abstract", "Keywords",
+                    "Body content", "Easy", "Author", "Public", new ArrayList<>(), new ArrayList<>());
+
+            // Attempt to backup to an invalid file path
+            System.out.println("Attempting to backup to an invalid file path...");
+            String invalidBackupFileName = "fileDoesNotExist.txt";
+            ArrayList<Integer> groupIds = new ArrayList<>(); // No groups
+            articleManager.backup(groupIds, invalidBackupFileName);
+
+            System.out.println("Error: Backup should have failed due to invalid file path.");
+        } catch (Exception e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+            passed = true;
+        }
+
+        // Clean up
+        articleManager.deleteArticle(9001L);
+
+        return passed;
+    }
+
+    private static boolean TestCase17(GroupArticlesHelper articleManager) throws SQLException {
+        System.out.println("\n------------------------------------\n");
+        System.out.println("Test Case 17: Restore from backup file with invalid data");
+
+        boolean passed = false;
+
+        try {
+            // Prepare a backup file with articles containing invalid data
+            System.out.println("Preparing backup file with invalid data...");
+            String backupFileName = "invalid_data_backup.dat";
+            ArrayList<Article> backupArticles = new ArrayList<>();
+            backupArticles.add(new Article("", "Authors", "Abstract", "Keywords",
+                    "Body content", 10001L, "Easy", new ArrayList<Integer>(),  new ArrayList<Long>(), "Public", new ArrayList<>()));
+
+            // Article with empty title, which is invalid
+
+            // Write backupArticles to file
+            articleManager.writeArticlesToFile(backupArticles, backupFileName);
+
+            // Attempt to restore
+            System.out.println("Attempting to restore from backup file with invalid data...");
+            articleManager.restore(backupFileName);
+
+            System.out.println("Error: Restore should have failed due to invalid article data.");
+        } catch (Exception e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+            passed = true;
         }
 
         return passed;
