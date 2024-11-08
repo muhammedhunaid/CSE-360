@@ -183,13 +183,14 @@ public class UserHelper{
 	
 	public User getUser(String username) throws SQLException {
 		// SQL query to retrieve user details based on username
-		String query = "SELECT role, first, otp_expires FROM cse360users WHERE username = ?";
+		String query = "SELECT * FROM cse360users WHERE username = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username); // Set the username in the query
 			try (ResultSet rs = pstmt.executeQuery()) {
 				// If user exists, retrieve their details
 				if (rs.next()) {
 					String role = rs.getString("role"); // Get user's role
+					int id = rs.getInt("id"); // Get user's id
 					String firstName = rs.getString("first"); // Get user's first name
 					Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
 					String pw_reset_string = "";
@@ -198,7 +199,7 @@ public class UserHelper{
 						pw_reset_string = password_reset.toString();
 					}
 					// Return a User object with the retrieved details
-					return new User(username, firstName, role, pw_reset_string);
+					return new User(username, firstName, role, pw_reset_string, id);
 				} else {
 					System.out.println("User does not exist."); // Log if user is not found
 					return null; // Return null if user doesn't exist

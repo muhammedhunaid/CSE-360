@@ -135,9 +135,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
 
     //add group to groups table
     public Group addGroup(String groupName) throws SQLException {
-        String insertGroupSQL = "INSERT INTO Groups (group_name) VALUES (?);";
+        String insertGroupSQL = "INSERT INTO Groups (group_name, special) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
             pstmt.setString(1, groupName);
+            pstmt.setBoolean(2, false);
             pstmt.executeUpdate();
         }
         return getGroup(groupName);
@@ -176,7 +177,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
     // Method to get all groups from the database and add to an ObservableList
     public ObservableList<Group> getAllGroups() throws SQLException {
         ObservableList<Group> groups = FXCollections.observableArrayList();
-        String query = "SELECT * FROM Groups;";
+        String query = "SELECT * FROM Groups ;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             ResultSet rs = pstmt.executeQuery();
 
@@ -184,6 +185,49 @@ public class GroupArticlesHelper extends DatabaseHelper{
                 String groupName = rs.getString("group_name");
                 Integer groupID = rs.getInt("group_id");
                 groups.add(new Group(groupName, groupID));
+            }
+        }
+        return groups;
+    }
+
+     // Method to get general groups from the database and add to an ObservableList
+     public ObservableList<Group> getAllGeneralGroups() throws SQLException {
+        ObservableList<Group> groups = FXCollections.observableArrayList();
+        String query = "SELECT * FROM Groups WHERE special = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setBoolean(1, false);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String groupName = rs.getString("group_name");
+                Integer groupID = rs.getInt("group_id");
+                groups.add(new Group(groupName, groupID));
+            }
+        }
+        return groups;
+    }
+
+    //method to get all special groups a user belongs to
+    public ObservableList<Group> getAllSpecialGroups(int user_id) throws SQLException {
+        ObservableList<Group> groups = FXCollections.observableArrayList();
+        String query = 
+            "SELECT g.group_name " + 
+            "FROM Groups g " + 
+            "JOIN User_Groups ag ON g.group_id = ag.group_id " +
+            "JOIN cse360users a ON ag.id = a.id " +
+            "WHERE a.id = ?;";
+        
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set theuser_id parameter
+        stmt.setLong(1, user_id);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Group objects
+            while (rs.next()) {
+                String g_name = rs.getString("name");
+                int g_id = rs.getInt("group_id");
+                Group g = new Group(g_name, g_id); g.setSpecial(true);
+                groups.add(g);
             }
         }
         return groups;
@@ -237,7 +281,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
 
 
 public ObservableList<Article> ListArticles(int group_id) throws SQLException {
-        ObservableList<Article> articles =  FXCollections.observableArrayList();
+        ObservableList<Article> articles = FXCollections.observableArrayList();
 
         String query = 
             "SELECT * " + 
@@ -269,6 +313,64 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
                     articles.add(article);
                 }
             }
+
+        return articles;
+    }
+
+    public ObservableList<Article> searchArticles(int group_id, String search_level, String search_keywords) throws SQLException {
+        ObservableList<Article> articles = FXCollections.observableArrayList();
+
+        String query = 
+            "SELECT * " + 
+            "FROM Articles a " + 
+            "JOIN Article_Groups ag ON a.article_id = ag.article_id " +
+            "JOIN Groups g ON ag.group_id = g.group_id " +
+            "WHERE g.group_id = ?";
+
+        if(!search_level.equals("All")) {
+            query += "AND (a.level = ?)";
+        }
+
+        if(!search_keywords.isEmpty()) {
+            query += "AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
+        }
+
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set the group name parameter
+        stmt.setInt(1, group_id);
+        int update_param = 0;
+
+        if(!search_level.equals("All")) {
+            stmt.setString(2, search_level);
+        }else{
+            update_param = -1;
+        }
+
+        if(!search_keywords.isEmpty()) {
+            stmt.setString(3 + update_param, "%" + search_keywords + "%");
+            stmt.setString(4 + update_param, "%" + search_keywords + "%");
+            stmt.setString(5 + update_param, "%" + search_keywords + "%");
+        }
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Article objects
+            while (rs.next()) {
+                Long id = rs.getLong("article_id");
+                String title = rs.getString("title");
+                String authors = rs.getString("authors");
+                String abstractTxt = rs.getString("abstract");
+                String body = rs.getString("body");
+                String keywords = rs.getString("keywords");
+                String level = rs.getString("level");
+                String permissions = rs.getString("permissions");
+                ArrayList<Integer> groups = getArticleGroups(id);
+                ArrayList<Long> refrences = getArticleRefs(id);
+                ArrayList<String> groups_names = getArticleGroupNames(id);
+
+                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
+                articles.add(article);
+            }
+        }
 
         return articles;
     }

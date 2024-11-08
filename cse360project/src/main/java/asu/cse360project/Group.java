@@ -18,11 +18,13 @@ public class Group {
 	
 	private String name;
 	private Integer id;
+    private boolean special;
 	
     // Constructor to initialize a User with specific details
     public Group(String name, Integer id) {
         this.name = name;
         this.id = id;
+        this.special = false;
     }
 
     // Default constructor initializes fields to empty strings
@@ -37,6 +39,14 @@ public class Group {
     
     public Integer getId() {
     	return this.id;
+    }
+
+    public Boolean getSpecial() {
+    	return this.special;
+    }
+
+    public void setSpecial(boolean special) {
+        this.special = special;
     }
 
     public String toString() {

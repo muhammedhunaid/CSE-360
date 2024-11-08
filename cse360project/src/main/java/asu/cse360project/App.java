@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 
+
 /*******
  * <p> App. </p>
  * 
@@ -24,8 +25,6 @@ import asu.cse360project.DatabaseHelpers.DatabaseHelper;
  * @version 1.00	2024-10-30 JavaFX "Main" class for the application
  * 
  */
-
-
 public class App extends Application {
 
     // The main JavaFX scene that will be displayed

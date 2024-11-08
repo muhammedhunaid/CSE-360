@@ -16,6 +16,7 @@ public class User {
      * 
      */
     
+    private int id; // User's id
     private String username; // User's username
     private String role; // User's role (e.g., admin, instructor, student)
     private String first_name; // User's first name
@@ -23,7 +24,8 @@ public class User {
     private String login_role = ""; // Role the user is currently logged in as
 
     // Constructor to initialize a User with specific details
-    public User(String username, String first_name, String role, String password_reset) {
+    public User(String username, String first_name, String role, String password_reset, int id) {
+        this.id = id;
         this.username = username;
         this.first_name = first_name;
         this.role = role;
@@ -41,6 +43,11 @@ public class User {
     // Getter for the username
     public String getUsername() {
         return username;
+    }
+
+    // Getter for the id
+    public int getId() {
+        return id;
     }
     
     // Setter for the username
