@@ -5,7 +5,8 @@ module asu.cse360project {
     requires javafx.graphics;
     requires com.h2database;
     requires javafx.base; // For JDBC
-//    requires org.bouncycastle.lts.prov; // For Bouncy castle
+    requires org.bouncycastle.provider; // For JDBC
+
 
     opens asu.cse360project to javafx.fxml;
     opens asu.cse360project.DashboardControllers to javafx.fxml;

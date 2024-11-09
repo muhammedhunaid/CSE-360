@@ -532,6 +532,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return refrences;
     }
 
+    //TODO: encrypt body before adding
     public void addArticle(String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
     
         String insertArticleQuery = "INSERT INTO articles (title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -542,6 +543,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             articleStmt.setString(1, title);
             articleStmt.setString(2, abstractTxt);
             articleStmt.setString(3, keywords);
+            //encrypt before setting param
             articleStmt.setString(4, body);
             articleStmt.setString(5, level);
             articleStmt.setString(6, authors);
@@ -602,6 +604,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         }
     }
 
+    //TODO: Encrypt vody before updating
     public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
         String sql = "UPDATE articles SET title = ?, abstract = ?, keywords = ?, body = ?, level = ?, authors = ?, permissions = ? WHERE article_id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -609,6 +612,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             pstmt.setString(1, title);
             pstmt.setString(2, abstractTxt);
             pstmt.setString(3, keywords);
+            //encryot before setting param
             pstmt.setString(4, body);
             pstmt.setString(5, level);
             pstmt.setString(6, authors);
