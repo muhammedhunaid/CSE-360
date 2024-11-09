@@ -174,5 +174,5 @@ public class ManageArticlesController implements Initializable {
             data.article = selectedArticle; // Set the article to be edited
             Utils.setContentArea("create_edit_article"); // Set the content area to the create/edit article view
         }
-    }  
+    }
 }
