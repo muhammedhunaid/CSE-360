@@ -111,7 +111,7 @@ public class LoginController implements Initializable {
         // If a valid invite code is found, navigate to the account creation screen
         if (new_User != null) {
             data.setAppUser(new_User);
-            Utils.setRoot("LoginScenes/creat_account");
+            Utils.setRoot("LoginScenes/create_account");
         } else {
             // If the invite code is invalid, display an error message
             Utils.setText(login_error, "Invite Code not found", Color.RED);
