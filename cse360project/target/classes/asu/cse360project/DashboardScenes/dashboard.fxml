@@ -19,6 +19,7 @@
                   <Button mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />
                </children>
             </VBox>
+            <Button mnemonicParsing="false" onAction="#sendMessage" prefHeight="41.0" prefWidth="200.0" text="Send Message" />
             <Button mnemonicParsing="false" onAction="#logout" prefHeight="41.0" prefWidth="200.0" text="Logout" />
          </children>
       </VBox>

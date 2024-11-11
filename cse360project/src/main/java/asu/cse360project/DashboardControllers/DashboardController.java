@@ -74,6 +74,17 @@ public class DashboardController implements Initializable {
             }
         });
     }
+    
+    /**
+     * Handles the send message action.
+     * @param event The action event.
+     * @throws IOException If an I/O exception occurs.
+     */
+    @FXML
+    void sendMessage(ActionEvent event) throws IOException {
+    	System.out.println("Sending message :)");
+    	Utils.setContentArea("messaging");
+    }
 }
 
 
