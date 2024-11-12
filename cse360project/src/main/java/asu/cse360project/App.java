@@ -37,7 +37,7 @@ public class App extends Application {
 
     @Override
     // Initializes the primary stage and sets the login scene
-    public void start(Stage stage) throws IOException, SQLException {
+    public void start(Stage stage) throws IOException, SQLException, Exception {
 
         // Load the login screen from the FXML file and set the scene
         Parent root = FXMLLoader.load(App.class.getResource("LoginScenes/login.fxml"));

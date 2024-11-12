@@ -36,7 +36,7 @@ public class DatabaseHelper {
             statement = connection.createStatement(); // Create a statement for executing SQL commands
 
 			user_helper = new UserHelper(connection, statement);
-			groups_articles_helper = new GroupArticlesHelper(connection, statement);
+			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
 			createTables();  // Call method to create necessary tables if they don't already exist
 
             //initialize the encryptionhelper object which will be used in encryption and decryption
