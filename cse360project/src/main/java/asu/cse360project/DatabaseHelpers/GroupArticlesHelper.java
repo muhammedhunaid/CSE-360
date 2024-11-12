@@ -1,19 +1,22 @@
 package asu.cse360project.DatabaseHelpers;
 
-import java.sql.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 import asu.cse360project.Article;
+import asu.cse360project.EncryptionHelper;
 import asu.cse360project.Group;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-
-import java.util.ArrayList; 
 
 /**
  * This class provides methods to interact with the database for Group and Article related operations.
@@ -22,6 +25,9 @@ public class GroupArticlesHelper extends DatabaseHelper{
 
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
+    
+    //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+    private EncryptionHelper encryptionHelper;
 
     /**
      * Constructor for GroupArticlesHelper class.
@@ -29,9 +35,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
      * @param statement The statement for executing SQL queries.
      * @throws SQLException If an SQL exception occurs.
      */
-    public GroupArticlesHelper(Connection connection, Statement statement) throws SQLException{
+    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
         this.connection = connection;
         this.statement = statement;
+        this.encryptionHelper = encryptionHelper;
     }
 
     /**
