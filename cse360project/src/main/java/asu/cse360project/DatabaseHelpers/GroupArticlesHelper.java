@@ -4,6 +4,8 @@ import java.sql.*;
 
 import asu.cse360project.Article;
 import asu.cse360project.Group;
+import asu.cse360project.Singleton;
+import asu.cse360project.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -20,6 +22,7 @@ import java.util.ArrayList;
  */
 public class GroupArticlesHelper extends DatabaseHelper{	
 
+    Singleton data = new Singleton();
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
 
@@ -177,7 +180,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
     // Method to get all groups from the database and add to an ObservableList
     public ObservableList<Group> getAllGroups() throws SQLException {
         ObservableList<Group> groups = FXCollections.observableArrayList();
-        String query = "SELECT * FROM Groups ;";
+        String query = "SELECT * FROM Groups;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             ResultSet rs = pstmt.executeQuery();
 
@@ -769,5 +772,52 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
            linkGroups(articleId, groups);
            linkArticles(articleId, links);
         }
+    }
+
+    //Assume same user cannot be added twice
+    public void linkSAG(int user,  int group_id, boolean admin) throws SQLException {
+        String linkSAGQuery = "INSERT INTO User_Groups (id, group_id, admin) VALUES (?, ?, ?)";
+        PreparedStatement linkStmt = connection.prepareStatement(linkSAGQuery);
+        linkStmt.setInt(1, user);
+        linkStmt.setInt(2, group_id);
+        linkStmt.setBoolean(3, admin);
+        linkStmt.executeUpdate();
+    }
+
+    public void deleteSAGUsers(int id) throws SQLException {
+        String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ?;";
+
+        // Delete from the SAG association table
+        try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public ObservableList<User> ListSAGUsers(int group_id, boolean admin) throws SQLException {
+        ObservableList<User> user =  FXCollections.observableArrayList();
+
+        String query = 
+            "SELECT * " + 
+            "FROM cse360users a " + 
+            "JOIN User_Groups ag ON a.id = ag.id " +
+            "JOIN Groups g ON ag.group_id = g.group_id " +
+            "WHERE g.group_id = ? AND ag.admin = ?;";
+
+            PreparedStatement stmt = connection.prepareStatement(query);            
+            // Set the group name parameter
+            stmt.setInt(1, group_id);
+            stmt.setBoolean(2, admin);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                // Iterate through the result set and create SAG Group objects
+                while (rs.next()) {
+                    String username = rs.getString("username");
+                    data.user_db.getUser(username);
+                    
+                    user.add(data.user_db.getUser(username));
+                }
+            }
+        return user;
     }
 }

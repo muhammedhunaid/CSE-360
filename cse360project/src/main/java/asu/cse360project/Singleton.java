@@ -39,6 +39,9 @@ public class Singleton {
     // List of groups the user is allowed to edit
     public ArrayList<Integer> edit_group = null;
 
+    //Group id
+    public int SAGGroupId = 0;
+
     /**
      * Public method to provide access to the instance of the Singleton class.
      * 

@@ -32,6 +32,16 @@ public class Group {
     	this.name = "Group";
     	this.id = -1;
     }
+
+    public void setSpecial(boolean special)
+    {
+        this.special = special;
+    }
+
+    public boolean getSpecial()
+    {
+        return special;
+    }
     
     public String getName() {
     	return this.name;
@@ -39,14 +49,6 @@ public class Group {
     
     public Integer getId() {
     	return this.id;
-    }
-
-    public Boolean getSpecial() {
-    	return this.special;
-    }
-
-    public void setSpecial(boolean special) {
-        this.special = special;
     }
 
     public String toString() {

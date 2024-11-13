@@ -9,11 +9,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.DashboardController">
    <left>
       <VBox prefHeight="400.0" prefWidth="119.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="search_articles" mnemonicParsing="false" onAction="#searchArticles" prefHeight="41.0" prefWidth="200.0" text="Search Articles" />
             <Button mnemonicParsing="false" onAction="#manageArticles" prefHeight="41.0" prefWidth="200.0" text="Manage Articles" />
             <VBox fx:id="admin_controlls">
                <children>
@@ -21,6 +20,7 @@
                </children>
             </VBox>
             <Button mnemonicParsing="false" onAction="#logout" prefHeight="41.0" prefWidth="200.0" text="Logout" />
+            <Button mnemonicParsing="false" onAction="#modifySAG" prefHeight="45.0" prefWidth="126.0" text="Modify SAG" />
          </children>
       </VBox>
    </left>

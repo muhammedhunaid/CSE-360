@@ -23,7 +23,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
 
 /**
  * The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
@@ -97,6 +97,7 @@ public class CEArticleController implements Initializable {
             groups_list = data.group_articles_db.getAllGroups();
             groups_list.add(0, new Group("All Articles", -1));
             groups_list.add(1, new Group("Ungrouped Articles", 0));
+            group_table.setItems(groups_list);  // Set groups list to group table
         } catch (SQLException e) {
             e.printStackTrace();
         }
