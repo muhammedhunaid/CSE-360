@@ -10,6 +10,7 @@ import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.Utils;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,6 +42,7 @@ public class CEArticleController implements Initializable {
     ArrayList<Long> refrences = new ArrayList<>();
     private Article selectedArticle = null;
     private Group selectedGroup = null;
+    EncryptionHelper encryptionHelper;
 
 
     //////////JavaFX elements ///////////////////////////
@@ -75,9 +77,16 @@ public class CEArticleController implements Initializable {
     @FXML private MenuButton level;
     /////////////////////////////////////////////////////
 
+    //TODO: make groups only ones user allowed to look at
     // Initializes the controller and sets up tables ahd populates with groups and articles
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        try {
+            encryptionHelper = new EncryptionHelper();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         body.setWrapText(true);
 
         // Setting cell value factories to map table columns with article and group properties
@@ -129,18 +138,23 @@ public class CEArticleController implements Initializable {
         if(data.editing_article)
         {
             title_label.setText("Editing Article");
-            setContent();
+            try {
+                setContent();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
     // Populates the UI fields with the selected article’s content
-    private void setContent() {
+    private void setContent() throws Exception {
         Article article = data.article;
 
         title.setText(article.getTitle()); //fill title
         authors.setText(article.getAuthors()); //fill authors
         description.setText(article.getAbstractText()); //fill description
-        body.setText(article.getBody()); //fill body
+        body.setText(encryptionHelper.decrypt(article.getBody())); //fill body
         keywords.setText(article.getKeywords()); //fill keywords
         setLevel(article.getLevel()); //fill level
         article_level = article.getLevel();
@@ -202,7 +216,7 @@ public class CEArticleController implements Initializable {
      // Adds the selected group to the group links list
     @FXML
     void addGroup(ActionEvent event) {
-        if(selectedGroup != null && !groups.contains(selectedGroup.getId()))
+        if(selectedGroup != null && !groups.contains(selectedGroup.getId()) && selectedGroup.getId() != -1 && selectedGroup.getId() != 0)
         {
             groups.add(selectedGroup.getId()); //add group to list of article groups
             group_links.setText("Groups links: " + groups.toString()); //update UI
@@ -266,7 +280,7 @@ public class CEArticleController implements Initializable {
  
         if(data.editing_article) //update article if editing
         {
-            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, permissions, groups, refrences);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
         }else{ //create new article

@@ -641,7 +641,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             if(!articleExists(a.getId()))
             {
                 checkGroups(a);
-                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }
         }
     }
@@ -653,9 +653,9 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             checkGroups(a);
             if(articleExists(a.getId()))
             {
-                updateArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                updateArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }else{
-                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }
         }  
     }
