@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import javafx.collections.ObservableList;
@@ -63,6 +64,7 @@ public class SearchArticlesController implements Initializable{
     @FXML private TextField group_input;
     @FXML private TextField article_input;
 
+    private EncryptionHelper encryptionHelper;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -115,7 +117,11 @@ public class SearchArticlesController implements Initializable{
         // Add listener to handle double clicking article
         article_table.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                viewArticle();
+                try {
+                    viewArticle();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -208,7 +214,7 @@ public class SearchArticlesController implements Initializable{
     }
 
     // Populates the UI fields with the selected article’s content
-    private void viewArticle() { 
+    private void viewArticle() throws Exception {
         String headTxt = "id: " + String.valueOf(selectedArticle.getId()); // Article ID
         headTxt += "    Groups: " + selectedArticle.getGroup_names().toString(); // Article groups
         headTxt += "    Level: " + selectedArticle.getLevel(); // Article level
@@ -217,7 +223,7 @@ public class SearchArticlesController implements Initializable{
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + selectedArticle.getBody()); // Set the body  TODO: decrypt
+        body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }

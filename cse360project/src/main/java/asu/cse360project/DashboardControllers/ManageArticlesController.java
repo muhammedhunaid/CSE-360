@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Singleton;
 import asu.cse360project.Utils;
 import javafx.collections.ObservableList;
@@ -32,6 +33,7 @@ public class ManageArticlesController implements Initializable {
     Singleton data = Singleton.getInstance(); // Singleton instance for accessing global data
     private Article selectedArticle = null; // Currently selected article
     ObservableList<Article> all_articles; // List to hold all articles
+    private EncryptionHelper encryptionHelper;
     
     @FXML private TableColumn<Article, String> title_col; // Table column for article titles
     @FXML private TableColumn<Article, String> author_col; // Table column for article authors
@@ -66,7 +68,11 @@ public class ManageArticlesController implements Initializable {
         article_table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedArticle = newSelection;
-                viewArticle(); // View the selected article
+                try {
+                    viewArticle(); // View the selected article
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -111,7 +117,7 @@ public class ManageArticlesController implements Initializable {
     /**
      * Views the selected article.
      */
-    void viewArticle() {
+    void viewArticle() throws Exception {
         String headTxt = "id: " + String.valueOf(selectedArticle.getId()); // Article ID
         headTxt += "    Groups: " + selectedArticle.getGroup_names().toString(); // Article groups
         headTxt += "    Level: " + selectedArticle.getLevel(); // Article level
@@ -120,7 +126,7 @@ public class ManageArticlesController implements Initializable {
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + selectedArticle.getBody()); // Set the body  TODO: decrypt
+        body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }

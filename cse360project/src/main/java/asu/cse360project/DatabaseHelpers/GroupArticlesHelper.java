@@ -13,7 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import asu.cse360project.Article;
-import asu.cse360project.EncryptionHelper;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Group;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +27,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
     private Statement statement = null; // Statement for executing SQL queries
     
     //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
-    private EncryptionHelper encryptionHelper;
+    private EncryptionHelper encryptionHelper = null;
 
     /**
      * Constructor for GroupArticlesHelper class.

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import asu.cse360project.EncryptionHelper;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
 public class DatabaseHelper {
     // JDBC driver name and database URL
