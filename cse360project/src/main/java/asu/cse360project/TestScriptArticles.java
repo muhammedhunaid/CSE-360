@@ -1,12 +1,12 @@
 package asu.cse360project;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * This class is used to test the GroupArticlesHelper methods for adding, deleting, and updating articles.
@@ -18,7 +18,7 @@ public class TestScriptArticles {
      * @param args The command line arguments.
      * @throws SQLException If a database access error occurs.
      */
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, Exception {
         System.out.println("Welcome to the Article Methods Test Script");
 
         DatabaseHelper databaseManager = new DatabaseHelper();

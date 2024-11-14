@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import asu.cse360project.Article;
 import asu.cse360project.Singleton;
 import asu.cse360project.Utils;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,6 +33,7 @@ public class ManageArticlesController implements Initializable {
     Singleton data = Singleton.getInstance(); // Singleton instance for accessing global data
     private Article selectedArticle = null; // Currently selected article
     ObservableList<Article> all_articles; // List to hold all articles
+    EncryptionHelper encryptionHelper;
     
     @FXML private TableColumn<Article, String> title_col; // Table column for article titles
     @FXML private TableColumn<Article, String> author_col; // Table column for article authors
@@ -54,6 +56,13 @@ public class ManageArticlesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            encryptionHelper = new EncryptionHelper();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         // Set up table columns
         title_col.setCellValueFactory(new PropertyValueFactory<>("title"));
         author_col.setCellValueFactory(new PropertyValueFactory<>("authors"));
@@ -66,7 +75,12 @@ public class ManageArticlesController implements Initializable {
         article_table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 selectedArticle = newSelection;
-                viewArticle(); // View the selected article
+                try {
+                    viewArticle();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } // View the selected article
             }
         });
 
@@ -110,8 +124,9 @@ public class ManageArticlesController implements Initializable {
 
     /**
      * Views the selected article.
-     */
-    void viewArticle() {
+          * @throws Exception 
+          */
+    void viewArticle() throws Exception {
         String headTxt = "id: " + String.valueOf(selectedArticle.getId()); // Article ID
         headTxt += "    Groups: " + selectedArticle.getGroup_names().toString(); // Article groups
         headTxt += "    Level: " + selectedArticle.getLevel(); // Article level
@@ -120,7 +135,7 @@ public class ManageArticlesController implements Initializable {
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + selectedArticle.getBody()); // Set the body  TODO: decrypt
+        body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }

@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,7 +23,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.text.Text;
 
 public class SearchArticlesController implements Initializable{
-
     Singleton data = Singleton.getInstance();
 
     //table variables
@@ -30,6 +30,7 @@ public class SearchArticlesController implements Initializable{
     ObservableList<Group> groups_list;
     Article selectedArticle;
     Group selectedGroup;
+    EncryptionHelper encryptionHelper;
 
     //buttons
     @FXML private MenuButton level_btn;
@@ -67,6 +68,12 @@ public class SearchArticlesController implements Initializable{
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         //make group table and set elements
+        try {
+            encryptionHelper = new EncryptionHelper();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         makeGroupTable();
         try {
@@ -115,7 +122,12 @@ public class SearchArticlesController implements Initializable{
         // Add listener to handle double clicking article
         article_table.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                viewArticle();
+                try {
+                    viewArticle();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -208,7 +220,7 @@ public class SearchArticlesController implements Initializable{
     }
 
     // Populates the UI fields with the selected article’s content
-    private void viewArticle() { 
+    private void viewArticle() throws Exception { 
         String headTxt = "id: " + String.valueOf(selectedArticle.getId()); // Article ID
         headTxt += "    Groups: " + selectedArticle.getGroup_names().toString(); // Article groups
         headTxt += "    Level: " + selectedArticle.getLevel(); // Article level
@@ -217,7 +229,7 @@ public class SearchArticlesController implements Initializable{
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + selectedArticle.getBody()); // Set the body  TODO: decrypt
+        body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }

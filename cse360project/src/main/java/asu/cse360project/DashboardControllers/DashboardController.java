@@ -59,6 +59,13 @@ public class DashboardController implements Initializable {
         Utils.setContentArea("modify_SAG");
     }
 
+    
+    @FXML
+    void viewArticles(ActionEvent event) throws IOException {
+        // Load the manage users scene when the corresponding action is triggered
+        Utils.setContentArea("search_articles");
+    }
+
     @FXML
     void logout(ActionEvent event) {
         // Create a confirmation dialog for logging out

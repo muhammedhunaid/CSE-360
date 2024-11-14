@@ -9,10 +9,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.DashboardController">
    <left>
       <VBox prefHeight="400.0" prefWidth="119.0" BorderPane.alignment="CENTER">
          <children>
+            <Button mnemonicParsing="false" onAction="#viewArticles" prefHeight="41.0" prefWidth="200.0" text="View Articles" />
             <Button mnemonicParsing="false" onAction="#manageArticles" prefHeight="41.0" prefWidth="200.0" text="Manage Articles" />
             <VBox fx:id="admin_controlls">
                <children>

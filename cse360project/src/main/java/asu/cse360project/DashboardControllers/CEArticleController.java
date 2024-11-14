@@ -3,6 +3,7 @@ package asu.cse360project.DashboardControllers;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
@@ -21,9 +22,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.util.ArrayList;
+import javafx.scene.control.cell.PropertyValueFactory; 
 
 /**
  * The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
@@ -250,7 +249,7 @@ public class CEArticleController implements Initializable {
 
     // Submits the article by adding it or updating it in the database
     @FXML
-    void submit(ActionEvent event) throws IOException, SQLException {
+    void submit(ActionEvent event) throws IOException, SQLException, Exception {
         //get text
         String title_text = title.getText();
         String description_text = description.getText();

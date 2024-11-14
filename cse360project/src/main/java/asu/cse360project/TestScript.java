@@ -1,12 +1,12 @@
 package asu.cse360project;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 import asu.cse360project.DatabaseHelpers.UserHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class TestScript {
 
@@ -23,7 +23,7 @@ public class TestScript {
      * 
      */
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, Exception {
         System.out.println("Welcome to the User Methods Test Script");
 
         DatabaseHelper databaseManager = new DatabaseHelper();

@@ -1,21 +1,24 @@
 package asu.cse360project.DatabaseHelpers;
 
-import java.sql.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-
-import java.util.ArrayList; 
 
 /**
  * This class provides methods to interact with the database for Group and Article related operations.
@@ -25,6 +28,9 @@ public class GroupArticlesHelper extends DatabaseHelper{
     Singleton data = new Singleton();
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
+    
+    //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+    private EncryptionHelper encryptionHelper;
 
     /**
      * Constructor for GroupArticlesHelper class.
@@ -32,9 +38,10 @@ public class GroupArticlesHelper extends DatabaseHelper{
      * @param statement The statement for executing SQL queries.
      * @throws SQLException If an SQL exception occurs.
      */
-    public GroupArticlesHelper(Connection connection, Statement statement) throws SQLException{
+    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
         this.connection = connection;
         this.statement = statement;
+        this.encryptionHelper = encryptionHelper;
     }
 
     /**
@@ -501,7 +508,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
     }
 
     //TODO: encrypt body before adding
-    public void addArticle(String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
+    public void addArticle(String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
     
         String insertArticleQuery = "INSERT INTO articles (title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
@@ -512,7 +519,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             articleStmt.setString(2, abstractTxt);
             articleStmt.setString(3, keywords);
             //encrypt before setting param
-            articleStmt.setString(4, body);
+            articleStmt.setString(4, encryptionHelper.encrypt(body));
             articleStmt.setString(5, level);
             articleStmt.setString(6, authors);
             articleStmt.setString(7, permissions);
@@ -573,7 +580,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
     }
 
     //TODO: Encrypt vody before updating
-    public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
+    public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
         String sql = "UPDATE articles SET title = ?, abstract = ?, keywords = ?, body = ?, level = ?, authors = ?, permissions = ? WHERE article_id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             
@@ -581,7 +588,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             pstmt.setString(2, abstractTxt);
             pstmt.setString(3, keywords);
             //encryot before setting param
-            pstmt.setString(4, body);
+            pstmt.setString(4, encryptionHelper.encrypt(body));
             pstmt.setString(5, level);
             pstmt.setString(6, authors);
             pstmt.setString(7, permissions);
@@ -626,7 +633,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         writeArticlesToFile(article_list, file_name);
     }
 
-    public void restoreMerge(String file_name) throws SQLException {
+    public void restoreMerge(String file_name) throws SQLException, Exception {
         ArrayList<Article> articles = readArticlesFromFile(file_name);
 
         for(Article a: articles) {
@@ -639,7 +646,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         }
     }
     
-    public void restore(String file_name) throws SQLException {
+    public void restore(String file_name) throws SQLException, Exception {
         ArrayList<Article> articles = readArticlesFromFile(file_name);
 
         for(Article a: articles) {
@@ -714,7 +721,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return false; // Default return value if there was an exception
     }
 
-    public void addArticle(Long articleId, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException {
+    public void addArticle(Long articleId, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
     
         String insertArticleQuery = "INSERT INTO Articles (article_id, title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
@@ -729,7 +736,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             articleStmt.setString(2, title);
             articleStmt.setString(3, abstractTxt);
             articleStmt.setString(4, keywords);
-            articleStmt.setString(5, body);
+            articleStmt.setString(5, encryptionHelper.encrypt(body));
             articleStmt.setString(6, level);
             articleStmt.setString(7, authors);
             articleStmt.setString(8, permissions);

@@ -1,6 +1,12 @@
 package asu.cse360project.DatabaseHelpers;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
 public class DatabaseHelper {
     // JDBC driver name and database URL
@@ -18,8 +24,11 @@ public class DatabaseHelper {
 	private UserHelper user_helper;
 	private GroupArticlesHelper groups_articles_helper;
 
+    //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+    private EncryptionHelper encryptionHelper;
+
     // Method to establish a connection to the database
-    public void connectToDatabase() throws SQLException {
+    public void connectToDatabase() throws SQLException, Exception {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver for H2
             System.out.println("Connecting to database..."); // Print connection status
@@ -27,8 +36,13 @@ public class DatabaseHelper {
             statement = connection.createStatement(); // Create a statement for executing SQL commands
 
 			user_helper = new UserHelper(connection, statement);
-			groups_articles_helper = new GroupArticlesHelper(connection, statement);
+            
+            //initialize the encryptionhelper object which will be used in encryption and decryption
+            encryptionHelper = new EncryptionHelper();
+
+			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
 			createTables();  // Call method to create necessary tables if they don't already exist
+            
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage()); // Handle the case where the driver isn't found
         }
