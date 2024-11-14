@@ -300,20 +300,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             try (ResultSet rs = stmt.executeQuery()) {
                 // Iterate through the result set and create Article objects
                 while (rs.next()) {
-                    Long id = rs.getLong("article_id");
-                    String title = rs.getString("title");
-                    String authors = rs.getString("authors");
-                    String abstractTxt = rs.getString("abstract");
-                    String body = rs.getString("body");
-                    String keywords = rs.getString("keywords");
-                    String level = rs.getString("level");
-                    String permissions = rs.getString("permissions");
-                    ArrayList<Integer> groups = getArticleGroups(id);
-                    ArrayList<Long> refrences = getArticleRefs(id);
-                    ArrayList<String> groups_names = getArticleGroupNames(id);
-
-                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
-                    articles.add(article);
+                    articles.add(getArticle(rs));
                 }
             }
 
@@ -358,24 +345,28 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
-                Long id = rs.getLong("article_id");
-                String title = rs.getString("title");
-                String authors = rs.getString("authors");
-                String abstractTxt = rs.getString("abstract");
-                String body = rs.getString("body");
-                String keywords = rs.getString("keywords");
-                String level = rs.getString("level");
-                String permissions = rs.getString("permissions");
-                ArrayList<Integer> groups = getArticleGroups(id);
-                ArrayList<Long> refrences = getArticleRefs(id);
-                ArrayList<String> groups_names = getArticleGroupNames(id);
-
-                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
-                articles.add(article);
+                articles.add(getArticle(rs));
             }
         }
 
         return articles;
+    }
+
+    //helper function for creating article object from result set
+    private Article getArticle(ResultSet rs) throws SQLException{
+        Long id = rs.getLong("article_id");
+        String title = rs.getString("title");
+        String authors = rs.getString("authors");
+        String abstractTxt = rs.getString("abstract");
+        String body = rs.getString("body");
+        String keywords = rs.getString("keywords");
+        String level = rs.getString("level");
+        String permissions = rs.getString("permissions");
+        ArrayList<Integer> groups = getArticleGroups(id);
+        ArrayList<Long> refrences = getArticleRefs(id);
+        ArrayList<String> groups_names = getArticleGroupNames(id);
+
+        return new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
     }
     
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
@@ -420,20 +411,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             try (ResultSet rs = stmt.executeQuery()) {
                 // Iterate through the result set and create Article objects
                 while (rs.next()) {
-                    Long id = rs.getLong("article_id");
-                    String title = rs.getString("title");
-                    String authors = rs.getString("authors");
-                    String abstractTxt = rs.getString("abstract");
-                    String body = rs.getString("body");
-                    String keywords = rs.getString("keywords");
-                    String level = rs.getString("level");
-                    String permissions = rs.getString("permissions");
-                    ArrayList<Integer> groups = getArticleGroups(id);
-                    ArrayList<Long> refrences = getArticleRefs(id);
-                    ArrayList<String> groups_names = getArticleGroupNames(id);
-
-                    Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
-                    articles.add(article);
+                    articles.add(getArticle(rs));
                 }
             }
 
@@ -449,20 +427,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
-                Long id = rs.getLong("article_id");
-                String title = rs.getString("title");
-                String authors = rs.getString("authors");
-                String abstractTxt = rs.getString("abstract");
-                String body = rs.getString("body");
-                String keywords = rs.getString("keywords");
-                String level = rs.getString("level");
-                String permissions = rs.getString("permissions");
-                ArrayList<Integer> groups = getArticleGroups(id);
-                ArrayList<Long> refrences = getArticleRefs(id);
-                ArrayList<String> groups_names = getArticleGroupNames(id);
-
-                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
-                articles.add(article);
+                articles.add(getArticle(rs));
             }
         }
 
@@ -775,49 +740,59 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
     }
 
     //Assume same user cannot be added twice
-    public void linkSAG(int user,  int group_id, boolean admin) throws SQLException {
+    public Boolean linkSAG(int user,  int group_id, boolean admin) throws SQLException {
         String linkSAGQuery = "INSERT INTO User_Groups (id, group_id, admin) VALUES (?, ?, ?)";
-        PreparedStatement linkStmt = connection.prepareStatement(linkSAGQuery);
-        linkStmt.setInt(1, user);
-        linkStmt.setInt(2, group_id);
-        linkStmt.setBoolean(3, admin);
-        linkStmt.executeUpdate();
+        try(PreparedStatement linkStmt = connection.prepareStatement(linkSAGQuery))
+        {
+            linkStmt.setInt(1, user);
+            linkStmt.setInt(2, group_id);
+            linkStmt.setBoolean(3, admin);
+            linkStmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
-    public void deleteSAGUsers(int id) throws SQLException {
+    public Boolean deleteSAGUsers(int id) throws SQLException {
         String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ?;";
 
         // Delete from the SAG association table
         try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
         }
     }
 
     public ObservableList<User> ListSAGUsers(int group_id, boolean admin) throws SQLException {
-        ObservableList<User> user =  FXCollections.observableArrayList();
+        ObservableList<User> users =  FXCollections.observableArrayList();
 
         String query = 
-            "SELECT * " + 
-            "FROM cse360users a " + 
-            "JOIN User_Groups ag ON a.id = ag.id " +
-            "JOIN Groups g ON ag.group_id = g.group_id " +
-            "WHERE g.group_id = ? AND ag.admin = ?;";
+        "SELECT * " + 
+        "FROM cse360users a " + 
+        "JOIN User_Groups ag ON a.id = ag.id " +
+        "JOIN Groups g ON ag.group_id = g.group_id " +
+        "WHERE g.group_id = ? AND ag.admin = ?;";
 
-            PreparedStatement stmt = connection.prepareStatement(query);            
-            // Set the group name parameter
-            stmt.setInt(1, group_id);
-            stmt.setBoolean(2, admin);
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set the group name parameter
+        stmt.setInt(1, group_id);
+        stmt.setBoolean(2, admin);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                // Iterate through the result set and create SAG Group objects
-                while (rs.next()) {
-                    String username = rs.getString("username");
-                    data.user_db.getUser(username);
-                    
-                    user.add(data.user_db.getUser(username));
-                }
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create SAG Group objects
+            while (rs.next()) {
+                String username = rs.getString("username");
+                data.user_db.getUser(username);
+                users.add(data.user_db.getUser(username));
+                return users;
             }
-        return user;
+        } catch (SQLException e) {
+            return null;
+        }
+        return users;
     }
 }
