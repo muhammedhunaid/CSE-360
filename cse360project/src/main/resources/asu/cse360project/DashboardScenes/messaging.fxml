@@ -27,17 +27,13 @@
 
 <HBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.MessageController">
    <children>
-      <BorderPane prefHeight="555.0" prefWidth="1184.0">
+      <BorderPane prefHeight="555.0" prefWidth="723.0">
       <top>
-      	<MenuBar BorderPane.alignment="CENTER">
-               <menus>
-                  <Menu mnemonicParsing="false" text="Article Manager">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
-                     </items>
-                  </Menu>
-               </menus>
-            </MenuBar>
+      	<Label alignment="BASELINE_CENTER" prefHeight="122.0" prefWidth="723.0" text="Send a message to the help system" >
+             <font>
+                <Font name="System Bold" size="15.0" />
+             </font>
+      	</Label>
       </top>
 	      <center>
 	          <VBox prefHeight="522.0" prefWidth="723.0" spacing="10.0">
@@ -47,7 +43,12 @@
 	                        <RadioButton fx:id="spc_btn" mnemonicParsing="false" text="Specific Message" />
 	                     </children>
 	              </HBox>
-		         <TextField fx:id="search_user" prefHeight="225.0" prefWidth="85.0" promptText="Enter Message here" />
+		         <TextField fx:id="message_box" prefHeight="225.0" prefWidth="5.0" alignment="TOP_LEFT" promptText="Enter Message here" />	
+	         <HBox alignment="CENTER" prefWidth="313.0" spacing="10.0">
+                 <children>
+                    <Button mnemonicParsing="false" onAction="#sendToDB" prefHeight="40.0" prefWidth="101.0" text="Send" />
+                 </children>
+              </HBox>
 	         </VBox>
 	      </center>
       </BorderPane>

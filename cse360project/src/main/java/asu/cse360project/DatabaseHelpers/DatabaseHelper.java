@@ -17,6 +17,7 @@ public class DatabaseHelper {
 
 	private UserHelper user_helper;
 	private GroupArticlesHelper groups_articles_helper;
+	private MessageHelper msg_helper;
 
     // Method to establish a connection to the database
     public void connectToDatabase() throws SQLException {
@@ -28,6 +29,7 @@ public class DatabaseHelper {
 
 			user_helper = new UserHelper(connection, statement);
 			groups_articles_helper = new GroupArticlesHelper(connection, statement);
+			msg_helper = new MessageHelper(connection, statement);
 			createTables();  // Call method to create necessary tables if they don't already exist
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage()); // Handle the case where the driver isn't found
@@ -40,6 +42,10 @@ public class DatabaseHelper {
 
 	public GroupArticlesHelper getGroupArticlesHelper() {
 		return groups_articles_helper;		
+	}
+	
+	public MessageHelper getMessageHelper() {
+		return msg_helper;
 	}
 
     // Method to check if the database is empty
@@ -71,6 +77,8 @@ public class DatabaseHelper {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();
+		msg_helper.createTables();
+		
 	}
 
 }

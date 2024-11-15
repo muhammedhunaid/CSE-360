@@ -24,6 +24,7 @@ public class Singleton {
     public DatabaseHelper db;
     public UserHelper user_db;
     public GroupArticlesHelper group_articles_db;
+    public MessageHelper message_db;
 
     // Scene and content area for managing the graphical user interface
     public Scene scene;
@@ -66,6 +67,7 @@ public class Singleton {
         this.db = db;
         this.user_db = db.getUser_helper();
         this.group_articles_db = db.getGroupArticlesHelper();
+        this.message_db = db.getMessageHelper();
     }
     
     /**
