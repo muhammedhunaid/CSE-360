@@ -17,6 +17,7 @@
             <VBox fx:id="admin_controlls">
                <children>
                   <Button mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />
+                  <Button mnemonicParsing="false" onAction="#viewMessages" prefHeight="41.0" prefWidth="200.0" text="View Messages" />
                </children>
             </VBox>
             <Button mnemonicParsing="false" onAction="#sendMessage" prefHeight="41.0" prefWidth="200.0" text="Send Message" />

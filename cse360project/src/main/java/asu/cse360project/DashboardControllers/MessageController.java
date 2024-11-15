@@ -60,17 +60,19 @@ public class MessageController implements Initializable {
 		
 		
         if(gen) {
-        	type = "General Message";
+        	type = "General";
         	System.out.println("General Message");
         }
         else {
-        	type = "Specific Message";
+        	type = "Specific";
 			System.out.println("Specific Message");
         }
         
         Singleton data = Singleton.getInstance();
         String user = data.getAppUser().getUsername();
         System.out.println(user); 
+        
+        
         
         data.message_db.newMsg(message_value, user, type);
 	}

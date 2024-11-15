@@ -3,8 +3,12 @@ package asu.cse360project.DatabaseHelpers;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import asu.cse360project.Message;
 import asu.cse360project.User;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class MessageHelper{
@@ -49,6 +53,50 @@ public class MessageHelper{
         } catch (SQLException e) {
             e.printStackTrace(); // Print the stack trace for SQL exceptions
         }
+    }
+    
+    public ObservableList<String[]> getAllMsg() throws SQLException {
+    	
+    	String message[] = {"user", "type", "text"};
+    	
+        // List to store all messages
+        ObservableList<String[]> messages = FXCollections.observableArrayList();
+
+    	
+		// SQL query to select all users
+		String sql = "SELECT * FROM messages"; 
+		Statement stmt = connection.createStatement(); // Create a statement object
+		ResultSet rs = stmt.executeQuery(sql); // Execute the query
+	
+		// Iterate through the result set and print message details
+		while (rs.next()) { 
+			int id = rs.getInt("id"); // Get ID
+			String username = rs.getString("username"); // Get username
+			String text = rs.getString("text"); // Get text of the message
+			String type = rs.getString("type"); // Get message type
+	
+			// Display user details
+			System.out.print("ID: " + id); 
+			System.out.print(", uname: " + username); 
+			System.out.print(", type: " + type);
+			System.out.println(", text: " + text);
+			
+			message[0] = username;
+			message[1] = type;
+			message[2] = text;
+			
+			messages.add(message.clone());
+			
+		}
+		
+		for (String[] row : messages) {
+            System.out.println("Row data: " + row[0] );
+        }
+		
+		System.out.println("---");
+		
+		return messages;
+		
     }
 
 //    // Method to delete a user from the database
