@@ -254,6 +254,23 @@ public class UserHelper{
 		return false; // If an error occurs, assume user doesn't exist
 	}
 
+	public boolean userExists(int user_id) {
+		// SQL query to count users with the given email
+		String query = "SELECT COUNT(*) FROM cse360users WHERE id = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, user_id); // Set the email in the query
+			ResultSet rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				// If the count is greater than 0, the user exists
+				return rs.getInt(1) > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace(); // Print the stack trace if there's a SQL error
+		}
+		return false; // If an error occurs, assume user doesn't exist
+	}
+
 	//method which will help us see the database as an admin
 	public int displayUsersByAdmin() throws SQLException {
 		// SQL query to select all users

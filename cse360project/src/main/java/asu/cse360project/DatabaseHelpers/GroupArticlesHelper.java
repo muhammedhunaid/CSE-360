@@ -11,11 +11,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
+import asu.cse360project.backup_container;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +25,7 @@ import javafx.collections.ObservableList;
 /**
  * This class provides methods to interact with the database for Group and Article related operations.
  */
-public class GroupArticlesHelper extends DatabaseHelper{	
+public class GroupArticlesHelper{	
 
     Singleton data = new Singleton();
     private Connection connection = null; // Connection to the database
@@ -143,42 +145,36 @@ public class GroupArticlesHelper extends DatabaseHelper{
         createUserGroupsTable();
     }
 
-    //add group to groups table
-    public Group addGroup(String groupName) throws SQLException {
-        String insertGroupSQL = "INSERT INTO Groups (group_name, special) VALUES (?, ?);";
-        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
-            pstmt.setString(1, groupName);
-            pstmt.setBoolean(2, false);
-            pstmt.executeUpdate();
-        }
-        return getGroup(groupName);
-    }
 
-    public Group addGroup(String groupName, int group_id) throws SQLException {
-        String insertGroupSQL = "INSERT INTO Groups (group_id, group_name) VALUES (?, ?);";
-        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
-            pstmt.setInt(1, group_id);
-            pstmt.setString(2, groupName);
-            pstmt.executeUpdate();
-        }
-        return getGroup(groupName);
-    }
-
-
-     private Group getGroup(String groupName) throws SQLException {
-        String query = "SELECT group_id, group_name FROM Groups WHERE group_name = ?;";
+     public Group getGroup(int group_id) throws SQLException {
+        String query = "SELECT * FROM Groups WHERE group_id = ?;";
         Group group = null;
         PreparedStatement pstmt = connection.prepareStatement(query);
 
-        pstmt.setString(1, groupName);
+        pstmt.setInt(1, group_id);
         try (ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
-                Integer id = rs.getInt("group_id");
-                String name = rs.getString("group_name");
-                group = new Group(name, id);  // Create a Group object with the retrieved data
+                group = getGroup(rs); // Create a Group object with the retrieved data
                 System.out.println("Group found: " + group);
             } else {
-                System.out.println("No group found with name: " + groupName);
+                System.out.println("No group found with name: " + group_id);
+            }
+        }
+        return group;
+    }
+
+    public Group getGroup(String group_name) throws SQLException {
+        String query = "SELECT * FROM Groups WHERE group_name = ?;";
+        Group group = null;
+        PreparedStatement pstmt = connection.prepareStatement(query);
+
+        pstmt.setString(1, group_name);
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                group = getGroup(rs); // Create a Group object with the retrieved data
+                System.out.println("Group found: " + group);
+            } else {
+                System.out.println("No group found with name: " + group_name);
             }
         }
         return group;
@@ -192,9 +188,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                String groupName = rs.getString("group_name");
-                Integer groupID = rs.getInt("group_id");
-                groups.add(new Group(groupName, groupID));
+                groups.add(getGroup(rs));
             }
         }
         return groups;
@@ -209,9 +203,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                String groupName = rs.getString("group_name");
-                Integer groupID = rs.getInt("group_id");
-                groups.add(new Group(groupName, groupID));
+                groups.add(getGroup(rs));
             }
         }
         return groups;
@@ -220,8 +212,9 @@ public class GroupArticlesHelper extends DatabaseHelper{
     //method to get all special groups a user belongs to
     public ObservableList<Group> getAllSpecialGroups(int user_id) throws SQLException {
         ObservableList<Group> groups = FXCollections.observableArrayList();
+
         String query = 
-            "SELECT g.group_name " + 
+            "SELECT * " + 
             "FROM Groups g " + 
             "JOIN User_Groups ag ON g.group_id = ag.group_id " +
             "JOIN cse360users a ON ag.id = a.id " +
@@ -234,13 +227,21 @@ public class GroupArticlesHelper extends DatabaseHelper{
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Group objects
             while (rs.next()) {
-                String g_name = rs.getString("name");
-                int g_id = rs.getInt("group_id");
-                Group g = new Group(g_name, g_id); g.setSpecial(true);
+                Group g = getGroup(rs);
+                g.setName(g.getName() + " *SAG*");
                 groups.add(g);
             }
         }
         return groups;
+    }
+
+    private Group getGroup(ResultSet rs) throws SQLException{
+        String g_name = rs.getString("group_name");
+        int g_id = rs.getInt("group_id");
+        Boolean special = rs.getBoolean("special");
+        ObservableList<User> group_admins = ListSAGUsers(g_id, true);
+        ObservableList<User> group_viewers = ListSAGUsers(g_id, false);
+        return new Group(g_name, g_id, special, new ArrayList<>(group_admins), new ArrayList<>(group_viewers));
     }
 
     public void deleteGroup(int groupId) throws SQLException {
@@ -274,8 +275,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
                 String level = rs.getString("level");
                 String permissions = rs.getString("permissions");
 
-
-                ArrayList<Integer> groups = getArticleGroups(id);
+                ArrayList<Integer> groups = getArticleGroupIds(id);
                 ArrayList<Long> references = getArticleRefs(id);
                 ArrayList<String> groupNames = getArticleGroupNames(id);
 
@@ -290,7 +290,7 @@ public class GroupArticlesHelper extends DatabaseHelper{
     }
 
 
-public ObservableList<Article> ListArticles(int group_id) throws SQLException {
+    public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         ObservableList<Article> articles = FXCollections.observableArrayList();
 
         String query = 
@@ -314,15 +314,27 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return articles;
     }
 
-    public ObservableList<Article> searchArticles(int group_id, String search_level, String search_keywords) throws SQLException {
+    public ObservableList<Article> searchArticles(ArrayList<Integer> group_ids, String search_level, String search_keywords) throws SQLException {
         ObservableList<Article> articles = FXCollections.observableArrayList();
+
+        if(group_ids.contains(0))
+        {
+            articles.addAll(ListAllUnGroupedArticles());
+        }
 
         String query = 
             "SELECT * " + 
             "FROM Articles a " + 
             "JOIN Article_Groups ag ON a.article_id = ag.article_id " +
             "JOIN Groups g ON ag.group_id = g.group_id " +
-            "WHERE g.group_id = ?";
+            "WHERE g.group_id IN ";
+
+            String values = "(";
+            for(int i = 0; i < group_ids.size()-1; i++) {
+                values += "?,";
+            }
+            values += "?)";
+            query += values;
 
         if(!search_level.equals("All")) {
             query += "AND (a.level = ?)";
@@ -334,19 +346,21 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
 
         PreparedStatement stmt = connection.prepareStatement(query);            
         // Set the group name parameter
-        stmt.setInt(1, group_id);
-        int update_param = 0;
+        int param = 1;
+        for (int i : group_ids) {
+            stmt.setInt(param, i);
+            param++;
+        }
 
         if(!search_level.equals("All")) {
-            stmt.setString(2, search_level);
-        }else{
-            update_param = -1;
+            stmt.setString(param, search_level);
+            param++;
         }
 
         if(!search_keywords.isEmpty()) {
-            stmt.setString(3 + update_param, "%" + search_keywords + "%");
-            stmt.setString(4 + update_param, "%" + search_keywords + "%");
-            stmt.setString(5 + update_param, "%" + search_keywords + "%");
+            stmt.setString(param, "%" + search_keywords + "%"); param++;
+            stmt.setString(param, "%" + search_keywords + "%"); param++;
+            stmt.setString(param, "%" + search_keywords + "%");
         }
 
         try (ResultSet rs = stmt.executeQuery()) {
@@ -369,7 +383,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         String keywords = rs.getString("keywords");
         String level = rs.getString("level");
         String permissions = rs.getString("permissions");
-        ArrayList<Integer> groups = getArticleGroups(id);
+        ArrayList<Integer> groups = getArticleGroupIds(id);
         ArrayList<Long> refrences = getArticleRefs(id);
         ArrayList<String> groups_names = getArticleGroupNames(id);
 
@@ -377,18 +391,13 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
     }
     
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
+        System.out.println(groups);
         ObservableList<Article> articles =  FXCollections.observableArrayList();
-
-        if(groups.contains(-1))
-        {
-            return AddAllArticles();
-        }
-
         if(groups.contains(0))
         {
+            System.out.println("finding ungrouped");
             articles.addAll(ListAllUnGroupedArticles());
         }
-
         for(Integer grp_id: groups)
         {
             articles = addUnique(articles, ListArticles(grp_id));
@@ -396,15 +405,6 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return articles;
     }
 
-    private ObservableList<Article> addUnique(ObservableList<Article> articles, ObservableList<Article> new_articles) {
-        for(Article a: new_articles) {
-            if (!articles.contains(a)) {
-                articles.add(a);
-            }
-        }
-        return articles;
-    }
-    
     private ObservableList<Article> ListAllUnGroupedArticles() throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
 
@@ -425,23 +425,16 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return articles;
     }
 
-    private ObservableList<Article> AddAllArticles() throws SQLException {
-        ObservableList<Article> articles =  FXCollections.observableArrayList();
-
-        String query =  "SELECT * FROM Articles";
-        PreparedStatement stmt = connection.prepareStatement(query);            
-
-        try (ResultSet rs = stmt.executeQuery()) {
-            // Iterate through the result set and create Article objects
-            while (rs.next()) {
-                articles.add(getArticle(rs));
+    private ObservableList<Article> addUnique(ObservableList<Article> articles, ObservableList<Article> new_articles) {
+        for(Article a: new_articles) {
+            if (!articles.contains(a)) {
+                articles.add(a);
             }
         }
-
         return articles;
     }
 
-    private ArrayList<Integer> getArticleGroups(Long id) throws SQLException {
+    private ArrayList<Integer> getArticleGroupIds(Long id) throws SQLException {
         ArrayList<Integer> groups = new ArrayList<>();
         String query = 
             "SELECT g.group_id " + 
@@ -458,6 +451,28 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             // Iterate through the result set and create Article objects
             while (rs.next()) {
                 groups.add(rs.getInt("group_id"));
+            }
+        }
+        return groups;
+    }
+
+    private ArrayList<Group> getArticleGroups(Long id) throws SQLException {
+        ArrayList<Group> groups = new ArrayList<>();
+        String query = 
+            "SELECT * " + 
+            "FROM Groups g " + 
+            "JOIN Article_Groups ag ON g.group_id = ag.group_id " +
+            "JOIN articles a ON ag.article_id = a.article_id " +
+            "WHERE a.article_id = ?;";
+        
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set the group name parameter
+        stmt.setLong(1, id);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Article objects
+            while (rs.next()) {
+                groups.add(getGroup(rs));
             }
         }
         return groups;
@@ -507,9 +522,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return refrences;
     }
 
-    //TODO: encrypt body before adding
     public void addArticle(String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
-    
         String insertArticleQuery = "INSERT INTO articles (title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
         try (PreparedStatement articleStmt = connection.prepareStatement(insertArticleQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -579,7 +592,6 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         }
     }
 
-    //TODO: Encrypt vody before updating
     public void updateArticle(Long id, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
         String sql = "UPDATE articles SET title = ?, abstract = ?, keywords = ?, body = ?, level = ?, authors = ?, permissions = ? WHERE article_id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -630,67 +642,74 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
     public void backup(ArrayList<Integer> groups, String file_name) throws SQLException {
         ObservableList<Article> observale_articles_list = ListMultipleGroupsArticles(groups);
         ArrayList<Article> article_list = new ArrayList<>(observale_articles_list);
-        writeArticlesToFile(article_list, file_name);
+        ArrayList<Group> article_groups = new ArrayList<>();
+        for(Article a : article_list)
+        {
+            article_groups.addAll(getArticleGroups(a.getId()));
+        }
+        article_groups.stream().distinct().collect(Collectors.toList());
+        writeArticlesToFile(new backup_container(article_list, article_groups), file_name);
+        data.user_db.updateBackupFiles(data.getAppUser().getUsername(), file_name);
     }
 
-    public void restoreMerge(String file_name) throws SQLException, Exception {
-        ArrayList<Article> articles = readArticlesFromFile(file_name);
+    //TODO: Fix merge restore
+    public void restoreMerge(String file_name) throws Exception {
+        backup_container backup = readArticlesFromFile(file_name);
 
-        for(Article a: articles) {
+        for (Group g : backup.groups)
+        {
+            restoreGroup(g);
+        }
 
+        for(Article a: backup.articles) {
             if(!articleExists(a.getId()))
             {
-                checkGroups(a);
-                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }
         }
     }
     
-    public void restore(String file_name) throws SQLException, Exception {
-        ArrayList<Article> articles = readArticlesFromFile(file_name);
+    //TODO: Fix restore
+    public void restore(String file_name) throws Exception {
+        backup_container backup = readArticlesFromFile(file_name);
 
-        for(Article a: articles) {
-            checkGroups(a);
+        for (Group g : backup.groups)
+        {
+            restoreGroup(g);
+        }
+
+        for(Article a: backup.articles) {
             if(articleExists(a.getId()))
             {
-                updateArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                updateArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }else{
-                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),encryptionHelper.decrypt(a.getBody()),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
+                addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }
         }  
     }
 
-    private void checkGroups(Article a) throws SQLException {
-        for(int i = 0; i < a.getGroups().size(); i++) {
-            if(!groupExists(a.getGroups().get(i))) {
-                addGroup(a.getGroup_names().get(i), a.getGroups().get(i));
-            }
-        }
-    }
-
-    public void writeArticlesToFile(ArrayList<Article> articles, String fileName) {
+    private void writeArticlesToFile(backup_container backup, String fileName) {
         try (FileOutputStream fos = new FileOutputStream("Backups/" + fileName);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             
-            oos.writeObject(articles);
+            oos.writeObject(backup);
             System.out.println("Articles have been written to " + fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public ArrayList<Article> readArticlesFromFile(String fileName) {
-        ArrayList<Article> articles = null;
+    private backup_container readArticlesFromFile(String fileName) {
+        backup_container contents = null;
         try (FileInputStream fis = new FileInputStream("Backups/" + fileName);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             
-            articles = (ArrayList<Article>) ois.readObject();
+            contents = (backup_container) ois.readObject();
             System.out.println("Articles have been read from " + fileName);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return articles;
+        return contents;
     }
 
     public boolean articleExists(Long articleId) {
@@ -721,8 +740,12 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         return false; // Default return value if there was an exception
     }
 
-    public void addArticle(Long articleId, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
-    
+    public boolean addArticle(Long articleId, String title, String abstractTxt, String keywords, String body, String level, String authors, String permissions, ArrayList<Integer> groups, ArrayList<Long> links) throws SQLException, Exception {
+        if(articleExists(articleId))
+        {
+            return false;
+        }
+
         String insertArticleQuery = "INSERT INTO Articles (article_id, title, abstract, keywords, body, level, authors, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
         try (PreparedStatement articleStmt = connection.prepareStatement(insertArticleQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -743,11 +766,21 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             articleStmt.executeUpdate();
            linkGroups(articleId, groups);
            linkArticles(articleId, links);
+           return true;
         }
     }
 
-    //Assume same user cannot be added twice
     public Boolean linkSAG(int user,  int group_id, boolean admin) throws SQLException {
+        if(isUserLinked(group_id, user))
+        {
+            return false;
+        }
+
+        if(!data.user_db.userExists(user))
+        {
+            return false;
+        }
+
         String linkSAGQuery = "INSERT INTO User_Groups (id, group_id, admin) VALUES (?, ?, ?)";
         try(PreparedStatement linkStmt = connection.prepareStatement(linkSAGQuery))
         {
@@ -776,6 +809,7 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
 
     public ObservableList<User> ListSAGUsers(int group_id, boolean admin) throws SQLException {
         ObservableList<User> users =  FXCollections.observableArrayList();
+        data = Singleton.getInstance();
 
         String query = 
         "SELECT * " + 
@@ -785,7 +819,6 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         "WHERE g.group_id = ? AND ag.admin = ?;";
 
         PreparedStatement stmt = connection.prepareStatement(query);            
-        // Set the group name parameter
         stmt.setInt(1, group_id);
         stmt.setBoolean(2, admin);
 
@@ -793,13 +826,168 @@ public ObservableList<Article> ListArticles(int group_id) throws SQLException {
             // Iterate through the result set and create SAG Group objects
             while (rs.next()) {
                 String username = rs.getString("username");
-                data.user_db.getUser(username);
                 users.add(data.user_db.getUser(username));
-                return users;
             }
         } catch (SQLException e) {
             return null;
         }
         return users;
+    }
+
+    public ObservableList<User> ListUsersNotInGroup(int group_id) throws SQLException {
+        ObservableList<User> users = FXCollections.observableArrayList();
+        data = Singleton.getInstance();
+    
+        String query = 
+            "SELECT * " + 
+            "FROM cse360users a " + 
+            "LEFT JOIN User_Groups ag ON a.id = ag.id AND ag.group_id = ? " +
+            "WHERE ag.group_id IS NULL;";
+    
+        PreparedStatement stmt = connection.prepareStatement(query);
+        // Set the group_id parameter
+        stmt.setInt(1, group_id);
+    
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create User objects
+            while (rs.next()) {
+                String username = rs.getString("username");
+                users.add(data.user_db.getUser(username));
+            }
+        } catch (SQLException e) {
+            return null;
+        }
+        return users;
+    }
+
+     public boolean doesGroupExist(String groupName) {
+        String query = "SELECT COUNT(*) FROM groups WHERE group_name = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, groupName);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public boolean isUserLinked(int group_id, int user_id) {
+        String query = "SELECT COUNT(*) FROM User_Groups WHERE (group_id = ? AND id = ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, group_id);
+            statement.setInt(2, user_id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public boolean createGroup(String group_name, boolean special) throws SQLException
+    {
+        data = Singleton.getInstance();
+        //check if group already exists
+        if (doesGroupExist(group_name)) 
+        {
+            return false;
+        }
+
+        //insert
+        String insertGroupSQL = "INSERT INTO Groups (group_name, special) VALUES (?, ?);";
+        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
+            pstmt.setString(1, group_name);
+            pstmt.setBoolean(2, special);
+            int rowsAffected = pstmt.executeUpdate();
+            if(rowsAffected > 0) {
+                System.out.println("Special:" + special);
+                Group new_group = getGroup(group_name);            
+                if(!special)
+                {
+                    return addGeneralGroupUsers(new_group.getId());
+                }else{
+                    return linkSAG(data.getAppUser().getId(), new_group.getId(), true);
+                }
+            }else{
+                return false;
+            }
+        }
+    }
+    
+    public boolean restoreGroup(Group group) throws SQLException
+    {
+        data = Singleton.getInstance();
+        //check if group already exists
+        if (doesGroupExist(group.getName())) 
+        {
+            return false;
+        }
+
+        //insert
+        String insertGroupSQL = "INSERT INTO Groups (group_id, group_name, special) VALUES (?, ?, ?);";
+        try (PreparedStatement pstmt = connection.prepareStatement(insertGroupSQL)) {
+            pstmt.setInt(1, group.getId());
+            pstmt.setString(2, group.getName());
+            pstmt.setBoolean(3, group.getSpecial());
+            int rowsAffected = pstmt.executeUpdate();
+            if(rowsAffected > 0) {         
+                if(!group.getSpecial())
+                {
+                    return addGeneralGroupUsers(group.getId());
+                }else{
+                    for(User i: group.getAdmin_users())
+                    {
+                        linkSAG(i.getId(), group.getId(), true);
+                    }
+
+                    for(User i: group.getViewer_users())
+                    {
+                        linkSAG(i.getId(), group.getId(), false);
+                    }
+                    return true;
+                }
+            }else{
+                return false;
+            }
+        }
+    }
+
+    public boolean addGeneralGroupUsers(int group_id) {
+        String query = "SELECT * FROM cse360users";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            // Execute the query and get results
+            ResultSet rs = statement.executeQuery();
+
+            // Process the result set
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String role = rs.getString("role");
+                if (role.contains("instructor") || role.contains("admin"))
+                {
+                    System.out.println("added " + id + " to " + group_id);
+                    linkSAG(id, group_id, true);
+                }else{
+                    System.out.println("added " + id + " to " + group_id);
+                    linkSAG(id, group_id, false);
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }

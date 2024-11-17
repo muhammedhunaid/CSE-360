@@ -1,39 +1,70 @@
 package asu.cse360project.DashboardControllers;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
+import asu.cse360project.Utils;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class SearchArticlesController implements Initializable{
     Singleton data = Singleton.getInstance();
+    boolean add_special = false;
 
     //table variables
-    ObservableList<Article> articles_list;
-    ObservableList<Group> groups_list;
+    ObservableList<Article> articles_list  = FXCollections.observableArrayList();;
+    ObservableList<Group> groups_list = FXCollections.observableArrayList();
+    ObservableList<String> all_backups; // List to hold all group names
+    ArrayList<Integer> selected_groups = new ArrayList<>();
     Article selectedArticle;
     Group selectedGroup;
     EncryptionHelper encryptionHelper;
+    String selectedBackup; 
+    Alert alert;
+
+    @FXML private Label error_text;
+    @FXML private ScrollPane scroll_pane;
+
 
     //buttons
     @FXML private MenuButton level_btn;
+    @FXML private HBox top_pane;
+    @FXML private VBox bottom_box;
+    @FXML private StackPane botttom_pane;
+    @FXML private ToggleButton edit_view_btn;
 
     //article table JavaFX elements
     @FXML private TableView<Article> article_table;
@@ -45,6 +76,9 @@ public class SearchArticlesController implements Initializable{
     @FXML private TableView<Group> group_table;
     @FXML private TableColumn<Group, String> group_id;
     @FXML private TableColumn<Group, String> group_name;
+
+    //backups table
+    @FXML private ListView<String> backups_list;
 
     //article elements
     @FXML private Text authors;
@@ -63,10 +97,21 @@ public class SearchArticlesController implements Initializable{
     @FXML private TextField keyword_input;
     @FXML private TextField group_input;
     @FXML private TextField article_input;
+    @FXML private Text groups_selected_txt;
 
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        // Initialize alert for confirmation dialogs
+        alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirm");
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Please confirm your action");
+
+        data.sa_controller = this;
+        data.view_area = botttom_pane;
+        data.view_box = bottom_box;
+        Utils.disableNode(top_pane);
         //make group table and set elements
         try {
             encryptionHelper = new EncryptionHelper();
@@ -84,17 +129,38 @@ public class SearchArticlesController implements Initializable{
 
         //make article table set elements
         makeArticleTable();
+
+        scroll_pane.setOnMouseMoved(event -> {
+            Utils.disableNode(error_text);
+        });
+
+        backups_list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+            	selectedBackup = newSelection;
+                //Utils.disableNode(error_label);
+            }
+        });
+
+        setBackupsTable();
     }
 
     //get all articles from picked group
     public void getArticles() throws SQLException {
-        articles_list = data.group_articles_db.searchArticles(selectedGroup.getId(), level, search_keywords);
+        if(selected_groups.isEmpty())
+        {
+            articles_list.clear();
+        }else{
+            articles_list = data.group_articles_db.searchArticles(selected_groups, level, search_keywords);
+        }
         article_table.setItems(articles_list);
     }
 
     //get all groups user can access
     public void getGroups() throws SQLException {
-        groups_list = data.group_articles_db.getAllGeneralGroups();
+        groups_list.clear();
+        if(!data.getAppUser().getLoginRole().equals("student")) {
+            groups_list.add(new Group("Ungrouped", 0));
+        }
         groups_list.addAll(data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId()));
         group_table.setItems(groups_list);
     }
@@ -137,7 +203,6 @@ public class SearchArticlesController implements Initializable{
         // Set up table columns to display Group information
         group_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         group_name.setCellValueFactory(new PropertyValueFactory<>("name"));
-
         group_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         createWrappedColumn(group_name);
@@ -146,12 +211,6 @@ public class SearchArticlesController implements Initializable{
         group_table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
             	selectedGroup = newSelection;
-                try {
-                    //set articles table to articles in group
-                    getArticles();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
         });
     }
@@ -172,6 +231,11 @@ public class SearchArticlesController implements Initializable{
     void SearchKeywords(ActionEvent event) throws SQLException {
         search_keywords = keyword_input.getText();
         getArticles();
+    }
+
+    @FXML //turn off error text on next button click
+    void removeErrorText(ActionEvent event) {
+        Utils.disableNode(error_text);
     }
 
     @FXML
@@ -232,6 +296,257 @@ public class SearchArticlesController implements Initializable{
         body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
+    }
+
+    /**
+     * Handles the add article action.
+     * @param event The action event.
+     * @throws IOException If an I/O exception occurs.
+    * @throws SQLException 
+    */
+    @FXML
+    void addArticle(ActionEvent event) throws IOException, SQLException {
+        data.editing_article = false; // Indicate that a new article is being created
+        Utils.setContentArea(data.view_area, "create_edit_article"); // Set the content area to the create/edit article view
+    }
+
+    @FXML
+    void addGroup(ActionEvent event) throws SQLException {
+        add_special = false;
+        boolean added = showGroupNamePopup();
+        if(!added)
+        {
+            Utils.setLabel(error_text, "Error Inserting General Group", Color.RED);
+        }else{
+            getGroups();
+        }
+    }
+
+    @FXML
+    void addSAG(ActionEvent event) throws SQLException {
+        add_special = true;
+        System.out.println(add_special);
+        boolean added = showGroupNamePopup();
+        if(!added)
+        {
+            Utils.setLabel(error_text, "Error Inserting Special Group", Color.RED);
+        }else{
+            getGroups();
+        }
+    }
+
+    @FXML
+    void backupGroups(ActionEvent event) throws SQLException {
+        if(selected_groups.size() > 0)
+        {
+            // Create a TextInputDialog
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Backup File Input");
+            dialog.setHeaderText("Enter the Backup File Name");
+            dialog.setContentText("File Name:");
+
+            // Show the dialog and wait for the response
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(fileName -> {
+                try {
+                    if(all_backups == null || !all_backups.contains(fileName))
+                    {
+                        data.group_articles_db.backup(selected_groups, fileName);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        setBackupsTable();
+    }
+
+    @FXML
+    void deleteArticle(ActionEvent event) {
+        if(selectedArticle != null) // Check if an article is selected
+        {
+            Alert alert = new Alert(AlertType.CONFIRMATION); // Create a confirmation alert
+            alert.setTitle("Delete Confirmation"); // Set the title
+            alert.setHeaderText("Are you sure you want to delete this article?"); // Set the header text
+            alert.setContentText("Article ID: " + selectedArticle.getId()); // Set the content text
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) { // If the user confirms
+                    try {
+                        data.group_articles_db.deleteArticle(selectedArticle.getId()); // Delete the article
+                        articles_list.remove(articles_list.indexOf(selectedArticle));
+                    } catch (SQLException e) {
+                        e.printStackTrace(); // Handle exception
+                    }
+                }
+            });
+        }
+    }
+
+    @FXML
+    void deleteGroup(ActionEvent event) throws SQLException {
+        if(selectedGroup != null)
+        {
+            data.group_articles_db.deleteGroup(selectedGroup.getId());
+            groups_list.remove(groups_list.indexOf(selectedGroup));
+        }
+    }
+
+    @FXML
+    void delete_backup(ActionEvent event) {
+        if(selectedBackup != null)
+        {
+            data.user_db.deleteBackupFile(data.getAppUser().getUsername(), selectedBackup);
+            setBackupsTable();
+            removeFile(selectedBackup);
+        }
+    }
+
+    private void removeFile(String file_name) {
+        String filePath = "Backups/" + file_name; // Update this to the file you want to delete
+        File file = new File(filePath);
+
+        // Check if the file exists and delete it
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("File deleted successfully: " + filePath);
+            } else {
+                System.out.println("Failed to delete the file: " + filePath);
+            }
+        } else {
+            System.out.println("File not found: " + filePath);
+        }
+    }
+
+    @FXML
+    void merge(ActionEvent event) {
+        if(selectedBackup != null)
+        {
+            alert.setContentText("Are you sure you want to Merge and Restore backup");
+            alert.showAndWait().ifPresent(response -> {
+                try {
+                    data.group_articles_db.restoreMerge(selectedBackup);
+                    getGroups();
+                    getArticles(); 
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Exception EncryptionError){
+                    EncryptionError.printStackTrace();
+                }              
+            });
+            
+        }
+    }
+
+    @FXML
+    void restore(ActionEvent event) {
+        if(selectedBackup != null)
+        {
+            alert.setContentText("Are you sure you want to Restore backup");
+            alert.showAndWait().ifPresent(response -> {
+                try {
+                    data.group_articles_db.restore(selectedBackup);
+                    getGroups();
+                    getArticles();   
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Exception EncryptionError){
+                    EncryptionError.printStackTrace();
+                }
+            });
+            
+        }
+    }
+
+    @FXML
+    void updateAccess(ActionEvent event) throws IOException, SQLException {
+        if(selected_groups.size() > 1 || selected_groups.isEmpty())
+        {
+            Utils.setLabel(error_text, "Select one group to edit", null);
+        }else{
+            data.edit_group = selected_groups;
+            Utils.setContentArea(data.view_area, "modify_SAG");
+        }
+        
+    }
+
+    @FXML
+    void updateArticle(ActionEvent event) throws IOException, SQLException {
+        if(selectedArticle != null) // Check if an article is selected
+        {
+            data.editing_article = true; // Indicate that an article is being edited
+            data.article = selectedArticle; // Set the article to be edited
+            Utils.setContentArea(data.view_area, "create_edit_article"); // Set the content area to the create/edit article view
+            getArticles();
+        }
+    }
+
+    @FXML   //change to edit view
+    void editView(ActionEvent event) throws IOException {
+        if(edit_view_btn.isSelected())
+        {
+            Utils.enableNode(top_pane);
+            edit_view_btn.setText("Search View");
+        }
+
+        if(!edit_view_btn.isSelected())
+        {
+            Utils.disableNode(top_pane);
+            Utils.setContentArea(data.view_area, data.view_box);
+            edit_view_btn.setText("Edit View");
+        }
+    }
+
+    // Method to show the popup with the two options
+    private boolean showGroupNamePopup() throws SQLException {
+        // Create a TextInputDialog
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Group Name Input");
+        dialog.setHeaderText("Enter the name of the group:");
+        dialog.setContentText("Group Name:");
+
+        // Show the dialog and wait for the user's input
+        Optional<String> result = dialog.showAndWait();
+
+        // Check if the user entered a value
+        if (result.isPresent() && !result.get().isBlank()) {
+            String groupName = result.get();
+            return data.group_articles_db.createGroup(groupName, add_special);
+        } else {
+            return false; // Input cancelled or invalid
+        }
+    }
+
+    @FXML
+    void selectGroup(ActionEvent event) throws SQLException {
+        if(selectedGroup != null && !selected_groups.contains(selectedGroup.getId()))
+        {
+            selected_groups.add(selectedGroup.getId());
+            groups_selected_txt.setText("Group: " + selected_groups.toString());
+            getArticles();
+        }
+    }
+
+    @FXML
+    void removeGroup(ActionEvent event) throws SQLException {
+        if(selectedGroup != null && selected_groups.contains(selectedGroup.getId()))
+        {
+            selected_groups.remove(Integer.valueOf(selectedGroup.getId()));
+            groups_selected_txt.setText("Groups: " + selected_groups.toString());
+            getArticles();
+        }
+    }
+    
+    private void setBackupsTable() {
+        String list = data.user_db.getUserBackups(data.getAppUser().getUsername());
+        System.out.println(list);
+        if(list != "") {
+            String[] backups_array  = list.split(",");
+            all_backups = FXCollections.observableArrayList(backups_array);
+            backups_list.setItems(all_backups);
+        }
     }
 }
 

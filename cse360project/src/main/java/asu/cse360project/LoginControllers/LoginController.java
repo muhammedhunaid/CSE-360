@@ -86,7 +86,7 @@ public class LoginController implements Initializable {
             }
 
             // If the user has a single role, set it and navigate to the dashboard
-            curr_user.setLoginRole(curr_user.getRole());             
+            curr_user.setLoginRole(curr_user.getRole());        
             Utils.setRoot("DashboardScenes/dashboard");
             return;
 

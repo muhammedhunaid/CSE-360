@@ -119,7 +119,7 @@ public class ManageArticlesController implements Initializable {
     @FXML
     void add(ActionEvent event) throws IOException {
         data.editing_article = false; // Indicate that a new article is being created
-        Utils.setContentArea("create_edit_article"); // Set the content area to the create/edit article view
+        Utils.setContentArea(data.content_area,"create_edit_article"); // Set the content area to the create/edit article view
     }
 
     /**
@@ -147,7 +147,7 @@ public class ManageArticlesController implements Initializable {
      */
     @FXML
     void back(ActionEvent event) throws IOException {
-        Utils.setContentArea("group_dashboard"); // Set the content area to the group dashboard view
+        Utils.setContentArea(data.content_area,"group_dashboard"); // Set the content area to the group dashboard view
     }
 
     /**
@@ -187,7 +187,7 @@ public class ManageArticlesController implements Initializable {
         {
             data.editing_article = true; // Indicate that an article is being edited
             data.article = selectedArticle; // Set the article to be edited
-            Utils.setContentArea("create_edit_article"); // Set the content area to the create/edit article view
+            Utils.setContentArea(data.content_area, "create_edit_article"); // Set the content area to the create/edit article view
         }
     }
 }

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.ModifySAG">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.ModifySAG">
    <children>
       <BorderPane prefHeight="400.0" prefWidth="606.0">
          <top>
@@ -22,6 +22,7 @@
                         <Button mnemonicParsing="false" onAction="#addAdmin" prefHeight="44.0" prefWidth="130.0" text="Add Admin" />
                         <Button mnemonicParsing="false" onAction="#addViewer" prefHeight="46.0" prefWidth="130.0" text="Add Viewer" />
                         <Button mnemonicParsing="false" onAction="#deleteViewer" prefHeight="48.0" prefWidth="130.0" text="Delete User" />
+                        <Button mnemonicParsing="false" onAction="#back" prefHeight="48.0" prefWidth="130.0" text="Back" />
                      </children>
                   </VBox>
                </children>
@@ -37,7 +38,8 @@
                   </TableView>
                   <TableView fx:id="all_users_table" prefHeight="366.0" prefWidth="238.0">
                     <columns>
-                      <TableColumn fx:id="all_users_col" prefWidth="235.0" text="All Users" />
+                      <TableColumn fx:id="all_users_col" prefWidth="136.0" text="All Users" />
+                        <TableColumn fx:id="all_users_role_col" prefWidth="100.0" text="Roles" />
                     </columns>
                   </TableView>
                </children>

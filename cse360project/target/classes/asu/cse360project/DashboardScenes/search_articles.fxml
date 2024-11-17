@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
@@ -9,95 +11,176 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane prefHeight="838.0" prefWidth="908.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.SearchArticlesController">
+<ScrollPane fx:id="scroll_pane" prefHeight="1381.0" prefWidth="1071.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.SearchArticlesController">
    <content>
-      <VBox alignment="TOP_CENTER" prefHeight="823.0" prefWidth="909.0" spacing="10.0">
-         <children>
-            <HBox alignment="CENTER" prefHeight="30.0" prefWidth="845.0" spacing="5.0">
+      <BorderPane prefHeight="1352.0" prefWidth="1071.0">
+         <bottom>
+            <StackPane fx:id="botttom_pane" alignment="TOP_CENTER" prefHeight="849.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="keyword_input" prefHeight="30.0" prefWidth="529.0" promptText="Searching uses words, names, or phrases in the title, author, or abstract" />
-                  <HBox>
+                  <VBox fx:id="bottom_box" alignment="TOP_CENTER" prefHeight="822.0" prefWidth="1071.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#SearchKeywords" prefHeight="33.0" prefWidth="64.0" text="Search" />
+                        <Text fx:id="header" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="667.0" />
+                        <Text fx:id="title" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="authors" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
+                        <Text fx:id="description" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="body" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="keywords" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
+                        <Text fx:id="references" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
+         </bottom>
+         <center>
+            <VBox alignment="TOP_CENTER" prefHeight="399.0" prefWidth="1071.0" spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ToggleButton fx:id="edit_view_btn" mnemonicParsing="false" onAction="#editView" prefHeight="25.0" prefWidth="99.0" text="Edit View" />
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="845.0" spacing="5.0">
+                     <children>
+                        <TextField fx:id="keyword_input" prefHeight="30.0" prefWidth="529.0" promptText="Searching uses words, names, or phrases in the title, author, or abstract" />
+                        <HBox>
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#SearchKeywords" prefHeight="33.0" prefWidth="64.0" text="Search" />
+                           </children>
+                        </HBox>
+                        <MenuButton fx:id="level_btn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="117.0" text="Level">
+                           <items>
+                              <MenuItem mnemonicParsing="false" onAction="#setBeginner" text="Beginner" />
+                              <MenuItem mnemonicParsing="false" onAction="#setIntermidiate" text="intermediate" />
+                              <MenuItem mnemonicParsing="false" onAction="#setAdvanced" text="Advanced" />
+                              <MenuItem mnemonicParsing="false" onAction="#setExpert" text="Expert" />
+                              <MenuItem mnemonicParsing="false" onAction="#setAll" text="All" />
+                           </items>
+                        </MenuButton>
                      </children>
                   </HBox>
-                  <MenuButton fx:id="level_btn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="117.0" text="Level">
-                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#setBeginner" text="Beginner" />
-                        <MenuItem mnemonicParsing="false" onAction="#setIntermidiate" text="intermediate" />
-                        <MenuItem mnemonicParsing="false" onAction="#setAdvanced" text="Advanced" />
-                        <MenuItem mnemonicParsing="false" onAction="#setExpert" text="Expert" />
-                        <MenuItem mnemonicParsing="false" onAction="#setAll" text="All" />
-                     </items>
-                  </MenuButton>
+                  <HBox alignment="CENTER" prefHeight="256.0" prefWidth="915.0" spacing="10.0">
+                     <children>
+                        <VBox alignment="CENTER">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#selectGroup" prefHeight="25.0" prefWidth="96.0" text="Select Group" />
+                              <Button mnemonicParsing="false" onAction="#removeGroup" text="Remove Group" />
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="195.0" prefWidth="296.0" spacing="10.0">
+                           <children>
+                              <HBox alignment="CENTER" prefHeight="29.0" prefWidth="277.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="groups_input" prefHeight="33.0" prefWidth="201.0" promptText="Groups" />
+                                    <Button mnemonicParsing="false" onAction="#searchGroups" prefHeight="32.0" prefWidth="68.0" text="Search" />
+                                 </children>
+                              </HBox>
+                              <TableView fx:id="group_table" prefHeight="220.0" prefWidth="296.0">
+                                 <columns>
+                                    <TableColumn fx:id="group_id" prefWidth="81.0" text="ID" />
+                                    <TableColumn fx:id="group_name" prefWidth="214.0" text="Name" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                        <VBox prefHeight="256.0" prefWidth="573.0" spacing="10.0">
+                           <children>
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="articles_input" prefHeight="33.0" prefWidth="201.0" promptText="Articles" />
+                                    <Button mnemonicParsing="false" onAction="#SearchArticles" prefHeight="33.0" prefWidth="64.0" text="Search" />
+                                 </children>
+                              </HBox>
+                              <TableView fx:id="article_table" prefHeight="226.0" prefWidth="573.0">
+                                 <columns>
+                                    <TableColumn fx:id="article_title" prefWidth="133.0" text="Title" />
+                                    <TableColumn fx:id="article_author" prefWidth="131.0" text="Author" />
+                                    <TableColumn fx:id="article_abstract" minWidth="0.0" prefWidth="308.0" text="Abstract" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Text fx:id="groups_selected_txt" strokeType="OUTSIDE" strokeWidth="0.0" text="Groups: " wrappingWidth="789.13671875" />
+                  <Label fx:id="error_text" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="755.0" />
+                  <Separator prefWidth="1051.0" />
                </children>
-            </HBox>
-            <HBox alignment="CENTER" prefHeight="256.0" prefWidth="870.0" spacing="10.0">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
+         </center>
+         <top>
+            <HBox fx:id="top_pane" alignment="CENTER" prefHeight="138.0" prefWidth="1071.0" spacing="3.0" BorderPane.alignment="CENTER">
                <children>
-                  <VBox prefHeight="195.0" prefWidth="296.0" spacing="10.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="3.0">
                      <children>
-                        <HBox alignment="CENTER" prefHeight="29.0" prefWidth="277.0" spacing="5.0">
-                           <children>
-                              <TextField fx:id="groups_input" prefHeight="33.0" prefWidth="201.0" promptText="Groups" />
-                              <Button mnemonicParsing="false" onAction="#searchGroups" prefHeight="32.0" prefWidth="68.0" text="Search" />
-                           </children>
-                        </HBox>
-                        <TableView fx:id="group_table" prefHeight="220.0" prefWidth="296.0">
-                           <columns>
-                              <TableColumn fx:id="group_id" prefWidth="81.0" text="ID" />
-                              <TableColumn fx:id="group_name" prefWidth="214.0" text="Name" />
-                           </columns>
-                        </TableView>
+                        <Label text="Article Settings">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="109.0" text="Add Article" />
+                        <Button mnemonicParsing="false" onAction="#updateArticle" prefHeight="25.0" prefWidth="109.0" text="Update Article" />
+                        <Button mnemonicParsing="false" onAction="#deleteArticle" prefHeight="25.0" prefWidth="109.0" text="Delete Article" />
                      </children>
                   </VBox>
-                  <VBox prefHeight="256.0" prefWidth="573.0" spacing="10.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="111.0" spacing="3.0">
                      <children>
-                        <HBox alignment="CENTER" spacing="5.0">
-                           <children>
-                              <TextField fx:id="articles_input" prefHeight="33.0" prefWidth="201.0" promptText="Articles" />
-                              <Button mnemonicParsing="false" onAction="#SearchArticles" prefHeight="33.0" prefWidth="64.0" text="Search" />
-                           </children>
-                        </HBox>
-                        <TableView fx:id="article_table" prefHeight="226.0" prefWidth="573.0">
-                           <columns>
-                              <TableColumn fx:id="article_title" prefWidth="133.0" text="Title" />
-                              <TableColumn fx:id="article_author" prefWidth="131.0" text="Author" />
-                              <TableColumn fx:id="article_abstract" minWidth="0.0" prefWidth="308.0" text="Abstract" />
-                           </columns>
-                        </TableView>
+                        <Label text="Group Settings">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="109.0" text="Add Group" />
+                        <Button mnemonicParsing="false" onAction="#addSAG" prefHeight="25.0" prefWidth="109.0" text="Add SAG Group" />
+                        <Button mnemonicParsing="false" onAction="#deleteGroup" prefHeight="25.0" prefWidth="109.0" text="Delete Group" />
+                        <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="109.0" text="Backup Group(s)" />
+                        <Button mnemonicParsing="false" onAction="#updateAccess" prefHeight="25.0" prefWidth="109.0" text="Update Acess" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="94.0" spacing="3.0">
+                     <children>
+                        <Label text="Backup Settings">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="33.0" prefWidth="86.0" text="Restore" />
+                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="33.0" prefWidth="85.0" text="Merge" />
+                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="33.0" prefWidth="85.0" text="Delete" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" prefHeight="175.0" prefWidth="313.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="108.0" text="Backups">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <ListView fx:id="backups_list" prefHeight="151.0" prefWidth="313.0" />
+                        <HBox alignment="CENTER" prefHeight="47.0" prefWidth="957.0" />
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <Separator prefWidth="200.0" />
-            <Text fx:id="header" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="667.0" />
-            <Text fx:id="title" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
-               <font>
-                  <Font name="System Bold" size="18.0" />
-               </font>
-            </Text>
-            <Text fx:id="authors" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
-            <Text fx:id="description" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Text>
-            <Text fx:id="body" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Text>
-            <Text fx:id="keywords" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
-            <Text fx:id="references" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="JUSTIFY" wrappingWidth="667.0" />
-         </children>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-      </VBox>
+         </top>
+      </BorderPane>
    </content>
 </ScrollPane>

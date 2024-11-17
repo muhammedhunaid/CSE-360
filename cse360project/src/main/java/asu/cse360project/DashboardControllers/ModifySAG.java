@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
+import asu.cse360project.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,6 +21,7 @@ import javafx.fxml.Initializable;
 public class ModifySAG implements Initializable{
 
     Singleton data = Singleton.getInstance();
+    private int num_admins = 0;
 
     private User selectedUser = null;
     private User selectedSAGUser = null;
@@ -30,6 +32,7 @@ public class ModifySAG implements Initializable{
     @FXML private TableView<User> all_users_table;
     @FXML private Button delete_viewer;
     @FXML private TableColumn<User, String> sag_users_col;
+    @FXML private TableColumn<User, String> all_users_role_col;
     @FXML private TableView<User> sag_users_table;
 
     ObservableList<User> all_users = FXCollections.observableArrayList();
@@ -39,14 +42,8 @@ public class ModifySAG implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         all_users_col.setCellValueFactory(new PropertyValueFactory<>("username"));
         sag_users_col.setCellValueFactory(new PropertyValueFactory<>("username"));
-
-        try {
-            all_users = data.user_db.ListUsers(all_users);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        all_users_role_col.setCellValueFactory(new PropertyValueFactory<>("role"));
         
-        all_users_table.setItems(all_users);
         try {
             getSAGUsers();
         } catch (SQLException e) {
@@ -70,43 +67,52 @@ public class ModifySAG implements Initializable{
     @FXML
     void addViewer(ActionEvent event) throws IOException, SQLException {
         if(selectedUser != null){
-            if(!sag_users.contains(selectedUser)){
-                data.group_articles_db.linkSAG(selectedUser.getId(), data.SAGGroupId, false);
-                getSAGUsers();
-            }
+            data.group_articles_db.linkSAG(selectedUser.getId(), data.edit_group.get(0), false);
+            getSAGUsers();
         }
     }
 
     @FXML
     void addAdmin(ActionEvent event) throws IOException, SQLException {
         if(selectedUser != null && !selectedUser.isOnlyStudent()){
-            if(!sag_users.contains(selectedUser)){
-                data.group_articles_db.linkSAG(selectedUser.getId(), data.SAGGroupId, true);
-                getSAGUsers();
-            }
+            data.group_articles_db.linkSAG(selectedUser.getId(), data.edit_group.get(0), true);
+            getSAGUsers();
         }
+    }
+
+    @FXML
+    void back(ActionEvent event) throws IOException, SQLException {
+        Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
     @FXML
     void deleteViewer(ActionEvent event) throws IOException, SQLException {
         if(selectedSAGUser != null){
+            if(selectedSAGUser.getUsername().contains(" *ADMIN*") && num_admins == 1) {  
+                return;
+            }
+
             data.group_articles_db.deleteSAGUsers(selectedSAGUser.getId());
             getSAGUsers();
         }
     }
 
     void getSAGUsers() throws SQLException{
-        ObservableList<User> admin_users;
-        ObservableList<User> viewer_users;
-        
-        admin_users = data.group_articles_db.ListSAGUsers(data.SAGGroupId, true);
-        viewer_users = data.group_articles_db.ListSAGUsers(data.SAGGroupId, false);
+        all_users = data.group_articles_db.ListUsersNotInGroup(data.edit_group.get(0));
+        all_users_table.setItems(all_users);
 
+        ObservableList<User> admin_users = data.group_articles_db.ListSAGUsers(data.edit_group.get(0), true);
+        ObservableList<User> viewer_users = data.group_articles_db.ListSAGUsers(data.edit_group.get(0), false);
+
+        num_admins = admin_users.size();
         for(User i : admin_users){
             i.setUsername(i.getUsername() + " *ADMIN*");
         }
-        
+
+        sag_users.clear();        
         sag_users.addAll(admin_users);
         sag_users.addAll(viewer_users);
+
+        sag_users_table.setItems(sag_users);
     }
 }

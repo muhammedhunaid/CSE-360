@@ -102,9 +102,7 @@ public class CEArticleController implements Initializable {
 
         // Attempt to load all groups, including special groups (All Articles, Ungrouped Articles) from database
         try {
-            groups_list = data.group_articles_db.getAllGroups();
-            groups_list.add(0, new Group("All Articles", -1));
-            groups_list.add(1, new Group("Ungrouped Articles", 0));
+            groups_list = data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId());
             group_table.setItems(groups_list);  // Set groups list to group table
         } catch (SQLException e) {
             e.printStackTrace();
@@ -216,7 +214,7 @@ public class CEArticleController implements Initializable {
      // Adds the selected group to the group links list
     @FXML
     void addGroup(ActionEvent event) {
-        if(selectedGroup != null && !groups.contains(selectedGroup.getId()) && selectedGroup.getId() != -1 && selectedGroup.getId() != 0)
+        if(selectedGroup != null)
         {
             groups.add(selectedGroup.getId()); //add group to list of article groups
             group_links.setText("Groups links: " + groups.toString()); //update UI
@@ -254,7 +252,7 @@ public class CEArticleController implements Initializable {
      // Cancels the editing or creation of an article and returns to the manage articles page
     @FXML
     void cancel(ActionEvent event) throws IOException {
-        Utils.setContentArea("manage_articles");
+        Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
     void setLevel(String level_txt) {
@@ -283,11 +281,13 @@ public class CEArticleController implements Initializable {
             data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, permissions, groups, refrences);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
+            data.sa_controller.getArticles();
         }else{ //create new article
             data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
+            data.sa_controller.getArticles();
         }
 
-        Utils.setContentArea("manage_articles");  // Navigate to manage articles view
+        Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
     //helper function to determine which permissions are checked

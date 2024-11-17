@@ -116,8 +116,6 @@ public class GroupController implements Initializable {
     {
         try {
         	all_Groups = data.group_articles_db.getAllGroups();
-            all_Groups.add(0, new Group("All Articles", -1));
-            all_Groups.add(1, new Group("Ungrouped Articles", 0));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -247,7 +245,7 @@ public class GroupController implements Initializable {
         if(selectedGroup != null)
         {
             data.edit_group = selected_groups;
-            Utils.setContentArea("manage_articles");
+            Utils.setContentArea(data.content_area,"manage_articles");
         } 
     }
     
@@ -263,7 +261,7 @@ public class GroupController implements Initializable {
         result.ifPresent(groupName -> {
             if (!groupName.isBlank()) {
                 try {
-                    Group new_group = data.group_articles_db.addGroup(groupName);
+                    //Group new_group = data.group_articles_db.addGroup(groupName);
                     all_Groups.add(new_group);                    
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -299,5 +297,6 @@ public class GroupController implements Initializable {
             selected_groups.remove(Integer.valueOf(selectedGroup.getId()));
             groups_selected_txt.setText(selected_groups.toString());
         }
-    }   
+    } 
+    
 }

@@ -44,26 +44,26 @@ public class DashboardController implements Initializable {
     @FXML
     void manageUsers(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea("manage_users");
+        Utils.setContentArea(data.content_area,"manage_users");
     }
 
     @FXML
     void manageArticles(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea("group_dashboard");
+        Utils.setContentArea(data.content_area,"group_dashboard");
     }
 
     @FXML
     void modifySAG(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea("modify_SAG");
+        Utils.setContentArea(data.content_area,"modify_SAG");
     }
 
     
     @FXML
     void viewArticles(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea("search_articles");
+        Utils.setContentArea(data.content_area,"search_articles");
     }
 
     @FXML
