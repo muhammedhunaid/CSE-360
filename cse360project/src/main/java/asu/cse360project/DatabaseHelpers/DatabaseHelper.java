@@ -23,6 +23,7 @@ public class DatabaseHelper {
 
 	private UserHelper user_helper;
 	private GroupArticlesHelper groups_articles_helper;
+	private MessageHelper msg_helper;
 
     //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
     private EncryptionHelper encryptionHelper;
@@ -36,11 +37,11 @@ public class DatabaseHelper {
             statement = connection.createStatement(); // Create a statement for executing SQL commands
 
 			user_helper = new UserHelper(connection, statement);
-            
             //initialize the encryptionhelper object which will be used in encryption and decryption
             encryptionHelper = new EncryptionHelper();
-
 			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
+			msg_helper = new MessageHelper(connection, statement);
+
 			createTables();  // Call method to create necessary tables if they don't already exist
             
         } catch (ClassNotFoundException e) {
@@ -54,6 +55,10 @@ public class DatabaseHelper {
 
 	public GroupArticlesHelper getGroupArticlesHelper() {
 		return groups_articles_helper;		
+	}
+	
+	public MessageHelper getMessageHelper() {
+		return msg_helper;
 	}
 
     // Method to check if the database is empty
@@ -85,6 +90,7 @@ public class DatabaseHelper {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();
+		msg_helper.createTables();
 	}
 
 }

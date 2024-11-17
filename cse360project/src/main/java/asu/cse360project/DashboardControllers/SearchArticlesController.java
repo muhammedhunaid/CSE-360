@@ -251,35 +251,35 @@ public class SearchArticlesController implements Initializable{
     @FXML   //set search level to advanced
     void setAdvanced(ActionEvent event) throws SQLException {
         level = "advanced";
-        level_btn.setText(level);
+        level_btn.setText("Advanced");
         getArticles();
     }
 
     @FXML //set search level to beginner
     void setBeginner(ActionEvent event) throws SQLException {
         level = "beginner";
-        level_btn.setText(level);
+        level_btn.setText("Beginner");
         getArticles();
     }
 
     @FXML //set search level to expert
     void setExpert(ActionEvent event) throws SQLException {
         level = "expert";
-        level_btn.setText(level);
+        level_btn.setText("Expert");
         getArticles();
     }
 
     @FXML //set search level to all
     void setAll(ActionEvent event) throws SQLException {
         level = "all";
-        level_btn.setText(level);
+        level_btn.setText("All");
         getArticles();
     }
 
     @FXML //set search level to Intermidiate
     void setIntermidiate(ActionEvent event) throws SQLException {
         level = "intermediate";
-        level_btn.setText(level);
+        level_btn.setText("Intermediate");
         getArticles();
     }
 

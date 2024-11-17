@@ -25,6 +25,7 @@ public class Singleton {
     // Database helpers for managing user and group article data
     public DatabaseHelper db;
     public UserHelper user_db;
+    public MessageHelper message_db;
     public GroupArticlesHelper group_articles_db;
     public SearchArticlesController sa_controller;
 
@@ -72,6 +73,7 @@ public class Singleton {
         this.db = db;
         this.user_db = db.getUser_helper();
         this.group_articles_db = db.getGroupArticlesHelper();
+        this.message_db = db.getMessageHelper();
     }
     
     /**

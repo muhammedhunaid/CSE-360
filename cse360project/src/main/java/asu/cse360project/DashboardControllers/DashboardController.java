@@ -52,13 +52,6 @@ public class DashboardController implements Initializable {
         // Load the manage users scene when the corresponding action is triggered
         Utils.setContentArea(data.content_area,"group_dashboard");
     }
-
-    @FXML
-    void modifySAG(ActionEvent event) throws IOException {
-        // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea(data.content_area,"modify_SAG");
-    }
-
     
     @FXML
     void viewArticles(ActionEvent event) throws IOException {
@@ -86,6 +79,27 @@ public class DashboardController implements Initializable {
                 }
             }
         });
+    }
+    
+    /**
+     * Handles the send message action.
+     * @param event The action event.
+     * @throws IOException If an I/O exception occurs.
+     */
+    @FXML
+    void sendMessage(ActionEvent event) throws IOException {
+    	Utils.setContentArea(data.content_area, "messaging");
+    }
+    
+    
+    /**
+     * Handles the view message action.
+     * @param event The action event.
+     * @throws IOException If an I/O exception occurs.
+     */
+    @FXML
+    void viewMessages(ActionEvent event) throws IOException {
+    	Utils.setContentArea(data.content_area, "manage_msg");
     }
 }
 

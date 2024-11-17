@@ -190,4 +190,15 @@ public class ManageArticlesController implements Initializable {
             Utils.setContentArea(data.content_area, "create_edit_article"); // Set the content area to the create/edit article view
         }
     }
+    
+    /**
+     * Handles the send message action.
+     * @param event The action event.
+     * @throws IOException If an I/O exception occurs.
+     */
+    @FXML
+    void sendMessage(ActionEvent event) throws IOException {
+    	System.out.println("Sending message :)");
+    	Utils.setContentArea("messaging");
+    }
 }
