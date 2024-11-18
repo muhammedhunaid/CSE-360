@@ -14,7 +14,6 @@
       <VBox prefHeight="400.0" prefWidth="119.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" onAction="#viewArticles" prefHeight="41.0" prefWidth="200.0" text="View Articles" />
-            <Button mnemonicParsing="false" onAction="#manageArticles" prefHeight="41.0" prefWidth="200.0" text="Manage Articles" />
             <VBox fx:id="admin_controlls">
                <children>
                   <Button mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />

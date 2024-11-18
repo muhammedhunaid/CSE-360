@@ -37,7 +37,7 @@ public class Group implements Serializable{
     // Default constructor initializes fields to empty strings
     public Group(String name, int id) {
     	this.name = name;
-    	this.id = 0;
+    	this.id = id;
     }
 
     public void setSpecial(boolean special)

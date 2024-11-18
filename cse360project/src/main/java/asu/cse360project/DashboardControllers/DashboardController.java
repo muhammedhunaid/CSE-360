@@ -48,12 +48,6 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
-    void manageArticles(ActionEvent event) throws IOException {
-        // Load the manage users scene when the corresponding action is triggered
-        Utils.setContentArea(data.content_area,"group_dashboard");
-    }
-    
-    @FXML
     void viewArticles(ActionEvent event) throws IOException {
         // Load the manage users scene when the corresponding action is triggered
         Utils.setContentArea(data.content_area,"search_articles");

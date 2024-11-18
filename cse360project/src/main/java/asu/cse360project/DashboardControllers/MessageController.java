@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Singleton;
+import asu.cse360project.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,12 +56,9 @@ public class MessageController implements Initializable {
         }
         
         Singleton data = Singleton.getInstance();
-        String user = data.getAppUser().getUsername();
-        System.out.println(user); 
+        User user = data.getAppUser();
         
-        
-        
-        data.message_db.newMsg(message_value, user, type);
+        data.message_db.newMsg(message_value, user.getUsername(), type, user.getId());
 	}
 	
 }

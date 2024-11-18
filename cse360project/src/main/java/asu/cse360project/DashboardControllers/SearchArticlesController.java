@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import asu.cse360project.Article;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
+import asu.cse360project.User;
 import asu.cse360project.Utils;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
@@ -43,6 +44,7 @@ import javafx.scene.text.Text;
 public class SearchArticlesController implements Initializable{
     Singleton data = Singleton.getInstance();
     boolean add_special = false;
+    String last_search = "";
 
     //table variables
     ObservableList<Article> articles_list  = FXCollections.observableArrayList();;
@@ -90,7 +92,7 @@ public class SearchArticlesController implements Initializable{
     @FXML private Text title;
 
     //search settings
-    String level = "All";
+    String level = "all";
     String search_keywords = "";
 
     //text fields
@@ -119,16 +121,18 @@ public class SearchArticlesController implements Initializable{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        
+        //make article table set elements
+        makeArticleTable();
         makeGroupTable();
+
         try {
             getGroups();
+            getArticles();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        //make article table set elements
-        makeArticleTable();
 
         scroll_pane.setOnMouseMoved(event -> {
             Utils.disableNode(error_text);
@@ -146,12 +150,8 @@ public class SearchArticlesController implements Initializable{
 
     //get all articles from picked group
     public void getArticles() throws SQLException {
-        if(selected_groups.isEmpty())
-        {
-            articles_list.clear();
-        }else{
-            articles_list = data.group_articles_db.searchArticles(selected_groups, level, search_keywords);
-        }
+        User user = data.getAppUser();
+        articles_list = data.group_articles_db.searchArticles(selected_groups, level, search_keywords, user.getId(), user.getLoginRole());
         article_table.setItems(articles_list);
     }
 
@@ -187,7 +187,7 @@ public class SearchArticlesController implements Initializable{
 
         // Add listener to handle double clicking article
         article_table.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedArticle != null) {
                 try {
                     viewArticle();
                 } catch (Exception e) {
@@ -213,6 +213,21 @@ public class SearchArticlesController implements Initializable{
             	selectedGroup = newSelection;
             }
         });
+
+        group_table.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedGroup != null) {
+                try {
+                    if(selected_groups.contains(selectedGroup.getId())) {
+                        removeGroup(new ActionEvent());
+                    }else{
+                        selectGroup(new ActionEvent());
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private <T> void createWrappedColumn (TableColumn<T, String> column) {
@@ -228,8 +243,19 @@ public class SearchArticlesController implements Initializable{
     }
 
     @FXML //set get keywords searched
-    void SearchKeywords(ActionEvent event) throws SQLException {
+    void searchArticles(ActionEvent event) throws SQLException {
         search_keywords = keyword_input.getText();
+        if(!groups_list.isEmpty() || !search_keywords.isEmpty() || !level.equals("all")) {
+            String search = "Group(s): " + data.group_articles_db.getGroupNames(selected_groups) + 
+                            " | Keywords: " + search_keywords +
+                            " | Level: " + level; 
+
+            if (last_search != search)
+            {
+                data.message_db.addSearch(search, data.getAppUser().getId());
+                last_search = search;
+            }
+        }
         getArticles();
     }
 
@@ -252,35 +278,30 @@ public class SearchArticlesController implements Initializable{
     void setAdvanced(ActionEvent event) throws SQLException {
         level = "advanced";
         level_btn.setText("Advanced");
-        getArticles();
     }
 
     @FXML //set search level to beginner
     void setBeginner(ActionEvent event) throws SQLException {
         level = "beginner";
         level_btn.setText("Beginner");
-        getArticles();
     }
 
     @FXML //set search level to expert
     void setExpert(ActionEvent event) throws SQLException {
         level = "expert";
         level_btn.setText("Expert");
-        getArticles();
     }
 
     @FXML //set search level to all
     void setAll(ActionEvent event) throws SQLException {
         level = "all";
         level_btn.setText("All");
-        getArticles();
     }
 
     @FXML //set search level to Intermidiate
     void setIntermidiate(ActionEvent event) throws SQLException {
         level = "intermediate";
         level_btn.setText("Intermediate");
-        getArticles();
     }
 
     // Populates the UI fields with the selected article’s content
@@ -479,7 +500,6 @@ public class SearchArticlesController implements Initializable{
             data.editing_article = true; // Indicate that an article is being edited
             data.article = selectedArticle; // Set the article to be edited
             Utils.setContentArea(data.view_area, "create_edit_article"); // Set the content area to the create/edit article view
-            getArticles();
         }
     }
 
@@ -525,7 +545,6 @@ public class SearchArticlesController implements Initializable{
         {
             selected_groups.add(selectedGroup.getId());
             groups_selected_txt.setText("Group: " + selected_groups.toString());
-            getArticles();
         }
     }
 
@@ -535,7 +554,6 @@ public class SearchArticlesController implements Initializable{
         {
             selected_groups.remove(Integer.valueOf(selectedGroup.getId()));
             groups_selected_txt.setText("Groups: " + selected_groups.toString());
-            getArticles();
         }
     }
     
@@ -548,5 +566,6 @@ public class SearchArticlesController implements Initializable{
             backups_list.setItems(all_backups);
         }
     }
+
 }
 

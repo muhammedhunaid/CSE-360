@@ -228,9 +228,37 @@ public class GroupArticlesHelper{
             // Iterate through the result set and create Group objects
             while (rs.next()) {
                 Group g = getGroup(rs);
-                g.setName(g.getName() + " *SAG*");
+                if (g.getSpecial()) {
+                    g.setName(g.getName() + " *SAG*");
+                }
                 groups.add(g);
             }
+        }
+        return groups;
+    }
+
+    public ArrayList<Integer> getAllSpecialGroupIds(int user_id) throws SQLException {
+        ArrayList<Integer> groups = new ArrayList<>();
+
+        String query = 
+            "SELECT * " + 
+            "FROM Groups g " + 
+            "JOIN User_Groups ag ON g.group_id = ag.group_id " +
+            "JOIN cse360users a ON ag.id = a.id " +
+            "WHERE a.id = ?;";
+        
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set theuser_id parameter
+        stmt.setLong(1, user_id);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Group objects
+            while (rs.next()) {
+                int group_id = rs.getInt(user_id);
+                groups.add(group_id);
+            }
+        } catch (Exception e) {
+            return null;
         }
         return groups;
     }
@@ -314,12 +342,24 @@ public class GroupArticlesHelper{
         return articles;
     }
 
-    public ObservableList<Article> searchArticles(ArrayList<Integer> group_ids, String search_level, String search_keywords) throws SQLException {
+    public ObservableList<Article> searchArticles(ArrayList<Integer> group_ids, String search_level, String search_keywords, int user_id, String role) throws SQLException {
         ObservableList<Article> articles = FXCollections.observableArrayList();
 
-        if(group_ids.contains(0))
+        if(group_ids.isEmpty())
         {
-            articles.addAll(ListAllUnGroupedArticles());
+            group_ids = getAllSpecialGroupIds(user_id);
+            if (group_ids.isEmpty()) {
+                return articles;
+            }
+            
+            if(!role.equals("student"))
+            {
+                articles.addAll(ListAllUnGroupedArticles(search_level,search_keywords));
+            }
+        }
+
+        if(group_ids.contains(0)) {
+            articles.addAll(ListAllUnGroupedArticles(search_level,search_keywords));
         }
 
         String query = 
@@ -336,12 +376,12 @@ public class GroupArticlesHelper{
             values += "?)";
             query += values;
 
-        if(!search_level.equals("All")) {
-            query += "AND (a.level = ?)";
+        if(!search_level.equals("all")) {
+            query += " AND (a.level = ?)";
         }
 
         if(!search_keywords.isEmpty()) {
-            query += "AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
+            query += " AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
         }
 
         PreparedStatement stmt = connection.prepareStatement(query);            
@@ -352,7 +392,7 @@ public class GroupArticlesHelper{
             param++;
         }
 
-        if(!search_level.equals("All")) {
+        if(!search_level.equals("all")) {
             stmt.setString(param, search_level);
             param++;
         }
@@ -391,12 +431,10 @@ public class GroupArticlesHelper{
     }
     
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
-        System.out.println(groups);
         ObservableList<Article> articles =  FXCollections.observableArrayList();
         if(groups.contains(0))
         {
-            System.out.println("finding ungrouped");
-            articles.addAll(ListAllUnGroupedArticles());
+            articles.addAll(ListAllUnGroupedArticles("all", ""));
         }
         for(Integer grp_id: groups)
         {
@@ -405,23 +443,44 @@ public class GroupArticlesHelper{
         return articles;
     }
 
-    private ObservableList<Article> ListAllUnGroupedArticles() throws SQLException {
+    private ObservableList<Article> ListAllUnGroupedArticles(String search_level, String search_keywords) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
 
         String query = 
             "SELECT a.* " + 
             "FROM Articles a " + 
             "LEFT JOIN Article_Groups ag ON a.article_id = ag.article_id " +
-            "WHERE ag.article_id IS NULL;";
+            "WHERE ag.article_id IS NULL";
 
-            PreparedStatement stmt = connection.prepareStatement(query);            
-            try (ResultSet rs = stmt.executeQuery()) {
-                // Iterate through the result set and create Article objects
-                while (rs.next()) {
-                    articles.add(getArticle(rs));
-                }
+        if(!search_level.equals("all")) {
+            query += " AND (a.level = ?)";
+        }
+
+        if(!search_keywords.isEmpty()) {
+            query += " AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
+        }
+
+        PreparedStatement stmt = connection.prepareStatement(query);            
+        // Set the group name parameter
+        int param = 1;
+
+        if(!search_level.equals("all")) {
+            stmt.setString(param, search_level);
+            param++;
+        }
+
+        if(!search_keywords.isEmpty()) {
+            stmt.setString(param, "%" + search_keywords + "%"); param++;
+            stmt.setString(param, "%" + search_keywords + "%"); param++;
+            stmt.setString(param, "%" + search_keywords + "%");
+        }
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            // Iterate through the result set and create Article objects
+            while (rs.next()) {
+                articles.add(getArticle(rs));
             }
-
+        }
         return articles;
     }
 
@@ -686,6 +745,29 @@ public class GroupArticlesHelper{
                 addArticle(a.getId(),a.getTitle(),a.getAbstractText(),a.getKeywords(),a.getBody(),a.getLevel(),a.getAuthors(),a.getPermissions(),a.getGroups(), a.getReferences());
             }
         }  
+    }
+
+    //input list of group ids and return list of their names
+    public ArrayList<String> getGroupNames(ArrayList<Integer> group_ids) throws SQLException
+    {
+        ArrayList<String> group_names = new ArrayList<>(0);
+
+        if (group_ids.size() == 0)
+        {
+            group_names.add("All");
+            return group_names;
+        }
+
+        if (group_ids.contains(0))
+        {
+            group_names.add("Ungrouped");
+        }
+
+        for(Integer gid : group_ids){
+            Group g = getGroup(gid);
+            group_names.add(g.getName());
+        }
+        return group_names;
     }
 
     private void writeArticlesToFile(backup_container backup, String fileName) {

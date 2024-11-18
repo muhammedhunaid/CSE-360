@@ -1,8 +1,9 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import asu.cse360project.User;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 import asu.cse360project.DatabaseHelpers.UserHelper;
 import javafx.collections.FXCollections;
