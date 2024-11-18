@@ -4,18 +4,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import asu.cse360project.Singleton;
-import asu.cse360project.User;
-import asu.cse360project.Utils;
+import asu.cse360project.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class DashboardController implements Initializable {
@@ -26,16 +22,20 @@ public class DashboardController implements Initializable {
 
     @FXML private StackPane contentArea; // Area to display the content of different scenes
     @FXML private Label top_label; // Label to display user information at the top
-    @FXML private VBox admin_controlls; // VBox to contain admin-specific controls
+    @FXML private Button send_message_btn;
+    @FXML private Button view_message_btn;
+    @FXML private Button manage_users_btn;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         // Set the top label with the user's role and username
         Utils.setLabel(top_label, user.getLoginRole() + ": " + user.getUsername(), Color.BLACK);
         
-        // Disable admin controls if the logged-in user is not an admin
-        if (!user.getLoginRole().equals("admin")) {
-            Utils.disableNode(admin_controlls);
+        if (user.getLoginRole().equals("student")) {
+            Utils.disableNode(view_message_btn);
+            Utils.disableNode(manage_users_btn);
+        }else{
+            Utils.disableNode(send_message_btn);
         }
         
         data.content_area = contentArea;

@@ -25,10 +25,12 @@ public class MessageController implements Initializable {
 	@FXML private RadioButton gen_btn, spc_btn;
 	@FXML private TextField message_box;
 	@FXML private Label top_label; // Label to display user information at the top
+	Singleton data;
     
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		data = Singleton.getInstance();
 		gen_btn.setToggleGroup(group);
 		gen_btn.setSelected(true);
 		spc_btn.setToggleGroup(group);
@@ -55,10 +57,12 @@ public class MessageController implements Initializable {
 			System.out.println("Specific Message");
         }
         
-        Singleton data = Singleton.getInstance();
         User user = data.getAppUser();
-        
-        data.message_db.newMsg(message_value, user.getUsername(), type, user.getId());
+		if(!message_value.isEmpty())
+		{     
+			data.message_db.newMsg(message_value, user.getUsername(), type, user.getId());
+		}
+
 	}
 	
 }

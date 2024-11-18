@@ -193,21 +193,44 @@ public class ManageUsersController implements Initializable {
     // Method to delete a selected user
     @FXML
     void delete(ActionEvent event) {
-        if (selectedUser != null) {
+        if(selectedUser == null)
+        {
+            return;
+        }
+
+        if(selectedUser.getUsername().equals(data.getAppUser().getUsername()))
+        {
+            Utils.setLabel(error_label, "Cannot remove self from system", Color.RED); // Show error if no user is selected
+            return;
+        }
+
+        if(data.getAppUser().getLoginRole().equals("instructor") && selectedUser.isAdmin()) {
+            Utils.setLabel(error_label, "Cannot remove admins from system", Color.RED); // Show error if no user is selected
+            return;
+        }
+
+        if (!selectedUser.getUsername().equals(data.getAppUser().getUsername())) {
             // Show confirmation dialog for deleting user
             alert.setContentText("Are you sure you want to delete user");
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     // Remove user from list and database
-                    all_Users.remove(all_Users.indexOf(selectedUser));
-                    data.user_db.deleteUser(selectedUser.getUsername());
-                    Utils.setLabel(error_label, "User Removed", Color.BLACK); // Show success message
+                    boolean removed;
+                    try {
+                        removed = data.user_db.deleteUser(selectedUser);
+                    } catch (SQLException e) {
+                        removed = false;
+                    }
+                    if(removed) {
+                        Utils.setLabel(error_label, "User Removed", Color.BLACK); // Show success message
+                        all_Users.remove(all_Users.indexOf(selectedUser));
+                    }else{
+                        Utils.setLabel(error_label, "Error removing User", Color.BLACK); // Show success message
+                    }
                 } else {
-                    Utils.setLabel(error_label, "User not Removed", Color.BLACK); // Show message if no deletion is made
+                    return;
                 }
             });
-        } else {
-            Utils.setLabel(error_label, "No User Selected", Color.RED); // Show error if no user is selected
         }
     }
 

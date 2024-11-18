@@ -60,25 +60,25 @@ public class UserHelper{
     }
 
     // Method to delete a user from the database
-    public void deleteUser(String username) {
+    public boolean deleteUser(User user) throws SQLException {
         String deleteQuery = "DELETE FROM cse360users WHERE username = ?"; // SQL query for deleting a user
 
         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) { // Create prepared statement
             // Set the username parameter for the DELETE query
-            deleteStmt.setString(1, username);
+            deleteStmt.setString(1, user.getUsername());
 
             // Execute the delete and get the number of rows affected
             int rowsDeleted = deleteStmt.executeUpdate(); 
             if (rowsDeleted > 0) {
-                System.out.println(username + " User deleted successfully."); // Print success message
+				return true;
             } else {
-                System.out.println("No user found with the given username."); // Print message if user not found
+                return false;
             }
-
         } catch (SQLException e) {
-            e.printStackTrace(); // Print the stack trace for SQL exceptions
+            return false;
         }
     }
+	
 
     // Method to add a new user with username, password, and role
     public void addUser(String username, String password, String role) throws SQLException {

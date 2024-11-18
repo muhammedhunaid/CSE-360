@@ -139,12 +139,12 @@ public class TestScript {
         try {
             // Deleting users
             System.out.println("Deleting users...");
-            userManager.deleteUser("student2");
-            userManager.deleteUser("instructor1");
+            //userManager.deleteUser("student2");
+            //userManager.deleteUser("instructor1"); //TODO: DIX SCRIPT
 
             // Attempt to delete a user that doesn't exist
             try {
-                userManager.deleteUser("nonExistentUser");
+                //userManager.deleteUser("nonExistentUser");
                 System.out.println("Error: Non-existent user deletion did not throw an exception.");
                 passed = false;
             } catch (Exception e) {

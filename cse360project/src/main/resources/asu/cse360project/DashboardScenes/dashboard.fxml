@@ -14,13 +14,9 @@
       <VBox prefHeight="400.0" prefWidth="119.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" onAction="#viewArticles" prefHeight="41.0" prefWidth="200.0" text="View Articles" />
-            <VBox fx:id="admin_controlls">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />
-                  <Button mnemonicParsing="false" onAction="#viewMessages" prefHeight="41.0" prefWidth="200.0" text="View Messages" />
-               </children>
-            </VBox>
-            <Button mnemonicParsing="false" onAction="#sendMessage" prefHeight="41.0" prefWidth="200.0" text="Send Message" />
+            <Button fx:id="manage_users_btn" mnemonicParsing="false" onAction="#manageUsers" prefHeight="41.0" prefWidth="200.0" text="Manage Users" />
+            <Button fx:id="view_message_btn" mnemonicParsing="false" onAction="#viewMessages" prefHeight="41.0" prefWidth="200.0" text="View Messages" />
+            <Button fx:id="send_message_btn" mnemonicParsing="false" onAction="#sendMessage" prefHeight="41.0" prefWidth="200.0" text="Send Message" />
             <Button mnemonicParsing="false" onAction="#logout" prefHeight="41.0" prefWidth="200.0" text="Logout" />
          </children>
       </VBox>

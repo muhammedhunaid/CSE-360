@@ -19,9 +19,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane fx:id="scroll_pane" prefHeight="1365.0" prefWidth="1071.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.SearchArticlesController">
+<ScrollPane fx:id="scroll_pane" prefHeight="1365.0" prefWidth="1282.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.SearchArticlesController">
    <content>
-      <BorderPane prefHeight="1352.0" prefWidth="1071.0">
+      <BorderPane prefHeight="1352.0" prefWidth="1283.0">
          <bottom>
             <StackPane fx:id="botttom_pane" alignment="TOP_CENTER" prefHeight="790.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
                <children>
@@ -83,7 +83,7 @@
                            <children>
                               <HBox alignment="CENTER" prefHeight="29.0" prefWidth="277.0" spacing="5.0">
                                  <children>
-                                    <TextField fx:id="groups_input" prefHeight="33.0" prefWidth="201.0" promptText="Groups" />
+                                    <TextField fx:id="groups_input" prefHeight="33.0" prefWidth="201.0" promptText="Search Group ID or Name" />
                                     <Button mnemonicParsing="false" onAction="#searchGroups" prefHeight="32.0" prefWidth="68.0" text="Search" />
                                  </children>
                               </HBox>
@@ -95,26 +95,27 @@
                               </TableView>
                            </children>
                         </VBox>
-                        <VBox prefHeight="177.0" prefWidth="573.0" spacing="10.0">
+                        <VBox prefHeight="249.0" prefWidth="750.0" spacing="10.0">
                            <children>
                               <HBox alignment="CENTER" prefHeight="81.0" prefWidth="573.0" spacing="5.0">
                                  <children>
-                                    <TextField fx:id="articles_input" prefHeight="25.0" prefWidth="218.0" promptText="Articles" />
+                                    <TextField fx:id="articles_input" prefHeight="25.0" prefWidth="218.0" promptText="Search Article ID or Title" />
                                     <Button mnemonicParsing="false" onAction="#SearchArticles" prefHeight="33.0" prefWidth="64.0" text="Search" />
                                  </children>
                               </HBox>
                               <TableView fx:id="article_table" prefHeight="319.0" prefWidth="562.0">
                                  <columns>
-                                    <TableColumn fx:id="article_title" prefWidth="133.0" text="Title" />
-                                    <TableColumn fx:id="article_author" prefWidth="131.0" text="Author" />
-                                    <TableColumn fx:id="article_abstract" minWidth="0.0" prefWidth="308.0" text="Abstract" />
+                                    <TableColumn fx:id="article_id_col" prefWidth="52.0" text="ID" />
+                                    <TableColumn fx:id="article_title" prefWidth="201.0" text="Title" />
+                                    <TableColumn fx:id="article_author" prefWidth="124.0" text="Authors" />
+                                    <TableColumn fx:id="article_abstract" minWidth="0.0" prefWidth="372.0" text="Abstract" />
                                  </columns>
                               </TableView>
                            </children>
                         </VBox>
                      </children>
                   </HBox>
-                  <Text fx:id="groups_selected_txt" strokeType="OUTSIDE" strokeWidth="0.0" text="Groups: " wrappingWidth="768.13671875" />
+                  <Text fx:id="groups_selected_txt" strokeType="OUTSIDE" strokeWidth="0.0" text="Groups: " wrappingWidth="934.13671875" />
                   <Label fx:id="error_text" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="755.0" />
                   <Separator prefWidth="1051.0" />
                </children>
@@ -134,7 +135,7 @@
                            </font>
                         </Label>
                         <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="109.0" text="Add Article" />
-                        <Button mnemonicParsing="false" onAction="#updateArticle" prefHeight="25.0" prefWidth="109.0" text="Update Article" />
+                        <Button fx:id="edit_article_btn" mnemonicParsing="false" onAction="#updateArticle" prefHeight="25.0" prefWidth="109.0" text="Edit Article" />
                         <Button mnemonicParsing="false" onAction="#deleteArticle" prefHeight="25.0" prefWidth="109.0" text="Delete Article" />
                      </children>
                   </VBox>
@@ -148,20 +149,21 @@
                         <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="109.0" text="Add Group" />
                         <Button mnemonicParsing="false" onAction="#addSAG" prefHeight="25.0" prefWidth="109.0" text="Add SAG Group" />
                         <Button mnemonicParsing="false" onAction="#deleteGroup" prefHeight="25.0" prefWidth="109.0" text="Delete Group" />
-                        <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="109.0" text="Backup Group(s)" />
                         <Button mnemonicParsing="false" onAction="#updateAccess" prefHeight="25.0" prefWidth="109.0" text="Update Acess" />
+                        <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="114.0" text="Backup Group(s)" />
                      </children>
                   </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="94.0" spacing="3.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="138.0" prefWidth="121.0" spacing="3.0">
                      <children>
                         <Label text="Backup Settings">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="33.0" prefWidth="86.0" text="Restore" />
-                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="33.0" prefWidth="85.0" text="Merge" />
-                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="33.0" prefWidth="85.0" text="Delete" />
+                        <Button mnemonicParsing="false" onAction="#backupAll" prefHeight="25.0" prefWidth="114.0" text="Backup All" />
+                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="25.0" prefWidth="113.0" text="Restore" />
+                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="25.0" prefWidth="113.0" text="Merge" />
+                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="25.0" prefWidth="112.0" text="Delete" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="175.0" prefWidth="313.0">

@@ -283,7 +283,8 @@ public class GroupArticlesHelper{
         }
     }
 
-    public void listAllArticles(ObservableList<Article> articles) throws SQLException {
+    public ObservableList<Article> listAllArticles() throws SQLException {
+        ObservableList<Article> articles = FXCollections.observableArrayList();
         String query = "SELECT * FROM Articles;";
 
         try (PreparedStatement pstmt = connection.prepareStatement(query);
@@ -315,6 +316,7 @@ public class GroupArticlesHelper{
             e.printStackTrace();
             throw e; // Re-throw the exception for handling by calling code
         }
+        return articles;
     }
 
 
@@ -351,7 +353,7 @@ public class GroupArticlesHelper{
             if (group_ids.isEmpty()) {
                 return articles;
             }
-            
+
             if(!role.equals("student"))
             {
                 articles.addAll(ListAllUnGroupedArticles(search_level,search_keywords));
@@ -432,6 +434,11 @@ public class GroupArticlesHelper{
     
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
         ObservableList<Article> articles =  FXCollections.observableArrayList();
+        if(groups.contains(-1))
+        {
+            articles.addAll(listAllArticles());
+            return articles;
+        }
         if(groups.contains(0))
         {
             articles.addAll(ListAllUnGroupedArticles("all", ""));
@@ -698,7 +705,7 @@ public class GroupArticlesHelper{
         }
     }
 
-    public void backup(ArrayList<Integer> groups, String file_name) throws SQLException {
+    public void backup(ArrayList<Integer> groups, String file_name, User user) throws SQLException {
         ObservableList<Article> observale_articles_list = ListMultipleGroupsArticles(groups);
         ArrayList<Article> article_list = new ArrayList<>(observale_articles_list);
         ArrayList<Group> article_groups = new ArrayList<>();
@@ -707,8 +714,10 @@ public class GroupArticlesHelper{
             article_groups.addAll(getArticleGroups(a.getId()));
         }
         article_groups.stream().distinct().collect(Collectors.toList());
-        writeArticlesToFile(new backup_container(article_list, article_groups), file_name);
-        data.user_db.updateBackupFiles(data.getAppUser().getUsername(), file_name);
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        if(writeArticlesToFile(new backup_container(article_list, article_groups), file_name)) {
+            data.user_db.updateBackupFiles(user.getUsername(), file_name);
+        }
     }
 
     //TODO: Fix merge restore
@@ -760,24 +769,29 @@ public class GroupArticlesHelper{
 
         if (group_ids.contains(0))
         {
-            group_names.add("Ungrouped");
+            
         }
 
-        for(Integer gid : group_ids){
-            Group g = getGroup(gid);
-            group_names.add(g.getName());
+        for(int gid : group_ids){
+            String name;
+            if (gid == 0) {
+                name = ("Ungrouped");
+            }else{
+                name = getGroup(gid).getName();
+            }
+            group_names.add(name);
         }
         return group_names;
     }
 
-    private void writeArticlesToFile(backup_container backup, String fileName) {
+    private boolean writeArticlesToFile(backup_container backup, String fileName) {
         try (FileOutputStream fos = new FileOutputStream("Backups/" + fileName);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            
             oos.writeObject(backup);
             System.out.println("Articles have been written to " + fileName);
+            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
@@ -979,7 +993,7 @@ public class GroupArticlesHelper{
         return false;
     }
 
-    public boolean createGroup(String group_name, boolean special) throws SQLException
+    public boolean createGroup(String group_name, boolean special, int user_id) throws SQLException
     {
         data = Singleton.getInstance();
         //check if group already exists
@@ -1001,7 +1015,7 @@ public class GroupArticlesHelper{
                 {
                     return addGeneralGroupUsers(new_group.getId());
                 }else{
-                    return linkSAG(data.getAppUser().getId(), new_group.getId(), true);
+                    return linkSAG(user_id, new_group.getId(), true);
                 }
             }else{
                 return false;
@@ -1060,10 +1074,8 @@ public class GroupArticlesHelper{
                 String role = rs.getString("role");
                 if (role.contains("instructor") || role.contains("admin"))
                 {
-                    System.out.println("added " + id + " to " + group_id);
                     linkSAG(id, group_id, true);
                 }else{
-                    System.out.println("added " + id + " to " + group_id);
                     linkSAG(id, group_id, false);
                 }
             }

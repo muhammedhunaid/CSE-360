@@ -8,31 +8,15 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import asu.cse360project.Article;
-import asu.cse360project.Group;
-import asu.cse360project.Singleton;
-import asu.cse360project.User;
-import asu.cse360project.Utils;
+import asu.cse360project.*;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -60,7 +44,6 @@ public class SearchArticlesController implements Initializable{
     @FXML private Label error_text;
     @FXML private ScrollPane scroll_pane;
 
-
     //buttons
     @FXML private MenuButton level_btn;
     @FXML private HBox top_pane;
@@ -73,6 +56,7 @@ public class SearchArticlesController implements Initializable{
     @FXML private TableColumn<Article, String> article_abstract;
     @FXML private TableColumn<Article, String> article_author;
     @FXML private TableColumn<Article, String> article_title;
+    @FXML private TableColumn<Article, String> article_id_col;
 
     //group table JavaFX elements
     @FXML private TableView<Group> group_table;
@@ -97,9 +81,11 @@ public class SearchArticlesController implements Initializable{
 
     //text fields
     @FXML private TextField keyword_input;
-    @FXML private TextField group_input;
-    @FXML private TextField article_input;
+    @FXML private TextField groups_input;
+    @FXML private TextField articles_input;
     @FXML private Text groups_selected_txt;
+    
+    @FXML private Button edit_article_btn;
 
 
     @Override
@@ -118,13 +104,13 @@ public class SearchArticlesController implements Initializable{
         try {
             encryptionHelper = new EncryptionHelper();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
         //make article table set elements
         makeArticleTable();
         makeGroupTable();
+        setBackupsTable();
 
         try {
             getGroups();
@@ -145,7 +131,17 @@ public class SearchArticlesController implements Initializable{
             }
         });
 
-        setBackupsTable();
+        disableByRole();
+    }
+
+    private void disableByRole() {
+        if (data.getAppUser().getLoginRole().equals("student")) {
+            Utils.disableNode(edit_view_btn);
+        }
+
+        if (data.getAppUser().getLoginRole().equals("admin")) {
+            Utils.disableNode(edit_article_btn);
+        }
     }
 
     //get all articles from picked group
@@ -171,6 +167,7 @@ public class SearchArticlesController implements Initializable{
         article_title.setCellValueFactory(new PropertyValueFactory<>("title"));
         article_author.setCellValueFactory(new PropertyValueFactory<>("authors"));
         article_abstract.setCellValueFactory(new PropertyValueFactory<>("abstractText"));
+        article_id_col.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         article_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -191,7 +188,6 @@ public class SearchArticlesController implements Initializable{
                 try {
                     viewArticle();
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -223,7 +219,6 @@ public class SearchArticlesController implements Initializable{
                         selectGroup(new ActionEvent());
                     }
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -259,19 +254,56 @@ public class SearchArticlesController implements Initializable{
         getArticles();
     }
 
-    @FXML //turn off error text on next button click
-    void removeErrorText(ActionEvent event) {
-        Utils.disableNode(error_text);
-    }
-
     @FXML
     void SearchArticles(ActionEvent event) {
+        Long article_id = (long) -1;
+        String article_name = groups_input.getText().toString();
+        boolean num = true;
+        try{ //try to cast input to Long, return if not
+            article_id = Long.parseLong(articles_input.getText().toString());
+        } catch (NumberFormatException e) {
+            num = false;
+        }
 
+        for (Article art : articles_list) {  //search articles for user inputed article id
+            if(num && art.getId() == article_id)
+            {
+                article_table.getSelectionModel().select(art); // Highlight the row if group is found
+                article_table.scrollTo(art); // Scroll to the row
+                return;
+            } else if(art.getTitle().equals(article_name)) {
+                article_table.getSelectionModel().select(art); // Highlight the row if group is found
+                article_table.scrollTo(art); // Scroll to the row
+                return;
+            }
+        }
+        Utils.setLabel(error_text, "Group not Found", Color.RED); // Show error if article is not found
     }
 
     @FXML
     void searchGroups(ActionEvent event) {
+        int grp_id = -1;
+        String group_name = groups_input.getText().toString();
+        boolean num = true;
+        try {
+            grp_id = Integer.parseInt(group_name);
+        } catch (NumberFormatException e) {
+            num = false;
+        }
 
+        for (Group grp : groups_list) { //search groups for user inputed group id
+            if(num && grp.getId() == grp_id)
+            {
+                group_table.getSelectionModel().select(grp); // Highlight the row if group is found
+                group_table.scrollTo(grp); // Scroll to the row
+                return;
+            } else if(grp.getName().equals(group_name)) {
+                group_table.getSelectionModel().select(grp); // Highlight the row if group is found
+                group_table.scrollTo(grp); // Scroll to the row
+                return;
+            }
+        }
+        Utils.setLabel(error_text, "Article not Found", Color.RED); // Show error if group is not found
     }
 
     @FXML   //set search level to advanced
@@ -314,7 +346,11 @@ public class SearchArticlesController implements Initializable{
         title.setText(selectedArticle.getTitle()); // Set the title
         authors.setText("Authors: " + selectedArticle.getAuthors()); // Set the authors
         description.setText("Desciption: " + selectedArticle.getAbstractText()); // Set the description
-        body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body  TODO: decrypt
+        if (data.getAppUser().getLoginRole().equals("admin")) { //dont decrypt body for admins
+            body.setText("Body: " + selectedArticle.getBody()); // Set the body
+        }else{
+            body.setText("Body: " + encryptionHelper.decrypt(selectedArticle.getBody())); // Set the body
+        }
         keywords.setText("Keywords: " + selectedArticle.getKeywords()); // Set the keywords
         references.setText("Refrences: " + selectedArticle.getReferences().toString()); // Set the references
     }
@@ -372,7 +408,7 @@ public class SearchArticlesController implements Initializable{
                 try {
                     if(all_backups == null || !all_backups.contains(fileName))
                     {
-                        data.group_articles_db.backup(selected_groups, fileName);
+                        data.group_articles_db.backup(selected_groups, fileName, data.getAppUser());
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -380,6 +416,31 @@ public class SearchArticlesController implements Initializable{
             });
         }
         setBackupsTable();
+    }
+
+    @FXML
+    void backupAll(ActionEvent event) throws SQLException {
+        // Create a TextInputDialog
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Backup File Input");
+        dialog.setHeaderText("Enter the Backup File Name");
+        dialog.setContentText("File Name:");
+
+        // Show the dialog and wait for the response
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(fileName -> {
+            try {
+                if(all_backups == null || !all_backups.contains(fileName))
+                {
+                    ArrayList<Integer> all = new ArrayList<>();
+                    all.add(-1);
+                    data.group_articles_db.backup(all, fileName, data.getAppUser());
+                    setBackupsTable();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @FXML
@@ -450,7 +511,6 @@ public class SearchArticlesController implements Initializable{
                     getGroups();
                     getArticles(); 
                 } catch (SQLException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (Exception EncryptionError){
                     EncryptionError.printStackTrace();
@@ -471,7 +531,6 @@ public class SearchArticlesController implements Initializable{
                     getGroups();
                     getArticles();   
                 } catch (SQLException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (Exception EncryptionError){
                     EncryptionError.printStackTrace();
@@ -533,7 +592,7 @@ public class SearchArticlesController implements Initializable{
         // Check if the user entered a value
         if (result.isPresent() && !result.get().isBlank()) {
             String groupName = result.get();
-            return data.group_articles_db.createGroup(groupName, add_special);
+            return data.group_articles_db.createGroup(groupName, add_special, data.getAppUser().getId());
         } else {
             return false; // Input cancelled or invalid
         }

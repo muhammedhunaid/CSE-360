@@ -198,7 +198,7 @@ public class TestScriptArticles {
 
             System.out.println("Listing all articles in database...");
             ObservableList<Article> allArticles = FXCollections.observableArrayList();
-            articleManager.listAllArticles(allArticles);
+            allArticles = articleManager.listAllArticles();
 
             System.out.println("Articles listed successfully:");
             for (Article article : allArticles) {
@@ -227,8 +227,8 @@ public class TestScriptArticles {
 
         try {
             System.out.println("Listing all articles...");
-            ObservableList<Article> allArticles = FXCollections.observableArrayList();
-            articleManager.listAllArticles(allArticles);
+            ObservableList<Article> allArticles = articleManager.listAllArticles();
+            
 
             System.out.println("Articles listed successfully:");
             for (Article article : allArticles) {
@@ -257,8 +257,7 @@ public class TestScriptArticles {
 
         try {
             System.out.println("Updating article with ID 1002...");
-            ObservableList<Article> articles = FXCollections.observableArrayList();
-            articleManager.listAllArticles(articles);
+            ObservableList<Article> articles = articleManager.listAllArticles();
 
             Article articleToUpdate = null;
             for (Article article : articles) {
@@ -279,7 +278,7 @@ public class TestScriptArticles {
 
             // Verify the update
             articles.clear();
-            articleManager.listAllArticles(articles);
+           articles =  articleManager.listAllArticles();
 
             System.out.println("Listing all articles...");
             for (Article article : articles) {
@@ -312,7 +311,7 @@ public class TestScriptArticles {
 
             // Verify deletion
             ObservableList<Article> articles = FXCollections.observableArrayList();
-            articleManager.listAllArticles(articles);
+            articles = articleManager.listAllArticles();
 
             for (Article article : articles) {
                 if (article.getId() == 1001L) {
@@ -335,8 +334,7 @@ public class TestScriptArticles {
         articleManager.deleteArticle(1003L);
 
         System.out.println("Listing all articles after deletion...");
-        ObservableList<Article> allArticles = FXCollections.observableArrayList();
-        articleManager.listAllArticles(allArticles);
+        ObservableList<Article> allArticles = articleManager.listAllArticles();
 
         System.out.println("Articles listed successfully:");
         for (Article article : allArticles) {
@@ -395,8 +393,7 @@ public class TestScriptArticles {
         }
 
         // Verify that no articles were added
-        ObservableList<Article> articles = FXCollections.observableArrayList();
-        articleManager.listAllArticles(articles);
+        ObservableList<Article> articles = articleManager.listAllArticles();
         if (articles.size() > 0) {
             System.out.println("Error: Articles with missing required fields were added to the database.");
             passed = false;
@@ -472,15 +469,14 @@ public class TestScriptArticles {
         boolean passed = true;
 
         // Ensure that no articles exist
-        ObservableList<Article> articles = FXCollections.observableArrayList();
-        articleManager.listAllArticles(articles);
+        ObservableList<Article> articles = articleManager.listAllArticles();
         for (Article article : articles) {
             articleManager.deleteArticle(article.getId());
         }
 
         // Try to list articles
         articles.clear();
-        articleManager.listAllArticles(articles);
+        articles = articleManager.listAllArticles();
         if (articles.isEmpty()) {
             System.out.println("No articles found, as expected.");
         } else {
@@ -512,8 +508,7 @@ public class TestScriptArticles {
             }
 
             // Verify that 100 articles were added
-            ObservableList<Article> articles = FXCollections.observableArrayList();
-            articleManager.listAllArticles(articles);
+            ObservableList<Article> articles = articleManager.listAllArticles();
             if (articles.size() == 100) {
                 System.out.println("100 articles added successfully.");
             } else {
@@ -526,8 +521,7 @@ public class TestScriptArticles {
         }
 
         // Clean up
-        ObservableList<Article> articles = FXCollections.observableArrayList();
-        articleManager.listAllArticles(articles);
+        ObservableList<Article> articles = articleManager.listAllArticles();
         for (Article article : articles) {
             articleManager.deleteArticle(article.getId());
         }
@@ -566,8 +560,7 @@ public class TestScriptArticles {
         }
 
         // Verify that no articles were added
-        ObservableList<Article> articles = FXCollections.observableArrayList();
-        articleManager.listAllArticles(articles);
+        ObservableList<Article> articles = articleManager.listAllArticles();
         if (articles.size() > 0) {
             System.out.println("Error: Articles with invalid data were added to the database.");
             passed = false;
