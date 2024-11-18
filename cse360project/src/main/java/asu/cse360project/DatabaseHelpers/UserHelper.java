@@ -304,7 +304,7 @@ public class UserHelper{
 			pstmt.setString(1, username); // Set new username
 			pstmt.setString(2, password); // Set new password
 			pstmt.setString(3, invite_code); // Set invite code as the username to match
-	
+				
 			// Execute the update
 			int rowsUpdated = pstmt.executeUpdate();
 			if (rowsUpdated > 0) {

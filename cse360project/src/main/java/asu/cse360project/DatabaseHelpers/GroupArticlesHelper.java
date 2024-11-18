@@ -241,7 +241,7 @@ public class GroupArticlesHelper{
         ArrayList<Integer> groups = new ArrayList<>();
 
         String query = 
-            "SELECT * " + 
+            "SELECT g.group_id " + 
             "FROM Groups g " + 
             "JOIN User_Groups ag ON g.group_id = ag.group_id " +
             "JOIN cse360users a ON ag.id = a.id " +
@@ -249,18 +249,19 @@ public class GroupArticlesHelper{
         
         PreparedStatement stmt = connection.prepareStatement(query);            
         // Set theuser_id parameter
-        stmt.setLong(1, user_id);
+        stmt.setInt(1, user_id);
 
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Group objects
             while (rs.next()) {
-                int group_id = rs.getInt(user_id);
+                int group_id = rs.getInt("group_id");
                 groups.add(group_id);
             }
+            return groups;
         } catch (Exception e) {
+            //System.out.println(e);
             return null;
         }
-        return groups;
     }
 
     private Group getGroup(ResultSet rs) throws SQLException{
@@ -737,7 +738,6 @@ public class GroupArticlesHelper{
         }
     }
     
-    //TODO: Fix restore
     public void restore(String file_name) throws Exception {
         backup_container backup = readArticlesFromFile(file_name);
 
@@ -756,7 +756,6 @@ public class GroupArticlesHelper{
         }  
     }
 
-    //input list of group ids and return list of their names
     public ArrayList<String> getGroupNames(ArrayList<Integer> group_ids) throws SQLException
     {
         ArrayList<String> group_names = new ArrayList<>(0);
@@ -765,11 +764,6 @@ public class GroupArticlesHelper{
         {
             group_names.add("All");
             return group_names;
-        }
-
-        if (group_ids.contains(0))
-        {
-            
         }
 
         for(int gid : group_ids){
@@ -1081,6 +1075,23 @@ public class GroupArticlesHelper{
             }
             return true;
         } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean addUsertoGeneralGroups(User user) {
+        String query = "SELECT * FROM Groups WHERE special = ?;";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setBoolean(1, false);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int group_id = rs.getInt("group_id");
+                linkSAG(user.getId(), group_id, !user.isOnlyStudent());
+            }
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }

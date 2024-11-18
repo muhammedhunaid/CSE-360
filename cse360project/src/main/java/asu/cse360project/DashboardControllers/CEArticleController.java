@@ -6,23 +6,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import asu.cse360project.Article;
-import asu.cse360project.Group;
-import asu.cse360project.Singleton;
-import asu.cse360project.Utils;
+import asu.cse360project.*;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory; 
 
 /**
@@ -71,20 +62,15 @@ public class CEArticleController implements Initializable {
     @FXML private Label title_label;
 
     //user input
-    @FXML private CheckBox instructor;
-    @FXML private CheckBox student;
-    @FXML private CheckBox admin;
     @FXML private MenuButton level;
     /////////////////////////////////////////////////////
 
-    //TODO: make groups only ones user allowed to look at
     // Initializes the controller and sets up tables ahd populates with groups and articles
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         try {
             encryptionHelper = new EncryptionHelper();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         body.setWrapText(true);
@@ -139,7 +125,6 @@ public class CEArticleController implements Initializable {
             try {
                 setContent();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -156,29 +141,10 @@ public class CEArticleController implements Initializable {
         keywords.setText(article.getKeywords()); //fill keywords
         setLevel(article.getLevel()); //fill level
         article_level = article.getLevel();
-        setPermissions(article.getPermissions()); //fill permssions
         article_links.setText("Article Links: " + article.getReferences().toString()); //fill groups
         group_links.setText("Groups links: " + article.getGroups().toString()); //fill refrences
         refrences = article.getReferences(); //set refrences
         groups = article.getGroups(); //sert groups
-    }
-
-    // Sets the permissions checkboxes based on the permissions string
-    private void setPermissions(String permissions) {
-        if(permissions.contains("admin")) //check admin check box if in string
-        {
-            admin.setSelected(true);
-        }
-
-        if(permissions.contains("instructor")) //check instructor check box if in string
-        {
-            instructor.setSelected(true);
-        }
-
-        if(permissions.contains("student")) //check student check box if in string
-        {
-            student.setSelected(true);
-        }
     }
 
     // Removes the selected article from articles references
@@ -271,41 +237,19 @@ public class CEArticleController implements Initializable {
 
         //get level, return if not selected
         if(article_level == "") { return; }
-
-        //get permission, return if none selected
-        String permissions = getPermissions();
-        if(permissions == "") { return; }
  
         if(data.editing_article) //update article if editing
         {
-            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, permissions, groups, refrences);
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, "", groups, refrences);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
             data.sa_controller.getArticles();
         }else{ //create new article
-            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
+            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, refrences);
             data.sa_controller.getArticles();
         }
 
         Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
-    }
-
-    //helper function to determine which permissions are checked
-    private String getPermissions() {
-        String p = "";
-        //check instructor check box
-        if(instructor.isSelected()) {
-            p += "instructor,"; 
-        }
-        //check admin check box
-        if(admin.isSelected()) {
-            p += "admin,"; 
-        }
-        //check student check box
-        if(student.isSelected()) {
-            p += "student,"; 
-        }
-        return p;
     }
 
     // Searches for a group based on the input group ID and selects it in the UI
