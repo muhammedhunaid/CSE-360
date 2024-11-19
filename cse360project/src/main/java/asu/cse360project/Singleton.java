@@ -2,9 +2,11 @@ package asu.cse360project;
 
 import java.util.ArrayList;
 
+import asu.cse360project.DashboardControllers.SearchArticlesController;
 import asu.cse360project.DatabaseHelpers.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Singleton class to manage application-wide state and provide access to database helpers.
@@ -23,7 +25,9 @@ public class Singleton {
     // Database helpers for managing user and group article data
     public DatabaseHelper db;
     public UserHelper user_db;
+    public MessageHelper message_db;
     public GroupArticlesHelper group_articles_db;
+    public SearchArticlesController sa_controller;
 
     // Scene and content area for managing the graphical user interface
     public Scene scene;
@@ -38,6 +42,9 @@ public class Singleton {
     public User app_user;
     // List of groups the user is allowed to edit
     public ArrayList<Integer> edit_group = null;
+
+    public VBox view_box = null;
+    public StackPane view_area = null;
 
     /**
      * Public method to provide access to the instance of the Singleton class.
@@ -66,6 +73,7 @@ public class Singleton {
         this.db = db;
         this.user_db = db.getUser_helper();
         this.group_articles_db = db.getGroupArticlesHelper();
+        this.message_db = db.getMessageHelper();
     }
     
     /**

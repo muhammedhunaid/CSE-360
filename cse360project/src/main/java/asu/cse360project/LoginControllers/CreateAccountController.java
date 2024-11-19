@@ -84,6 +84,8 @@ public class CreateAccountController implements Initializable{
                 data.setting_up_admin = false; // Switch off admin setup
             } else {
                 data.user_db.register(currentUser.getUsername(), username, password); // Register user
+                User user = data.user_db.getUser(username);
+                data.group_articles_db.addUsertoGeneralGroups(user);
             }          
             
             // Temporarily display "Account created" message before changing to login screen

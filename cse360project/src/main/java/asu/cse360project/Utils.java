@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 // Utility class for validation and UI management in the application
@@ -154,10 +156,16 @@ public class Utils {
         data.scene.setRoot(root);  // Set the root of the scene to the newly loaded FXML
     }
 
-    public static void setContentArea(String fxml) throws IOException {
-        Singleton data = Singleton.getInstance();
+    public static void setContentArea(StackPane pane, String fxml) throws IOException {
         Parent fxmlLoader = FXMLLoader.load(App.class.getResource("DashboardScenes/" + fxml + ".fxml"));
-        data.content_area.getChildren().removeAll(); // Remove existing children from content area
-        data.content_area.getChildren().setAll(fxmlLoader); // Set the new scene
+        pane.getChildren().removeAll(); // Remove existing children from content area
+        pane.getChildren().setAll(fxmlLoader); // Set the new scene
+    }
+
+    public static void setContentArea(StackPane pane, VBox box) throws IOException {
+        Singleton data = Singleton.getInstance();
+        
+        data.view_area.getChildren().removeAll(); // Remove existing children from content area
+        data.view_area.getChildren().setAll(data.view_box); // Set the new scene
     }
 }

@@ -1,4 +1,5 @@
 package asu.cse360project;
+//import org.bouncycastle.jce.provider.BouncyCastleProvider; 
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -24,8 +25,6 @@ import asu.cse360project.DatabaseHelpers.DatabaseHelper;
  * @version 1.00	2024-10-30 JavaFX "Main" class for the application
  * 
  */
-
-
 public class App extends Application {
 
     // The main JavaFX scene that will be displayed
@@ -37,7 +36,7 @@ public class App extends Application {
 
     @Override
     // Initializes the primary stage and sets the login scene
-    public void start(Stage stage) throws IOException, SQLException {
+    public void start(Stage stage) throws IOException, SQLException, Exception {
 
         // Load the login screen from the FXML file and set the scene
         Parent root = FXMLLoader.load(App.class.getResource("LoginScenes/login.fxml"));

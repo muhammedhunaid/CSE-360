@@ -1,6 +1,12 @@
 package asu.cse360project.DatabaseHelpers;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
 public class DatabaseHelper {
     // JDBC driver name and database URL
@@ -17,9 +23,13 @@ public class DatabaseHelper {
 
 	private UserHelper user_helper;
 	private GroupArticlesHelper groups_articles_helper;
+	private MessageHelper msg_helper;
+
+    //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+    private EncryptionHelper encryptionHelper;
 
     // Method to establish a connection to the database
-    public void connectToDatabase() throws SQLException {
+    public void connectToDatabase() throws SQLException, Exception {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver for H2
             System.out.println("Connecting to database..."); // Print connection status
@@ -27,8 +37,13 @@ public class DatabaseHelper {
             statement = connection.createStatement(); // Create a statement for executing SQL commands
 
 			user_helper = new UserHelper(connection, statement);
-			groups_articles_helper = new GroupArticlesHelper(connection, statement);
+            //initialize the encryptionhelper object which will be used in encryption and decryption
+            encryptionHelper = new EncryptionHelper();
+			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
+			msg_helper = new MessageHelper(connection, statement);
+
 			createTables();  // Call method to create necessary tables if they don't already exist
+            
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage()); // Handle the case where the driver isn't found
         }
@@ -40,6 +55,10 @@ public class DatabaseHelper {
 
 	public GroupArticlesHelper getGroupArticlesHelper() {
 		return groups_articles_helper;		
+	}
+	
+	public MessageHelper getMessageHelper() {
+		return msg_helper;
 	}
 
     // Method to check if the database is empty
@@ -71,6 +90,7 @@ public class DatabaseHelper {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();
+		msg_helper.createTables();
 	}
 
 }

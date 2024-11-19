@@ -1,7 +1,9 @@
 package asu.cse360project;
 
+import java.io.Serializable;
+
 // Class representing a user in the application
-public class User {
+public class User implements Comparable<User>, Serializable{
     /**
      * 
      * <p> Description: This class provides methods to get and set user details, check user roles, and manage login roles. User class represents a user with specific details such as username, role, first name, and password reset status </p>
@@ -17,17 +19,19 @@ public class User {
      */
     
     private String username; // User's username
+    private int id; //User's id
     private String role; // User's role (e.g., admin, instructor, student)
     private String first_name; // User's first name
     private String password_reset; // Indicator for password reset status
     private String login_role = ""; // Role the user is currently logged in as
 
     // Constructor to initialize a User with specific details
-    public User(String username, String first_name, String role, String password_reset) {
+    public User(String username, String first_name, String role, String password_reset, int id) {
         this.username = username;
         this.first_name = first_name;
         this.role = role;
         this.password_reset = password_reset;
+        this.id = id;
     }
 
     // Default constructor initializes fields to empty strings
@@ -68,6 +72,14 @@ public class User {
         return first_name;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     // Method to check if the user has an admin role
     public boolean isAdmin() {
         return role.contains("admin"); // Returns true if the role includes "admin"
@@ -81,6 +93,10 @@ public class User {
     // Method to check if the user has a student role
     public boolean isStudent() {
         return role.contains("student"); // Returns true if the role includes "student"
+    }
+
+    public boolean isOnlyStudent() {
+        return role.equals("student");
     }
 
     // Method to determine if the user needs to reset their password
@@ -116,5 +132,14 @@ public class User {
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
                 '}'; // Returns a formatted string with the user's first name, username, and role
+    }
+
+    @Override
+    public int compareTo(User o) {
+        if(o.getId() == this.getId())
+        {
+            return 1;
+        }
+        return 0;
     }
 }

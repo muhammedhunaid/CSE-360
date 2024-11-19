@@ -60,25 +60,25 @@ public class UserHelper{
     }
 
     // Method to delete a user from the database
-    public void deleteUser(String username) {
+    public boolean deleteUser(User user) throws SQLException {
         String deleteQuery = "DELETE FROM cse360users WHERE username = ?"; // SQL query for deleting a user
 
         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) { // Create prepared statement
             // Set the username parameter for the DELETE query
-            deleteStmt.setString(1, username);
+            deleteStmt.setString(1, user.getUsername());
 
             // Execute the delete and get the number of rows affected
             int rowsDeleted = deleteStmt.executeUpdate(); 
             if (rowsDeleted > 0) {
-                System.out.println(username + " User deleted successfully."); // Print success message
+				return true;
             } else {
-                System.out.println("No user found with the given username."); // Print message if user not found
+                return false;
             }
-
         } catch (SQLException e) {
-            e.printStackTrace(); // Print the stack trace for SQL exceptions
+            return false;
         }
     }
+	
 
     // Method to add a new user with username, password, and role
     public void addUser(String username, String password, String role) throws SQLException {
@@ -183,13 +183,14 @@ public class UserHelper{
 	
 	public User getUser(String username) throws SQLException {
 		// SQL query to retrieve user details based on username
-		String query = "SELECT role, first, otp_expires FROM cse360users WHERE username = ?";
+		String query = "SELECT * FROM cse360users WHERE username = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username); // Set the username in the query
 			try (ResultSet rs = pstmt.executeQuery()) {
 				// If user exists, retrieve their details
 				if (rs.next()) {
 					String role = rs.getString("role"); // Get user's role
+					int id = rs.getInt("id"); // Get user's id
 					String firstName = rs.getString("first"); // Get user's first name
 					Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
 					String pw_reset_string = "";
@@ -198,7 +199,7 @@ public class UserHelper{
 						pw_reset_string = password_reset.toString();
 					}
 					// Return a User object with the retrieved details
-					return new User(username, firstName, role, pw_reset_string);
+					return new User(username, firstName, role, pw_reset_string, id);
 				} else {
 					System.out.println("User does not exist."); // Log if user is not found
 					return null; // Return null if user doesn't exist
@@ -253,6 +254,23 @@ public class UserHelper{
 		return false; // If an error occurs, assume user doesn't exist
 	}
 
+	public boolean userExists(int user_id) {
+		// SQL query to count users with the given email
+		String query = "SELECT COUNT(*) FROM cse360users WHERE id = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, user_id); // Set the email in the query
+			ResultSet rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				// If the count is greater than 0, the user exists
+				return rs.getInt(1) > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace(); // Print the stack trace if there's a SQL error
+		}
+		return false; // If an error occurs, assume user doesn't exist
+	}
+
 	//method which will help us see the database as an admin
 	public int displayUsersByAdmin() throws SQLException {
 		// SQL query to select all users
@@ -286,7 +304,7 @@ public class UserHelper{
 			pstmt.setString(1, username); // Set new username
 			pstmt.setString(2, password); // Set new password
 			pstmt.setString(3, invite_code); // Set invite code as the username to match
-	
+				
 			// Execute the update
 			int rowsUpdated = pstmt.executeUpdate();
 			if (rowsUpdated > 0) {

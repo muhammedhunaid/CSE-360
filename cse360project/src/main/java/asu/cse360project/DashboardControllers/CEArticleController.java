@@ -3,27 +3,18 @@ package asu.cse360project.DashboardControllers;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import asu.cse360project.Article;
-import asu.cse360project.Group;
-import asu.cse360project.Singleton;
-import asu.cse360project.Utils;
+import asu.cse360project.*;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.util.ArrayList; 
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory; 
 
 /**
  * The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
@@ -42,6 +33,7 @@ public class CEArticleController implements Initializable {
     ArrayList<Long> refrences = new ArrayList<>();
     private Article selectedArticle = null;
     private Group selectedGroup = null;
+    EncryptionHelper encryptionHelper;
 
 
     //////////JavaFX elements ///////////////////////////
@@ -70,15 +62,17 @@ public class CEArticleController implements Initializable {
     @FXML private Label title_label;
 
     //user input
-    @FXML private CheckBox instructor;
-    @FXML private CheckBox student;
-    @FXML private CheckBox admin;
     @FXML private MenuButton level;
     /////////////////////////////////////////////////////
 
     // Initializes the controller and sets up tables ahd populates with groups and articles
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        try {
+            encryptionHelper = new EncryptionHelper();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         body.setWrapText(true);
 
         // Setting cell value factories to map table columns with article and group properties
@@ -94,9 +88,8 @@ public class CEArticleController implements Initializable {
 
         // Attempt to load all groups, including special groups (All Articles, Ungrouped Articles) from database
         try {
-            groups_list = data.group_articles_db.getAllGroups();
-            groups_list.add(0, new Group("All Articles", -1));
-            groups_list.add(1, new Group("Ungrouped Articles", 0));
+            groups_list = data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId());
+            group_table.setItems(groups_list);  // Set groups list to group table
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -129,44 +122,29 @@ public class CEArticleController implements Initializable {
         if(data.editing_article)
         {
             title_label.setText("Editing Article");
-            setContent();
+            try {
+                setContent();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     // Populates the UI fields with the selected article’s content
-    private void setContent() {
+    private void setContent() throws Exception {
         Article article = data.article;
 
         title.setText(article.getTitle()); //fill title
         authors.setText(article.getAuthors()); //fill authors
         description.setText(article.getAbstractText()); //fill description
-        body.setText(article.getBody()); //fill body
+        body.setText(encryptionHelper.decrypt(article.getBody())); //fill body
         keywords.setText(article.getKeywords()); //fill keywords
         setLevel(article.getLevel()); //fill level
         article_level = article.getLevel();
-        setPermissions(article.getPermissions()); //fill permssions
         article_links.setText("Article Links: " + article.getReferences().toString()); //fill groups
         group_links.setText("Groups links: " + article.getGroups().toString()); //fill refrences
         refrences = article.getReferences(); //set refrences
         groups = article.getGroups(); //sert groups
-    }
-
-    // Sets the permissions checkboxes based on the permissions string
-    private void setPermissions(String permissions) {
-        if(permissions.contains("admin")) //check admin check box if in string
-        {
-            admin.setSelected(true);
-        }
-
-        if(permissions.contains("instructor")) //check instructor check box if in string
-        {
-            instructor.setSelected(true);
-        }
-
-        if(permissions.contains("student")) //check student check box if in string
-        {
-            student.setSelected(true);
-        }
     }
 
     // Removes the selected article from articles references
@@ -202,7 +180,7 @@ public class CEArticleController implements Initializable {
      // Adds the selected group to the group links list
     @FXML
     void addGroup(ActionEvent event) {
-        if(selectedGroup != null && !groups.contains(selectedGroup.getId()))
+        if(selectedGroup != null)
         {
             groups.add(selectedGroup.getId()); //add group to list of article groups
             group_links.setText("Groups links: " + groups.toString()); //update UI
@@ -240,7 +218,7 @@ public class CEArticleController implements Initializable {
      // Cancels the editing or creation of an article and returns to the manage articles page
     @FXML
     void cancel(ActionEvent event) throws IOException {
-        Utils.setContentArea("manage_articles");
+        Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
     void setLevel(String level_txt) {
@@ -249,7 +227,7 @@ public class CEArticleController implements Initializable {
 
     // Submits the article by adding it or updating it in the database
     @FXML
-    void submit(ActionEvent event) throws IOException, SQLException {
+    void submit(ActionEvent event) throws IOException, SQLException, Exception {
         //get text
         String title_text = title.getText();
         String description_text = description.getText();
@@ -259,39 +237,19 @@ public class CEArticleController implements Initializable {
 
         //get level, return if not selected
         if(article_level == "") { return; }
-
-        //get permission, return if none selected
-        String permissions = getPermissions();
-        if(permissions == "") { return; }
  
         if(data.editing_article) //update article if editing
         {
-            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, "", groups, refrences);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
+            data.sa_controller.getArticles();
         }else{ //create new article
-            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, permissions, groups, refrences);
+            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, refrences);
+            data.sa_controller.getArticles();
         }
 
-        Utils.setContentArea("manage_articles");  // Navigate to manage articles view
-    }
-
-    //helper function to determine which permissions are checked
-    private String getPermissions() {
-        String p = "";
-        //check instructor check box
-        if(instructor.isSelected()) {
-            p += "instructor,"; 
-        }
-        //check admin check box
-        if(admin.isSelected()) {
-            p += "admin,"; 
-        }
-        //check student check box
-        if(student.isSelected()) {
-            p += "student,"; 
-        }
-        return p;
+        Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
     // Searches for a group based on the input group ID and selects it in the UI
