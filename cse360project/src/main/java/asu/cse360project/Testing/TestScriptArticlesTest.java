@@ -6,7 +6,7 @@ public class TestScriptArticlesTest {
 
     @Before
     public void setup(){
-
+        
     }
         
     @Test

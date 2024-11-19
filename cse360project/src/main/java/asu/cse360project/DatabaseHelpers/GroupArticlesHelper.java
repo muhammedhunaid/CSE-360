@@ -145,8 +145,8 @@ public class GroupArticlesHelper{
         createUserGroupsTable();
     }
 
-
-     public Group getGroup(int group_id) throws SQLException {
+    //Get group object from database by group id
+    public Group getGroup(int group_id) throws SQLException {
         String query = "SELECT * FROM Groups WHERE group_id = ?;";
         Group group = null;
         PreparedStatement pstmt = connection.prepareStatement(query);
@@ -155,29 +155,33 @@ public class GroupArticlesHelper{
         try (ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
                 group = getGroup(rs); // Create a Group object with the retrieved data
-                System.out.println("Group found: " + group);
+                return group;
             } else {
                 System.out.println("No group found with name: " + group_id);
+                return group;
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception
         }
-        return group;
     }
 
+    //Get group object from database by group name
     public Group getGroup(String group_name) throws SQLException {
         String query = "SELECT * FROM Groups WHERE group_name = ?;";
-        Group group = null;
         PreparedStatement pstmt = connection.prepareStatement(query);
 
         pstmt.setString(1, group_name);
         try (ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()) {
-                group = getGroup(rs); // Create a Group object with the retrieved data
-                System.out.println("Group found: " + group);
+                return getGroup(rs); // Create a Group object with the retrieved data
             } else {
-                System.out.println("No group found with name: " + group_name);
+                System.out.println("No group found with name: " + group_name); 
+                return null;
+                //return null if not found
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception
         }
-        return group;
     }
 
     // Method to get all groups from the database and add to an ObservableList
@@ -186,10 +190,11 @@ public class GroupArticlesHelper{
         String query = "SELECT * FROM Groups;";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             ResultSet rs = pstmt.executeQuery();
-
             while (rs.next()) {
-                groups.add(getGroup(rs));
+                groups.add(getGroup(rs)); //add groups found to list
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception
         }
         return groups;
     }
@@ -201,10 +206,11 @@ public class GroupArticlesHelper{
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setBoolean(1, false);
             ResultSet rs = pstmt.executeQuery();
-
             while (rs.next()) {
-                groups.add(getGroup(rs));
+                groups.add(getGroup(rs)); //add groups to list
             }
+        } catch(Exception e) {
+            return null; //dont return anything if exception
         }
         return groups;
     }
@@ -221,22 +227,24 @@ public class GroupArticlesHelper{
             "WHERE a.id = ?;";
         
         PreparedStatement stmt = connection.prepareStatement(query);            
-        // Set theuser_id parameter
         stmt.setLong(1, user_id);
 
         try (ResultSet rs = stmt.executeQuery()) {
             // Iterate through the result set and create Group objects
             while (rs.next()) {
                 Group g = getGroup(rs);
-                if (g.getSpecial()) {
+                if (g.getSpecial()) { //add identifier to name if special access group
                     g.setName(g.getName() + " *SAG*");
                 }
                 groups.add(g);
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception 
         }
         return groups;
     }
 
+    //get list of group IDs user can access
     public ArrayList<Integer> getAllSpecialGroupIds(int user_id) throws SQLException {
         ArrayList<Integer> groups = new ArrayList<>();
 
@@ -248,7 +256,6 @@ public class GroupArticlesHelper{
             "WHERE a.id = ?;";
         
         PreparedStatement stmt = connection.prepareStatement(query);            
-        // Set theuser_id parameter
         stmt.setInt(1, user_id);
 
         try (ResultSet rs = stmt.executeQuery()) {
@@ -259,11 +266,11 @@ public class GroupArticlesHelper{
             }
             return groups;
         } catch (Exception e) {
-            //System.out.println(e);
-            return null;
+            return null; //dont return anything if exception 
         }
     }
 
+    //Helper method that converts group result set to group object
     private Group getGroup(ResultSet rs) throws SQLException{
         String g_name = rs.getString("group_name");
         int g_id = rs.getInt("group_id");
@@ -273,14 +280,17 @@ public class GroupArticlesHelper{
         return new Group(g_name, g_id, special, new ArrayList<>(group_admins), new ArrayList<>(group_viewers));
     }
 
-    public void deleteGroup(int groupId) throws SQLException {
+    //Delete group by group_id
+    public boolean deleteGroup(int groupId) throws SQLException {
         String deleteGroupSQL = "DELETE FROM Groups WHERE group_id = ?;";
 
         // Delete from the group article association table
         try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
             pstmt.setInt(1, groupId);
             pstmt.executeUpdate();
-            System.out.println("Group removed");
+            return true; //return true if deleted successfully 
+        } catch (Exception e) {
+            return false; //dont return anything if exception 
         }
     }
 
@@ -290,37 +300,18 @@ public class GroupArticlesHelper{
 
         try (PreparedStatement pstmt = connection.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
-
-            // Clear the ObservableList to avoid duplicate entries
-            articles.clear();
-
             // Retrieve each row and populate the Article object
             while (rs.next()) {
-                Long id = rs.getLong("article_id");
-                String title = rs.getString("title");
-                String authors = rs.getString("authors");
-                String abstractTxt = rs.getString("abstract");
-                String body = rs.getString("body");
-                String keywords = rs.getString("keywords");
-                String level = rs.getString("level");
-                String permissions = rs.getString("permissions");
-
-                ArrayList<Integer> groups = getArticleGroupIds(id);
-                ArrayList<Long> references = getArticleRefs(id);
-                ArrayList<String> groupNames = getArticleGroupNames(id);
-
-                // Create a new Article object and add it to the ObservableList
-                Article article = new Article(title, authors, abstractTxt, keywords, body, id, level, groups, references, permissions, groupNames);
-                articles.add(article);
+                articles.add(getArticle(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e; // Re-throw the exception for handling by calling code
+            return null; //dont return anything if exception 
         }
         return articles;
     }
 
 
+    //list all articles accossiated to group by group_id
     public ObservableList<Article> ListArticles(int group_id) throws SQLException {
         ObservableList<Article> articles = FXCollections.observableArrayList();
 
@@ -332,7 +323,6 @@ public class GroupArticlesHelper{
             "WHERE g.group_id = ?;";
 
             PreparedStatement stmt = connection.prepareStatement(query);            
-            // Set the group name parameter
             stmt.setInt(1, group_id);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -340,84 +330,105 @@ public class GroupArticlesHelper{
                 while (rs.next()) {
                     articles.add(getArticle(rs));
                 }
+            } catch (Exception e) {
+                return null; //dont return anything if exception 
             }
 
         return articles;
     }
 
+    // Method to search articles based on group IDs, search level, keywords, user ID, and role
     public ObservableList<Article> searchArticles(ArrayList<Integer> group_ids, String search_level, String search_keywords, int user_id, String role) throws SQLException {
+        // ObservableList to store the result set of articles
         ObservableList<Article> articles = FXCollections.observableArrayList();
 
-        if(group_ids.isEmpty())
-        {
+        // If the provided group IDs list is empty
+        if (group_ids.isEmpty()) {
+            // Retrieve all special group IDs associated with the user
             group_ids = getAllSpecialGroupIds(user_id);
+
+            // If no groups are found, return an empty list
             if (group_ids.isEmpty()) {
                 return articles;
             }
 
-            if(!role.equals("student"))
-            {
-                articles.addAll(ListAllUnGroupedArticles(search_level,search_keywords));
+            // If the user is not a student, include ungrouped articles in the search results
+            if (!role.equals("student")) {
+                articles.addAll(ListAllUnGroupedArticles(search_level, search_keywords));
             }
         }
 
-        if(group_ids.contains(0)) {
-            articles.addAll(ListAllUnGroupedArticles(search_level,search_keywords));
+        // If the group IDs contain '0', include ungrouped articles in the search results
+        if (group_ids.contains(0)) {
+            articles.addAll(ListAllUnGroupedArticles(search_level, search_keywords));
         }
 
+        // Construct the SQL query to retrieve articles belonging to specified groups
         String query = 
-            "SELECT * " + 
-            "FROM Articles a " + 
+            "SELECT * " +
+            "FROM Articles a " +
             "JOIN Article_Groups ag ON a.article_id = ag.article_id " +
             "JOIN Groups g ON ag.group_id = g.group_id " +
             "WHERE g.group_id IN ";
 
-            String values = "(";
-            for(int i = 0; i < group_ids.size()-1; i++) {
-                values += "?,";
-            }
-            values += "?)";
-            query += values;
+        // Build a parameterized list of group IDs for the query
+        String values = "(";
+        for (int i = 0; i < group_ids.size() - 1; i++) {
+            values += "?,";
+        }
+        values += "?)";
+        query += values;
 
-        if(!search_level.equals("all")) {
+        // Add additional conditions to the query for search level if it's not 'all'
+        if (!search_level.equals("all")) {
             query += " AND (a.level = ?)";
         }
 
-        if(!search_keywords.isEmpty()) {
+        // Add conditions for searching by keywords if provided
+        if (!search_keywords.isEmpty()) {
             query += " AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
         }
 
-        PreparedStatement stmt = connection.prepareStatement(query);            
-        // Set the group name parameter
+        // Prepare the SQL statement with the constructed query
+        PreparedStatement stmt = connection.prepareStatement(query);
+
+        // Set the group IDs as parameters in the query
         int param = 1;
         for (int i : group_ids) {
             stmt.setInt(param, i);
             param++;
         }
 
-        if(!search_level.equals("all")) {
+        // Set the search level parameter if applicable
+        if (!search_level.equals("all")) {
             stmt.setString(param, search_level);
             param++;
         }
 
-        if(!search_keywords.isEmpty()) {
+        // Set the search keyword parameters if provided
+        if (!search_keywords.isEmpty()) {
             stmt.setString(param, "%" + search_keywords + "%"); param++;
             stmt.setString(param, "%" + search_keywords + "%"); param++;
             stmt.setString(param, "%" + search_keywords + "%");
         }
 
+        // Execute the query and process the results
         try (ResultSet rs = stmt.executeQuery()) {
-            // Iterate through the result set and create Article objects
+            // Iterate through the result set and create Article objects for each row
             while (rs.next()) {
                 articles.add(getArticle(rs));
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception 
         }
 
+        // Return the list of articles that match the search criteria
         return articles;
     }
 
     //helper function for creating article object from result set
     private Article getArticle(ResultSet rs) throws SQLException{
+        // get columns from result set
         Long id = rs.getLong("article_id");
         String title = rs.getString("title");
         String authors = rs.getString("authors");
@@ -426,75 +437,96 @@ public class GroupArticlesHelper{
         String keywords = rs.getString("keywords");
         String level = rs.getString("level");
         String permissions = rs.getString("permissions");
-        ArrayList<Integer> groups = getArticleGroupIds(id);
-        ArrayList<Long> refrences = getArticleRefs(id);
-        ArrayList<String> groups_names = getArticleGroupNames(id);
+        //get links
+        ArrayList<Integer> groups = getArticleGroupIds(id); //article group ids
+        ArrayList<Long> refrences = getArticleRefs(id); //articles refrences
+        ArrayList<String> groups_names = getArticleGroupNames(id); //articles groups
 
         return new Article(title, authors, abstractTxt, keywords, body, id, level, groups, refrences, permissions, groups_names);
     }
     
+
+    // Method to retrieve articles from multiple groups and return them as an ObservableList
     public ObservableList<Article> ListMultipleGroupsArticles(ArrayList<Integer> groups) throws SQLException {
-        ObservableList<Article> articles =  FXCollections.observableArrayList();
-        if(groups.contains(-1))
-        {
+        ObservableList<Article> articles = FXCollections.observableArrayList();
+
+        // If the groups list contains -1, retrieve and return all articles
+        if (groups.contains(-1)) {
             articles.addAll(listAllArticles());
-            return articles;
+            return articles; // Return immediately as -1 signifies retrieving all articles
         }
-        if(groups.contains(0))
-        {
+
+        // If the groups list contains 0, add all ungrouped articles to the result
+        if (groups.contains(0)) {
             articles.addAll(ListAllUnGroupedArticles("all", ""));
         }
-        for(Integer grp_id: groups)
-        {
+
+        // For each group ID in the list, retrieve articles and add them to the result
+        for (Integer grp_id : groups) {
+            // Use the addUnique method to avoid duplicate entries in the result list
             articles = addUnique(articles, ListArticles(grp_id));
         }
+
+        // Return the final list of articles
         return articles;
     }
 
-    private ObservableList<Article> ListAllUnGroupedArticles(String search_level, String search_keywords) throws SQLException {
-        ObservableList<Article> articles =  FXCollections.observableArrayList();
 
+    // Method to list all ungrouped articles based on optional search level and keywords
+    private ObservableList<Article> ListAllUnGroupedArticles(String search_level, String search_keywords) throws SQLException {
+        ObservableList<Article> articles = FXCollections.observableArrayList();
         String query = 
             "SELECT a.* " + 
-            "FROM Articles a " + 
+            "FROM Articles a " +
             "LEFT JOIN Article_Groups ag ON a.article_id = ag.article_id " +
-            "WHERE ag.article_id IS NULL";
+            "WHERE ag.article_id IS NULL"; // Filters out grouped articles
 
-        if(!search_level.equals("all")) {
+        // Add condition for search level if it is not set to 'all'
+        if (!search_level.equals("all")) {
             query += " AND (a.level = ?)";
         }
 
-        if(!search_keywords.isEmpty()) {
+        // Add condition for search keywords if they are provided
+        if (!search_keywords.isEmpty()) {
             query += " AND (a.title LIKE ? OR a.authors LIKE ? OR a.abstract LIKE ?)";
         }
 
-        PreparedStatement stmt = connection.prepareStatement(query);            
-        // Set the group name parameter
+        PreparedStatement stmt = connection.prepareStatement(query);
+
+        // Bind parameters to the prepared statement
         int param = 1;
 
-        if(!search_level.equals("all")) {
+        // Set the search level parameter if applicable
+        if (!search_level.equals("all")) {
             stmt.setString(param, search_level);
             param++;
         }
 
-        if(!search_keywords.isEmpty()) {
+        // Set the search keyword parameters if provided
+        if (!search_keywords.isEmpty()) {
             stmt.setString(param, "%" + search_keywords + "%"); param++;
             stmt.setString(param, "%" + search_keywords + "%"); param++;
             stmt.setString(param, "%" + search_keywords + "%");
         }
 
+        // Execute the query and process the results
         try (ResultSet rs = stmt.executeQuery()) {
-            // Iterate through the result set and create Article objects
+            // Iterate through the result set and create Article objects for each row
             while (rs.next()) {
-                articles.add(getArticle(rs));
+                articles.add(getArticle(rs)); // Convert each row into an Article object and add it to the list
             }
+        } catch (Exception e) {
+            return null; //dont return anything if exception
         }
+
+        // Return the list of ungrouped articles
         return articles;
     }
 
+    // Helper method to add unique Articles to an ObservableList
     private ObservableList<Article> addUnique(ObservableList<Article> articles, ObservableList<Article> new_articles) {
         for(Article a: new_articles) {
-            if (!articles.contains(a)) {
+            if (!articles.contains(a)) { // Check if the list already contains the article
                 articles.add(a);
             }
         }
