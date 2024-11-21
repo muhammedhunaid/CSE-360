@@ -240,7 +240,7 @@ public class CEArticleController implements Initializable {
  
         if(data.editing_article) //update article if editing
         {
-            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, encryptionHelper.decrypt(body_text), article_level, authors_text, "", groups, refrences);
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, refrences);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
             data.sa_controller.getArticles();
