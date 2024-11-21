@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bcprov-lts8on-2.73.6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../ASU-CSE360/BouncyCastle-2.73.6/bcprov-lts8on-2.73.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
