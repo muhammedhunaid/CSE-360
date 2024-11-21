@@ -71,7 +71,7 @@ public class MessageHelper{
         }
 	}
 
-    public void newMsg(String text, String user, String type, int user_id) {
+    public boolean newMsg(String text, String user, String type, int user_id) {
         String insertQuery = "INSERT INTO messages (username, text, type, user_id) VALUES (?, ?, ?, ?)"; // SQL query for inserting a new user
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) { // Create prepared statement to prevent SQL injection
@@ -85,12 +85,13 @@ public class MessageHelper{
             int rowsInserted = insertStmt.executeUpdate(); 
             if (rowsInserted > 0) {
                 System.out.println("Message inserted successfully."); // Print success message
+                return false;
             } else {
                 System.out.println("Failed to insert message."); // Print failure message
+                return false;
             }
-
         } catch (SQLException e) {
-            e.printStackTrace(); // Print the stack trace for SQL exceptions
+            return false;
         }
     }
     
@@ -118,7 +119,6 @@ public class MessageHelper{
 			System.out.println(", text: " + text); 
 			*/			
 			messages.add(new Message(username, type, text, user_id));
-			
 		}
 
 		return messages;		
