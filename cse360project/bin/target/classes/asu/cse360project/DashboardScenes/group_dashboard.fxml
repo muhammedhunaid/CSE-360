@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="403.0" prefWidth="701.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.GroupController">
+   <center>
+      <HBox prefHeight="418.0" prefWidth="815.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox alignment="CENTER" prefHeight="418.0" prefWidth="126.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#selectGroup" prefHeight="28.0" prefWidth="126.0" text="Select Group" />
+                  <Button mnemonicParsing="false" onAction="#removeGroup" prefHeight="29.0" prefWidth="126.0" text="Un-Select Group" />
+                  <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="30.0" prefWidth="146.0" text="Add" />
+                  <Button mnemonicParsing="false" onAction="#delete" prefHeight="31.0" prefWidth="132.0" text="Delete" />
+                  <Button mnemonicParsing="false" onAction="#view" prefHeight="31.0" prefWidth="132.0" text="View" />
+                  <Button mnemonicParsing="false" onAction="#backup" prefHeight="33.0" prefWidth="132.0" text="Backup" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="418.0" prefWidth="323.0" spacing="10.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="372.0" spacing="5.0">
+                     <children>
+                        <TextField fx:id="search_group" prefHeight="25.0" prefWidth="192.0" promptText="Search for a Group" />
+                        <Button fx:id="search_button" mnemonicParsing="false" onAction="#searchGroup" prefHeight="25.0" prefWidth="85.0" text="Enter" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="290.0" prefWidth="368.0">
+                     <children>
+                        <TableView fx:id="table" prefHeight="290.0" prefWidth="274.0">
+                           <columns>
+                              <TableColumn fx:id="groupname_col" prefWidth="139.0" text="Group Name" />
+                              <TableColumn fx:id="article_ids_col" prefWidth="134.0" text="Group ID" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="19.0" prefWidth="363.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Group(s) Selected:" wrappingWidth="112.373046875">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="groups_selected_txt" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="258.13671875" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" spacing="10.0" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="418.0" prefWidth="229.0" spacing="10.0">
+               <children>
+                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="108.0" text="Backups">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="backups_list" prefHeight="200.0" prefWidth="200.0" />
+                  <HBox spacing="3.0" />
+                  <HBox alignment="CENTER" spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="33.0" prefWidth="61.0" text="Restore" />
+                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="33.0" prefWidth="59.0" text="Merge" />
+                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="33.0" prefWidth="59.0" text="Delete" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </center>
+</BorderPane>
