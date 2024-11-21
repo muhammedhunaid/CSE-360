@@ -30,6 +30,11 @@ public class EncryptionHelper {
 	}
 	
 	public String encrypt(String plainText) throws Exception {
+
+		if (plainText == null) {
+			throw new IllegalArgumentException("Input cannot be null");
+		}
+	
 		cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(IV));
 		
 		//converting the plain text to bytes
@@ -44,6 +49,11 @@ public class EncryptionHelper {
 	}
 	
 	public String decrypt(String cipherText) throws Exception {
+
+		if (cipherText == null) {
+			throw new IllegalArgumentException("Encrypted input cannot be null");
+		}
+		
 		cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(IV));
 		
 		//decoding the Base64 encoded cipherText to get the encrypted bytes

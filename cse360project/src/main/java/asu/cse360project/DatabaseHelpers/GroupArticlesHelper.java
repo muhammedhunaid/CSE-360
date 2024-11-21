@@ -22,6 +22,9 @@ import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+// import org.junit.jupiter.api.Test;
+// import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * This class provides methods to interact with the database for Group and Article related operations.
  */
@@ -604,7 +607,7 @@ public class GroupArticlesHelper{
     }
 
     //return arraylist of articles IDs that an article refrences
-    private ArrayList<Long> getArticleRefs(long id) throws SQLException {
+    public ArrayList<Long> getArticleRefs(long id) throws SQLException {
         ArrayList<Long> refrences = new ArrayList<>();
         String query = 
             "SELECT r.article_id " + 
@@ -660,7 +663,7 @@ public class GroupArticlesHelper{
     }
 
     //add an article with only an id - used for restore operations
-    private void addDummyArticle(Long article_id) throws SQLException
+    public void addDummyArticle(Long article_id) throws SQLException
     {
         String insertArticleQuery = "INSERT INTO articles (article_id) VALUES (?)";
 
@@ -853,7 +856,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Reads a backup container object from a file.
-    private backup_container readArticlesFromFile(String fileName) {
+    public backup_container readArticlesFromFile(String fileName) {
         backup_container contents = null;
         try (FileInputStream fis = new FileInputStream("Backups/" + fileName);
             ObjectInputStream ois = new ObjectInputStream(fis)) {

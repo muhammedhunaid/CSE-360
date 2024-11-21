@@ -6,8 +6,12 @@ module asu.cse360project {
     requires com.h2database;
     requires javafx.base; // For JDBC
     requires org.bouncycastle.provider; // For JDBC
+<<<<<<< HEAD
     requires junit;
 
+=======
+    requires jdk.incubator.vector;
+>>>>>>> origin/main
 
     opens asu.cse360project to javafx.fxml;
     opens asu.cse360project.DashboardControllers to javafx.fxml;
