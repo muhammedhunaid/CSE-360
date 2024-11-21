@@ -81,7 +81,7 @@ class GroupArticlesHelperTest {
         } catch (NullPointerException e) {
             System.out.println("NullPointerException in testGetAllGroups: Ensure all objects are initialized.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("FAILURE: No Groups on the Database");
         }
     }
 
@@ -107,7 +107,7 @@ class GroupArticlesHelperTest {
         } catch (NullPointerException e) {
             System.out.println("NullPointerException in testGetAllSpecialGroups: Ensure all objects are initialized.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("FAILURE: No Groups on the Database");
         }
     }
 
