@@ -22,6 +22,9 @@ import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+// import org.junit.jupiter.api.Test;
+// import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * This class provides methods to interact with the database for Group and Article related operations.
  */
@@ -567,7 +570,7 @@ public class GroupArticlesHelper{
         return groups;
     }
 
-    private ArrayList<Long> getArticleRefs(long id) throws SQLException {
+    public ArrayList<Long> getArticleRefs(long id) throws SQLException {
         ArrayList<Long> refrences = new ArrayList<>();
         String query = 
             "SELECT r.article_id " + 
@@ -620,7 +623,7 @@ public class GroupArticlesHelper{
         }
     }
 
-    private void addDummyArticle(Long article_id) throws SQLException
+    public void addDummyArticle(Long article_id) throws SQLException
     {
         String insertArticleQuery = "INSERT INTO articles (article_id) VALUES (?)";
 
@@ -647,7 +650,7 @@ public class GroupArticlesHelper{
         }
     }
 
-    private void linkGroups(long articleId,  ArrayList<Integer> groups) throws SQLException {
+    public void linkGroups(long articleId, ArrayList<Integer> groups) throws SQLException {
         String linkArticleGroupQuery = "INSERT INTO article_groups (article_id, group_id) VALUES (?, ?)";
 
         for(int group: groups)
@@ -789,7 +792,7 @@ public class GroupArticlesHelper{
         }
     }
 
-    private backup_container readArticlesFromFile(String fileName) {
+    public backup_container readArticlesFromFile(String fileName) {
         backup_container contents = null;
         try (FileInputStream fis = new FileInputStream("Backups/" + fileName);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
@@ -963,7 +966,6 @@ public class GroupArticlesHelper{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
         return false;
     }
