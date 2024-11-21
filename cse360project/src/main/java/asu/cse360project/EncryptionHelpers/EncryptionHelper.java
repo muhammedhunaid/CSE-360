@@ -10,6 +10,17 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+/**
+ * <p> EncryptionHelper. </p>
+ * 
+ * <p> Description: A class to contain helper functions for encryption and decryption of messages. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @version 1.00	2024-11-17 Added encryption and decryption methods
+ * 
+ */
+
 public class EncryptionHelper {
 
 	private static String BOUNCY_CASTLE_PROVIDER_IDENTIFIER = "BC";	

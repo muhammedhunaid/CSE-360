@@ -17,10 +17,20 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory; 
 
 /**
- * The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
+ * 
+ * <p> CEArticleController class </p>
+ * 
+ * <p> The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
  * This controller allows users to create, edit, and manage articles with various properties, including title,
  * authors, abstract, body, keywords, and permissions. Users can link articles to multiple groups and add 
- * cross-references to other articles. 
+ * cross-references to other articles.  </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-11-18 JavaFX controller class for creating and editing articles
+ * 
  */
 public class CEArticleController implements Initializable {
 

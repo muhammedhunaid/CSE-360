@@ -5,6 +5,17 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+/**
+ * <p> EncryptionUtils. </p>
+ * 
+ * <p> Description: A class to contain methods for interfacing Encryption functionality to the rest of the project </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @version 1.00	2024-11-17 Added helper methods for encryption and decryption
+ * 
+ */
+
 public class EncryptionUtils {
 	private static int IV_SIZE = 16;
 	

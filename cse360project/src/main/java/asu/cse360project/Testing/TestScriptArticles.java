@@ -9,9 +9,19 @@ import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * This class is used to test the GroupArticlesHelper methods for adding, deleting, and updating articles.
- */
+    /*******
+     * <p> TestScriptArticles </p>
+     * 
+     * <p> Description: This class contains a test script to test the Article methods in the GroupArticlesHelper class. </p>
+     * 
+     * <p> Copyright: Tu35 © 2024 </p>
+     * 
+     * @author Tu35
+     * 
+     * @version 1.00 2024-11-20 Created to test Phase 3 Group Articles.
+     * 
+     */
+
 public class TestScriptArticles {
 
     /**

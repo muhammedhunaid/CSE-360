@@ -14,6 +14,21 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+/**
+ * <p> DashboardController. </p>
+ * 
+ * <p> Description: A class that is responsible for handling user actions on the dashboard scene. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 JavaFX controller class for admin dashboard scene
+ * @version 2.00	2024-11-01 Added Articles and user dashboard
+ * @version 3.00	2024-10-30 Added messaging buttons
+ * 
+ *  */
+
 public class DashboardController implements Initializable {
     // Retrieve the current user from the application context
     Singleton data = Singleton.getInstance();
