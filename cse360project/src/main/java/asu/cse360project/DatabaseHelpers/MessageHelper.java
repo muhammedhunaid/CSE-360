@@ -8,6 +8,18 @@ import asu.cse360project.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * 
+ * <p> MessageHelper. </p>
+ * 
+ * <p> Description: A class to handle database operations for messages. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @version 1.00	2024-11-17 Using Singleton class to create and get database connection 
+ * 
+ */
+
 public class MessageHelper{
 
     private Connection connection = null; // Connection to the database

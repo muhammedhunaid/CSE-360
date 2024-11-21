@@ -19,6 +19,20 @@ import javafx.scene.control.ToggleGroup;
  * Controller class for managing articles in the system.
  * Provides functionality to add, remove, view, and update articles.
  */
+
+/**
+ * <p> MessageController. </p>
+ * 
+ * <p> Description: A class that is responsible for handling user actions on the message scene. </p>
+ * 
+ * <p> Copyright: Tu35 © 2024 </p>
+ * 
+ * @author Tu35
+ * @version 1.00	2024-10-30 JavaFX controller class for message scene
+ * 
+ * 
+ */
+
 public class MessageController implements Initializable {
 
 	final ToggleGroup group = new ToggleGroup();
