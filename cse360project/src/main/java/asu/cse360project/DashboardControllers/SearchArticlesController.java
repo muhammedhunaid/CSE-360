@@ -396,6 +396,11 @@ public class SearchArticlesController implements Initializable{
     void backupGroups(ActionEvent event) throws SQLException {
         if(selected_groups.size() > 0)
         {
+            if(!adminOfGroups())
+            {
+                Utils.setLabel(error_text, "You are not an admin of one of the selected groups to backup", Color.RED);
+                return;
+            }
             // Create a TextInputDialog
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Backup File Input");
@@ -416,6 +421,15 @@ public class SearchArticlesController implements Initializable{
             });
         }
         setBackupsTable();
+    }
+
+    public boolean adminOfGroups() throws SQLException {
+        for(Group group : groups_list) {
+            if(group.getId() > 0 && (group.getAdmin_users() == null || !group.getAdmin_users().contains(data.getAppUser()))) {
+                return false;
+            }   
+        }
+        return true;
     }
 
     @FXML

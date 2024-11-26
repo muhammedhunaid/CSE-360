@@ -1,4 +1,4 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

@@ -1,4 +1,4 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import asu.cse360project.Article;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;

@@ -941,6 +941,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
             return false;
         }
 
+        data = data.getInstance();
         // Ensure the user exists in the database.
         if (!data.user_db.userExists(user)) {
             return false;
@@ -976,6 +977,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
 
     // Lists all users in a specific group who have admin or non-admin roles.
     public ObservableList<User> ListSAGUsers(int group_id, boolean admin) throws SQLException {
+        System.out.println("LISTing SAG uses");
         ObservableList<User> users = FXCollections.observableArrayList();
 
         String query =
