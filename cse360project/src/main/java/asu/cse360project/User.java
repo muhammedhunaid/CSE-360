@@ -3,7 +3,7 @@ package asu.cse360project;
 import java.io.Serializable;
 
 // Class representing a user in the application
-public class User implements Serializable{
+public class User implements Serializable, Comparable<User>{
     /**
      * 
      * <p> Description: This class provides methods to get and set user details, check user roles, and manage login roles. User class represents a user with specific details such as username, role, first name, and password reset status </p>
@@ -141,5 +141,10 @@ public class User implements Serializable{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return this.getUsername().compareTo(o.getUsername());
     }
 }

@@ -72,6 +72,8 @@ public class App extends Application {
                 System.out.println("Closing db");
             }
         });
+
+        SetupBackupRestoreManualTesting.Test2(3);
     }
 
     // Main method to launch the JavaFX application

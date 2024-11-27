@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
  */
 public class GroupArticlesHelper{	
 
-    Singleton data = Singleton.getInstance();
+    public  Singleton data = Singleton.getInstance();
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
     
@@ -562,7 +562,7 @@ public class GroupArticlesHelper{
     }
 
     //return array list of group objects that an article belongs to 
-    private ArrayList<Group> getArticleGroups(Long id) throws SQLException {
+    public ArrayList<Group> getArticleGroups(Long id) throws SQLException {
         ArrayList<Group> groups = new ArrayList<>();
         String query = 
             "SELECT * " + 
@@ -765,7 +765,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Backs up articles belonging to specified groups into a file and updates user backup records.
-    public void backup(ArrayList<Integer> groups, String file_name, User user) throws SQLException {
+    public boolean backup(ArrayList<Integer> groups, String file_name, User user) throws SQLException {
         ObservableList<Article> observableArticlesList = ListMultipleGroupsArticles(groups);
         ArrayList<Article> articleList = new ArrayList<>(observableArticlesList);
         ArrayList<Group> articleGroups = new ArrayList<>();
@@ -780,6 +780,9 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
         // Write articles and groups to a file and update user backup records.
         if (writeArticlesToFile(new backup_container(articleList, articleGroups), file_name)) {
             data.user_db.updateBackupFiles(user.getUsername(), file_name);
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -845,7 +848,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Writes a backup container object to a file.
-    private boolean writeArticlesToFile(backup_container backup, String fileName) {
+    public boolean writeArticlesToFile(backup_container backup, String fileName) {
         try (FileOutputStream fos = new FileOutputStream("Backups/" + fileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(backup); // Serialize the backup object to the file.
