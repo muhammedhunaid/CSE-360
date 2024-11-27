@@ -70,6 +70,14 @@ public class Group implements Serializable{
         return viewer_users;
     }
 
+    public void setAdmin_users(ArrayList<User> admin_users) {
+        this.admin_users = admin_users;
+    }
+
+    public void setViewer_users(ArrayList<User> viewer_users) {
+        this.viewer_users = viewer_users;
+    }
+
     public String toString() {
         return "Group{" +
                "id=" + id +

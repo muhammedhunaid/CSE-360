@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
  */
 public class GroupArticlesHelper{	
 
-    Singleton data = new Singleton();
+    Singleton data = Singleton.getInstance();
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
     
@@ -44,6 +44,7 @@ public class GroupArticlesHelper{
      * @throws SQLException If an SQL exception occurs.
      */
     public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
+        data = Singleton.getInstance();
         this.connection = connection;
         this.statement = statement;
         this.encryptionHelper = encryptionHelper;
@@ -941,7 +942,6 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
             return false;
         }
 
-        data = data.getInstance();
         // Ensure the user exists in the database.
         if (!data.user_db.userExists(user)) {
             return false;
@@ -961,13 +961,15 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Deletes all user associations with a group based on the user ID.
-    public Boolean deleteSAGUsers(int id) throws SQLException {
-        String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ?;";
+    public Boolean deleteSAGUsers(int id, int group_id) throws SQLException {
+        String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ? AND group_id = ?;";
 
         try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
             // Execute the delete operation for the specified user ID.
             pstmt.setInt(1, id);
+            pstmt.setInt(2, group_id);
             pstmt.executeUpdate();
+            System.out.println("delted!!!!!");
             return true; // Return true if deletion is successful.
         } catch (SQLException e) {
             return false; // Return false if an exception occurs.
@@ -977,7 +979,6 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
 
     // Lists all users in a specific group who have admin or non-admin roles.
     public ObservableList<User> ListSAGUsers(int group_id, boolean admin) throws SQLException {
-        System.out.println("LISTing SAG uses");
         ObservableList<User> users = FXCollections.observableArrayList();
 
         String query =

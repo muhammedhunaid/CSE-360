@@ -12,7 +12,7 @@ import javafx.stage.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
-import asu.cse360project.Testing.SetupManualTesting;
+import asu.cse360project.Testing.SetupBackupRestoreManualTesting;
 
 /*******
  * <p> App. </p>
@@ -62,7 +62,7 @@ public class App extends Application {
 
         // Display all in db for debugging purposes
         databaseHelper.getUser_helper().displayUsersByAdmin();
-        SetupManualTesting.Test1();
+        SetupBackupRestoreManualTesting.Test1();
 
         // Handle the event when the application is closed, ensuring the database connection is closed
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {

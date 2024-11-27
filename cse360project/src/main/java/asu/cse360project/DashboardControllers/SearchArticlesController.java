@@ -424,10 +424,13 @@ public class SearchArticlesController implements Initializable{
     }
 
     public boolean adminOfGroups() throws SQLException {
-        for(Group group : groups_list) {
-            if(group.getId() > 0 && (group.getAdmin_users() == null || !group.getAdmin_users().contains(data.getAppUser()))) {
-                return false;
-            }   
+        for(int group_id : selected_groups) {
+            if(group_id > 0) {
+                Group g = data.group_articles_db.getGroup(group_id);
+                if(g.getAdmin_users() == null || !g.getAdmin_users().contains(data.getAppUser())) {
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -446,8 +449,7 @@ public class SearchArticlesController implements Initializable{
             try {
                 if(all_backups == null || !all_backups.contains(fileName))
                 {
-                    ArrayList<Integer> all = new ArrayList<>();
-                    all.add(-1);
+                    ArrayList<Integer> all = getAdminGroups();
                     data.group_articles_db.backup(all, fileName, data.getAppUser());
                     setBackupsTable();
                 }
@@ -455,6 +457,28 @@ public class SearchArticlesController implements Initializable{
                 e.printStackTrace();
             }
         });
+    }
+
+    public ArrayList<Integer> getAdminGroups() throws SQLException {
+        ArrayList<Integer> all = new ArrayList<>();
+        for(Group group: groups_list) {
+            if(group.getId() == 0) {
+                all.add(0);
+            }else{
+                if(group.getAdmin_users() != null && group.getAdmin_users().contains(data.getAppUser())) {
+                    all.add(group.getId());
+                }
+            }
+        }
+        return all;
+    }
+
+    public void setGroups_list(ObservableList<Group> groups_list) {
+        this.groups_list = groups_list;
+    }
+
+    public void setData(Singleton data) {
+        this.data = data;
     }
 
     @FXML
