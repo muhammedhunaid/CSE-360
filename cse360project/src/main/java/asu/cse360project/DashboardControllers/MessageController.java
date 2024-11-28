@@ -64,10 +64,13 @@ public class MessageController implements Initializable {
 		
         if(gen) {
         	type = "General";
+			assert message_value != null;
         	System.out.println("General Message");
+
         }
         else {
         	type = "Specific";
+			assert message_value != null;
 			System.out.println("Specific Message");
         }
         
