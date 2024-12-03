@@ -6,7 +6,6 @@ module asu.cse360project {
     requires com.h2database;
     requires javafx.base; // For JDBC
     requires org.bouncycastle.provider; // For JDBC
-    requires junit;
 
     requires jdk.incubator.vector;
 

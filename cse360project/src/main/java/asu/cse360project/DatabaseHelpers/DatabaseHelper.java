@@ -1,4 +1,5 @@
 package asu.cse360project.DatabaseHelpers;
+import asu.cse360project.Singleton;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,7 +40,9 @@ public class DatabaseHelper {
 			user_helper = new UserHelper(connection, statement);
             //initialize the encryptionhelper object which will be used in encryption and decryption
             encryptionHelper = new EncryptionHelper();
-			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
+            // Create a new Singleton instance for GroupArticlesHelper
+            Singleton singleton = new Singleton();
+			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
 			msg_helper = new MessageHelper(connection, statement);
 
 			createTables();  // Call method to create necessary tables if they don't already exist
@@ -94,5 +97,3 @@ public class DatabaseHelper {
 	}
 
 }
-
-

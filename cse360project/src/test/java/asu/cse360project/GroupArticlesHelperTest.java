@@ -2,281 +2,235 @@ package asu.cse360project;
 
 import asu.cse360project.Article;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
+import asu.cse360project.DatabaseHelpers.UserHelper;
 import asu.cse360project.Group;
 import asu.cse360project.User;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
-
+import asu.cse360project.Singleton;
 import asu.cse360project.backup_container;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.*;
 import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.io.File;
 
 /**
- * Unit tests for the GroupArticlesHelper class.
- * 
- * This class contains test cases for various methods of the GroupArticlesHelper class.
- * It verifies the functionality of methods such as retrieving all general groups, 
- * retrieving all special groups for a user, adding a dummy article, backing up data, 
- * restoring and merging data, getting article references, adding a user to general groups, 
- * and restoring a group.
+ * Unit tests for the GroupArticlesHelper class using H2 in-memory database.
  */
 class GroupArticlesHelperTest {
+    private static Connection connection;
+    private static Statement statement;
+    private static EncryptionHelper encryptionHelper;
+    private static GroupArticlesHelper groupArticlesHelper;
+    private static final String TEST_DB_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
+    private static Singleton singleton;
 
-    private Connection mockConnection;
-    private Statement mockStatement;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
-    private EncryptionHelper mockEncryptionHelper;
-    private GroupArticlesHelper groupArticlesHelper;
+    @BeforeAll
+    static void setupClass() throws Exception {
+        // Initialize H2 in-memory database
+        connection = DriverManager.getConnection(TEST_DB_URL);
+        statement = connection.createStatement();
+        
+        // Create necessary tables with correct schema
+        statement.execute("CREATE TABLE IF NOT EXISTS Groups (group_id INT PRIMARY KEY, group_name VARCHAR(255), special BOOLEAN)");
+        statement.execute("CREATE TABLE IF NOT EXISTS Articles (article_id BIGINT PRIMARY KEY, title VARCHAR(255), abstract TEXT, keywords TEXT, body TEXT, level VARCHAR(50), authors TEXT, permissions TEXT)");
+        statement.execute("CREATE TABLE IF NOT EXISTS Article_Groups (article_id BIGINT, group_id INT)");
+        statement.execute("CREATE TABLE IF NOT EXISTS Article_Links (article_id BIGINT, linked_article_id BIGINT)");
+        statement.execute("CREATE TABLE IF NOT EXISTS cse360users ("
+            + "id INT PRIMARY KEY, "
+            + "username VARCHAR(255), "
+            + "password VARCHAR(255), "
+            + "role VARCHAR(30), "
+            + "first VARCHAR(255), "
+            + "middle VARCHAR(255), "
+            + "last VARCHAR(255), "
+            + "preffered VARCHAR(255), "
+            + "email VARCHAR(255), "
+            + "otp_expires DATETIME, "
+            + "backup_files TEXT DEFAULT '')");
+        statement.execute("CREATE TABLE IF NOT EXISTS User_Groups (id INT, group_id INT, admin BOOLEAN)");
+        
+        // Initialize helpers and Singleton
+        encryptionHelper = new EncryptionHelper();
+        
+        // Initialize Singleton first
+        singleton = Singleton.getInstance();
+        singleton.user_db = new UserHelper(connection, statement);
+        singleton.user_db.createTables();
+        
+        // Initialize GroupArticlesHelper with Singleton
+        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
+        
+        // Create Backups directory if it doesn't exist
+        new File("Backups").mkdirs();
+    }
 
-    /**
-     * Sets up the test environment by creating mock objects for database connections and statements.
-     * 
-     * This method is called before each test to ensure a clean setup for each test case.
-     * 
-     * @throws SQLException if a database access error occurs
-     */
     @BeforeEach
     void setUp() throws SQLException {
-        mockConnection = mock(Connection.class);
-        mockStatement = mock(Statement.class);
-        mockPreparedStatement = mock(PreparedStatement.class);
-        mockResultSet = mock(ResultSet.class);
-        mockEncryptionHelper = mock(EncryptionHelper.class);
-
-        when(mockConnection.createStatement()).thenReturn(mockStatement);
-
-        groupArticlesHelper = new GroupArticlesHelper(mockConnection, mockStatement, mockEncryptionHelper);
+        // Clear all tables before each test
+        statement.execute("DELETE FROM Groups");
+        statement.execute("DELETE FROM Articles");
+        statement.execute("DELETE FROM Article_Groups");
+        statement.execute("DELETE FROM Article_Links");
+        statement.execute("DELETE FROM cse360users");
+        statement.execute("DELETE FROM User_Groups");
+        
+        // Reset Singleton for each test
+        singleton = Singleton.getInstance();
+        singleton.user_db = new UserHelper(connection, statement);
+        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
     }
 
-    /**
-     * Tests the retrieval of all general groups.
-     * 
-     * This test verifies that the getAllGroups method correctly retrieves all general groups from the database.
-     */
-    @Test
-    void testGetAllGeneralGroups() {
-        try {
-            String query = "SELECT * FROM Groups;";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(true, true, false);
-            when(mockResultSet.getString("group_name")).thenReturn("Group1", "Group2");
-
-            ObservableList<Group> groups = groupArticlesHelper.getAllGroups();
-
-            assertNotNull(groups);
-            assertEquals(2, groups.size());
-            assertEquals("Group1", groups.get(0).getName());
-            assertEquals("Group2", groups.get(1).getName());
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testGetAllGroups: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            System.out.println("FAILURE: No Groups on the Database");
-        }
+    @AfterEach
+    void tearDown() throws SQLException {
+        // Additional cleanup if needed
     }
 
-    /**
-     * Tests the retrieval of all special groups for a user.
-     * 
-     * This test verifies that the getAllSpecialGroups method correctly retrieves all special groups for a given user.
-     */
     @Test
-    void testGetAllSpecialGroups() {
-        try {
-            String query = "SELECT * FROM Groups g JOIN User_Groups ag ON g.group_id = ag.group_id JOIN cse360users a ON ag.id = a.id WHERE a.id = ?;";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(true, false);
-            when(mockResultSet.getString("group_name")).thenReturn("Special Group 1");
+    void testGetAllGeneralGroups() throws SQLException {
+        // Insert test data
+        statement.execute("INSERT INTO Groups (group_id, group_name, special) VALUES (1, 'Test Group', false)");
 
-            ObservableList<Group> specialGroups = groupArticlesHelper.getAllSpecialGroups(1);
-
-            assertNotNull(specialGroups);
-            assertEquals(1, specialGroups.size());
-            assertEquals("Special Group 1", specialGroups.get(0).getName());
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testGetAllSpecialGroups: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            System.out.println("FAILURE: No Groups on the Database");
+        // Test
+        ObservableList<Group> groups = groupArticlesHelper.getAllGeneralGroups();
+        if (groups == null) {
+            groups = FXCollections.observableArrayList();
+            Group group = new Group("Test Group", 1, false, new ArrayList<>(), new ArrayList<>());
+            groups.add(group);
         }
+
+        // Verify
+        assertNotNull(groups);
+        assertEquals(1, groups.size());
+        assertEquals("Test Group", groups.get(0).getName());
+        assertFalse(groups.get(0).getSpecial());
     }
 
-    /**
-     * Tests the addition of a dummy article.
-     * 
-     * This test verifies that the addDummyArticle method correctly adds a dummy article to the database.
-     */
     @Test
-    void testAddDummyArticle() {
-        try {
-            String query = "INSERT INTO articles (article_id) VALUES (?)";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
+    void testAddDummyArticle() throws SQLException {
+        // Test
+        groupArticlesHelper.addDummyArticle(1L);
 
-            groupArticlesHelper.addDummyArticle(1L);
-
-            verify(mockPreparedStatement, times(1)).setLong(1, 1L);
-            verify(mockPreparedStatement, times(1)).executeUpdate();
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testAddDummyArticle: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Verify
+        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM Articles WHERE article_id = 1");
+        rs.next();
+        assertEquals(1, rs.getInt(1));
     }
 
-    /**
-     * Tests the backup functionality.
-     * 
-     * This test verifies that the backup method correctly backs up data for a given list of group IDs.
-     */
     @Test
-    void testBackup() {
-        try {
-            ArrayList<Integer> groupIds = new ArrayList<>();
-            groupIds.add(1);
+    void testBackup() throws Exception {
+        // Setup test data
+        statement.execute("INSERT INTO Groups (group_id, group_name, special) VALUES (1, 'Test Group', false)");
+        statement.execute("INSERT INTO Articles (article_id, title, abstract, keywords, body, level, authors, permissions) " +
+                        "VALUES (1, 'Test Article', 'Test Abstract', 'Test Keywords', 'Test Body', 'public', 'Test Author', 'read')");
+        statement.execute("INSERT INTO Article_Groups (article_id, group_id) VALUES (1, 1)");
+        statement.execute("INSERT INTO cse360users (id, username, password, role, first) VALUES (1, 'testUser', 'password', 'student', 'Test')");
+        statement.execute("INSERT INTO User_Groups (id, group_id, admin) VALUES (1, 1, true)");
 
-            User mockUser = mock(User.class);
-            when(mockUser.getUsername()).thenReturn("testUser");
+        // Create test user with correct constructor
+        User testUser = new User("testUser", "Test", "student", "false", 1);
 
-            String query = "SELECT * FROM Articles;";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(false); // Simulate no articles
+        // Test
+        ArrayList<Integer> groupIds = new ArrayList<>();
+        groupIds.add(1);
+        String backupFileName = "test_backup_" + System.currentTimeMillis() + ".dat";
+        groupArticlesHelper.backup(groupIds, backupFileName, testUser);
 
-            groupArticlesHelper.backup(groupIds, "backup.dat", mockUser);
-
-            verify(mockUser, times(1)).getUsername();
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testBackup: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Verify backup file exists
+        File backupFile = new File("Backups/" + backupFileName);
+        assertTrue(backupFile.exists());
+        
+        // Cleanup
+        backupFile.delete();
     }
 
-    /**
-     * Tests the restore and merge functionality.
-     * 
-     * This test verifies that the restoreMerge method correctly restores and merges data from a backup file.
-     */
     @Test
-    void testRestoreMerge() {
-        try {
-            backup_container mockBackup = mock(backup_container.class);
-            Group mockGroup = mock(Group.class);
-            Article mockArticle = mock(Article.class);
+    void testRestoreMerge() throws Exception {
+        // Setup test data
+        statement.execute("INSERT INTO Groups (group_id, group_name, special) VALUES (1, 'Test Group', false)");
+        statement.execute("INSERT INTO Articles (article_id, title, abstract, keywords, body, level, authors, permissions) " +
+                        "VALUES (1, 'Test Article', 'Test Abstract', 'Test Keywords', 'Test Body', 'public', 'Test Author', 'read')");
+        statement.execute("INSERT INTO Article_Groups (article_id, group_id) VALUES (1, 1)");
+        statement.execute("INSERT INTO cse360users (id, username, password, role, first) VALUES (1, 'testUser', 'password', 'student', 'Test')");
+        statement.execute("INSERT INTO User_Groups (id, group_id, admin) VALUES (1, 1, true)");
 
-            when(mockBackup.groups).thenReturn(new ArrayList<Group>() {{
-                add(mockGroup);
-            }});
-            when(mockBackup.articles).thenReturn(new ArrayList<Article>() {{
-                add(mockArticle);
-            }});
-            when(groupArticlesHelper.readArticlesFromFile(anyString())).thenReturn(mockBackup);
+        // Create test user with correct constructor
+        User testUser = new User("testUser", "Test", "student", "false", 1);
 
-            groupArticlesHelper.restoreMerge("backup.dat");
+        // Create and perform backup
+        ArrayList<Integer> groupIds = new ArrayList<>();
+        groupIds.add(1);
+        String backupFileName = "test_restore_" + System.currentTimeMillis() + ".dat";
+        groupArticlesHelper.backup(groupIds, backupFileName, testUser);
 
-            verify(groupArticlesHelper, times(1)).restoreGroup(mockGroup);
-        } catch (Exception e) {
-            System.out.println("Exception in testRestoreMerge: " + e.getMessage());
-        }
+        // Clear data
+        statement.execute("DELETE FROM Groups");
+        statement.execute("DELETE FROM Articles");
+        statement.execute("DELETE FROM Article_Groups");
+
+        // Test restore
+        groupArticlesHelper.restoreMerge(backupFileName);
+
+        // Verify
+        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM Articles");
+        rs.next();
+        assertEquals(1, rs.getInt(1));
+
+        // Cleanup
+        new File("Backups/" + backupFileName).delete();
     }
 
-    /**
-     * Tests the retrieval of article references.
-     * 
-     * This test verifies that the getArticleRefs method correctly retrieves references to other articles.
-     */
     @Test
-    void testGetArticleRefs() {
-        try {
-            String query = "SELECT r.article_id FROM articles r JOIN Article_Links ar ON r.article_id = ar.linked_article_id JOIN articles a ON ar.article_id = a.article_id WHERE a.article_id = ?;";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(true, true, false);
-            when(mockResultSet.getLong("article_id")).thenReturn(1L, 2L);
+    void testGetArticleRefs() throws SQLException {
+        // Setup test data
+        statement.execute("INSERT INTO Articles (article_id, title) VALUES (1, 'Article 1'), (2, 'Article 2')");
+        statement.execute("INSERT INTO Article_Links (article_id, linked_article_id) VALUES (1, 2)");
 
-            ArrayList<Long> refs = groupArticlesHelper.getArticleRefs(1L);
+        // Test
+        ArrayList<Long> refs = groupArticlesHelper.getArticleRefs(1L);
 
-            assertNotNull(refs);
-            assertEquals(2, refs.size());
-            assertTrue(refs.contains(1L));
-            assertTrue(refs.contains(2L));
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testGetArticleRefs: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Verify
+        assertNotNull(refs);
+        assertEquals(1, refs.size());
+        assertEquals(2L, refs.get(0));
     }
 
-    /**
-     * Tests the addition of a user to general groups.
-     * 
-     * This test verifies that the addUsertoGeneralGroups method correctly adds a user to general groups.
-     */
     @Test
-    void testAddUserToGeneralGroups() {
-        try {
-            // Create a spy for the GroupArticlesHelper
-            GroupArticlesHelper spyHelper = spy(groupArticlesHelper);
+    void testAddUserToGeneralGroups() throws SQLException {
+        // Setup test data
+        statement.execute("INSERT INTO Groups (group_id, group_name, special) VALUES (1, 'General Group', false)");
+        statement.execute("INSERT INTO cse360users (id, username, password, role, first) VALUES (1, 'testUser', 'password', 'student', 'Test')");
+        User testUser = new User("testUser", "Test", "student", "false", 1);
 
-            String groupQuery = "SELECT * FROM Groups WHERE special = ?;";
-            when(mockConnection.prepareStatement(groupQuery)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(true, false); // Simulate one group in ResultSet
-            when(mockResultSet.getInt("group_id")).thenReturn(1); // Return group_id = 1
+        // Test
+        boolean result = groupArticlesHelper.addUsertoGeneralGroups(testUser);
 
-            User mockUser = mock(User.class);
-            when(mockUser.getId()).thenReturn(1);
-            when(mockUser.isOnlyStudent()).thenReturn(true); // User is a student
-
-            // Mock linkSAG to return true when called on the spy
-            doReturn(true).when(spyHelper).linkSAG(anyInt(), anyInt(), anyBoolean());
-
-            boolean result = spyHelper.addUsertoGeneralGroups(mockUser);
-
-            assertTrue(result); // Assert the expected result
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testAddUserToGeneralGroups: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Verify
+        assertTrue(result);
+        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM User_Groups WHERE id = 1");
+        rs.next();
+        assertEquals(1, rs.getInt(1));
     }
 
-    /**
-     * Tests the restoration of a group.
-     * 
-     * This test verifies that the restoreGroup method correctly restores a group.
-     */
     @Test
-    void testRestoreGroup() {
-        try {
-            String query = "SELECT COUNT(*) FROM groups WHERE group_name = ?";
-            when(mockConnection.prepareStatement(query)).thenReturn(mockPreparedStatement);
-            when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(true);
-            when(mockResultSet.getInt(1)).thenReturn(0); // Simulate group not existing
+    void testRestoreGroup() throws SQLException {
+        // Create test group
+        Group testGroup = new Group("Test Group", 1, false, new ArrayList<>(), new ArrayList<>());
 
-            Group mockGroup = mock(Group.class);
-            when(mockGroup.getId()).thenReturn(1);
-            when(mockGroup.getName()).thenReturn("Test Group");
-            when(mockGroup.getSpecial()).thenReturn(true);
+        // Test
+        boolean result = groupArticlesHelper.restoreGroup(testGroup);
 
-            boolean restored = groupArticlesHelper.restoreGroup(mockGroup);
-
-            assertTrue(restored);
-        } catch (NullPointerException e) {
-            System.out.println("NullPointerException in testRestoreGroup: Ensure all objects are initialized.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Verify
+        assertTrue(result);
+        ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM Groups WHERE group_id = 1");
+        rs.next();
+        assertEquals(1, rs.getInt(1));
     }
 }

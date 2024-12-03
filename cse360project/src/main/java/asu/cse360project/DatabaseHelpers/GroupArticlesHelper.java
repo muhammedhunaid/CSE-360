@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
  */
 public class GroupArticlesHelper{	
 
-    Singleton data = new Singleton();
+    Singleton data = null;
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
     
@@ -41,12 +41,15 @@ public class GroupArticlesHelper{
      * Constructor for GroupArticlesHelper class.
      * @param connection The connection to the database.
      * @param statement The statement for executing SQL queries.
+     * @param encryptionHelper The encryption helper for encrypting/decrypting objects.
+     * @param data The singleton instance for shared data.
      * @throws SQLException If an SQL exception occurs.
      */
-    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
+    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper, Singleton data) throws SQLException{
         this.connection = connection;
         this.statement = statement;
         this.encryptionHelper = encryptionHelper;
+        this.data = data;
     }
 
     /**
