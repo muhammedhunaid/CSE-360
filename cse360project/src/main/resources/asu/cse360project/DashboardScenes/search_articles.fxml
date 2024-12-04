@@ -90,7 +90,8 @@
                               <TableView fx:id="group_table" prefHeight="220.0" prefWidth="296.0">
                                  <columns>
                                     <TableColumn fx:id="group_id" prefWidth="81.0" text="ID" />
-                                    <TableColumn fx:id="group_name" prefWidth="214.0" text="Name" />
+                                    <TableColumn fx:id="group_name" prefWidth="165.0" text="Name" />
+                                    <TableColumn fx:id="group_admin" prefWidth="49.0" text="Admin" />
                                  </columns>
                               </TableView>
                            </children>

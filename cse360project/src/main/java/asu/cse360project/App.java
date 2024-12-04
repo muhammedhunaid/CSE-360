@@ -73,7 +73,7 @@ public class App extends Application {
             }
         });
 
-        SetupBackupRestoreManualTesting.Test2(3);
+        SetupBackupRestoreManualTesting.Test1();
     }
 
     // Main method to launch the JavaFX application

@@ -18,10 +18,13 @@ public class SetupBackupRestoreManualTesting {
         data.db.createTables();
         String uname = "TestAdminUser";
         String uname2 = "TestAdminUser2";
+        String uname3 = "StudentUser";
         data.user_db.addUser(uname , "Password123#", "admin"); //create user
         data.user_db.addUser(uname2 , "Password123#", "admin"); //create user
+        data.user_db.addUser(uname3 , "Password123#", "student"); //create user
         User user1 = data.user_db.getUser(uname);
         User user2 = data.user_db.getUser(uname2);
+        User user3 = data.user_db.getUser(uname3);
         //create groups
         data.group_articles_db.createGroup("Viewing Group1", false, user1.getId()); 
         data.group_articles_db.createGroup("Viewing Group2", true, user2.getId());
@@ -35,6 +38,7 @@ public class SetupBackupRestoreManualTesting {
         data.group_articles_db.linkSAG(user1.getId(), view_group1.getId(), false);
         //add user as viewer
         data.group_articles_db.linkSAG(user1.getId(), view_group2.getId(), false);
+        data.group_articles_db.linkSAG(user3.getId(), view_group2.getId(), false);
         //create user as admin of group
 
         //set login role
@@ -72,7 +76,7 @@ public class SetupBackupRestoreManualTesting {
         data.user_db.addUser(uname , "Password123#", "admin"); //create user
         data.user_db.addUser(uname2 , "Password123#", "admin"); //create user
         User user1 = data.user_db.getUser(uname);
-        User user2 = data.user_db.getUser(uname2);
+        //User user2 = data.user_db.getUser(uname2);
         //create groups
         data.group_articles_db.createGroup("Group1", true, user1.getId());
         data.group_articles_db.createGroup("Group2", false, user1.getId());

@@ -78,6 +78,20 @@ public class Group implements Serializable{
         this.viewer_users = viewer_users;
     }
 
+    public boolean isAdmin(User user) {
+        if(admin_users != null && admin_users.contains(user)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOnlyAdmin(User user) {
+        if(admin_users != null && admin_users.size() == 1 && admin_users.contains(user) ) {
+            return true;
+        }
+        return false;
+    }
+
     public String toString() {
         return "Group{" +
                "id=" + id +
