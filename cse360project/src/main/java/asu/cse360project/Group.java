@@ -70,6 +70,28 @@ public class Group implements Serializable{
         return viewer_users;
     }
 
+    public void setAdmin_users(ArrayList<User> admin_users) {
+        this.admin_users = admin_users;
+    }
+
+    public void setViewer_users(ArrayList<User> viewer_users) {
+        this.viewer_users = viewer_users;
+    }
+
+    public boolean isAdmin(User user) {
+        if(admin_users != null && admin_users.contains(user)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOnlyAdmin(User user) {
+        if(admin_users != null && admin_users.size() == 1 && admin_users.contains(user) ) {
+            return true;
+        }
+        return false;
+    }
+
     public String toString() {
         return "Group{" +
                "id=" + id +

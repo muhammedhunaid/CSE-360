@@ -8,15 +8,35 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import asu.cse360project.*;
+import asu.cse360project.Article;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
+import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleStringProperty;
+import asu.cse360project.Group;
+import asu.cse360project.Singleton;
+import asu.cse360project.User;
+import asu.cse360project.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -24,11 +44,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 public class SearchArticlesController implements Initializable{
     Singleton data = Singleton.getInstance();
     boolean add_special = false;
     String last_search = "";
+    PauseTransition pause;
 
     //table variables
     ObservableList<Article> articles_list  = FXCollections.observableArrayList();;
@@ -62,6 +84,7 @@ public class SearchArticlesController implements Initializable{
     @FXML private TableView<Group> group_table;
     @FXML private TableColumn<Group, String> group_id;
     @FXML private TableColumn<Group, String> group_name;
+    @FXML private TableColumn<Group, String> group_admin;
 
     //backups table
     @FXML private ListView<String> backups_list;
@@ -119,11 +142,6 @@ public class SearchArticlesController implements Initializable{
             e.printStackTrace();
         }
 
-
-        scroll_pane.setOnMouseMoved(event -> {
-            Utils.disableNode(error_text);
-        });
-
         backups_list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
             	selectedBackup = newSelection;
@@ -131,12 +149,29 @@ public class SearchArticlesController implements Initializable{
             }
         });
 
+        pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(event -> error_text.setVisible(false));
+
         disableByRole();
+
+        addTooltips();
+    }
+
+    void addTooltips() {
+        Tooltip editViewTooltip = new Tooltip("Toggle between edit view and search view.");
+        Tooltip levelTooltip = new Tooltip("Set the difficulty level for filtering articles.");
+        Tooltip editArticleTooltip = new Tooltip("Edit the selected article.");
+    
+        // Attach tooltips to buttons that exist
+        edit_view_btn.setTooltip(editViewTooltip);
+        level_btn.setTooltip(levelTooltip);
+        edit_article_btn.setTooltip(editArticleTooltip);
     }
 
     private void disableByRole() {
         if (data.getAppUser().getLoginRole().equals("student")) {
             Utils.disableNode(edit_view_btn);
+            group_admin.setVisible(false);
         }
 
         if (data.getAppUser().getLoginRole().equals("admin")) {
@@ -223,6 +258,11 @@ public class SearchArticlesController implements Initializable{
                 }
             }
         });
+
+        group_admin.setCellValueFactory(cellData -> {
+            Group g = cellData.getValue();
+            return new SimpleStringProperty(g.isAdmin(data.getAppUser()) ? "Y" : "N");
+        });
     }
 
     private <T> void createWrappedColumn (TableColumn<T, String> column) {
@@ -278,6 +318,7 @@ public class SearchArticlesController implements Initializable{
             }
         }
         Utils.setLabel(error_text, "Group not Found", Color.RED); // Show error if article is not found
+        pause.play();
     }
 
     @FXML
@@ -304,6 +345,7 @@ public class SearchArticlesController implements Initializable{
             }
         }
         Utils.setLabel(error_text, "Article not Found", Color.RED); // Show error if group is not found
+        pause.play();
     }
 
     @FXML   //set search level to advanced
@@ -374,6 +416,7 @@ public class SearchArticlesController implements Initializable{
         if(!added)
         {
             Utils.setLabel(error_text, "Error Inserting General Group", Color.RED);
+            pause.play();
         }else{
             getGroups();
         }
@@ -387,6 +430,7 @@ public class SearchArticlesController implements Initializable{
         if(!added)
         {
             Utils.setLabel(error_text, "Error Inserting Special Group", Color.RED);
+            pause.play();
         }else{
             getGroups();
         }
@@ -396,6 +440,12 @@ public class SearchArticlesController implements Initializable{
     void backupGroups(ActionEvent event) throws SQLException {
         if(selected_groups.size() > 0)
         {
+            if(!adminOfGroups())
+            {
+                Utils.setLabel(error_text, "You are not an admin of one of the selected groups to backup", Color.RED);
+                pause.play();
+                return;
+            }
             // Create a TextInputDialog
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Backup File Input");
@@ -418,6 +468,16 @@ public class SearchArticlesController implements Initializable{
         setBackupsTable();
     }
 
+    public boolean adminOfGroups() throws SQLException {
+        for(int group_id : selected_groups) {
+            Group g = data.group_articles_db.getGroup(group_id);
+            if(group_id > 0 && !g.isAdmin(data.getAppUser())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @FXML
     void backupAll(ActionEvent event) throws SQLException {
         // Create a TextInputDialog
@@ -432,8 +492,7 @@ public class SearchArticlesController implements Initializable{
             try {
                 if(all_backups == null || !all_backups.contains(fileName))
                 {
-                    ArrayList<Integer> all = new ArrayList<>();
-                    all.add(-1);
+                    ArrayList<Integer> all = getAdminGroups();
                     data.group_articles_db.backup(all, fileName, data.getAppUser());
                     setBackupsTable();
                 }
@@ -441,6 +500,28 @@ public class SearchArticlesController implements Initializable{
                 e.printStackTrace();
             }
         });
+    }
+
+    public ArrayList<Integer> getAdminGroups() throws SQLException {
+        ArrayList<Integer> all = new ArrayList<>();
+        for(Group group: groups_list) {
+            if(group.getId() == 0) {
+                all.add(0);
+            }else{
+                if(group.getAdmin_users() != null && group.getAdmin_users().contains(data.getAppUser())) {
+                    all.add(group.getId());
+                }
+            }
+        }
+        return all;
+    }
+
+    public void setGroups_list(ObservableList<Group> groups_list) {
+        this.groups_list = groups_list;
+    }
+
+    public void setData(Singleton data) {
+        this.data = data;
     }
 
     @FXML
@@ -467,11 +548,20 @@ public class SearchArticlesController implements Initializable{
 
     @FXML
     void deleteGroup(ActionEvent event) throws SQLException {
-        if(selectedGroup != null)
-        {
-            data.group_articles_db.deleteGroup(selectedGroup.getId());
-            groups_list.remove(groups_list.indexOf(selectedGroup));
+        if(selectedGroup == null) {
+            Utils.setLabel(error_text, "No group selected", Color.RED);
+            pause.play();
+            return;
         }
+
+        if(!selectedGroup.isAdmin(data.getAppUser())) {
+            Utils.setLabel(error_text, "Not an admin of the group your trying to delete", Color.RED);
+            pause.play();
+            return;
+        }
+
+        data.group_articles_db.deleteGroup(selectedGroup.getId());
+        groups_list.remove(groups_list.indexOf(selectedGroup));
     }
 
     @FXML
@@ -544,10 +634,14 @@ public class SearchArticlesController implements Initializable{
     void updateAccess(ActionEvent event) throws IOException, SQLException {
         if(selected_groups.size() > 1 || selected_groups.isEmpty())
         {
-            Utils.setLabel(error_text, "Select one group to edit", null);
-        }else{
+            Utils.setLabel(error_text, "Select one group to edit access", Color.RED);
+            pause.play();
+        }else if(adminOfGroups()) {
             data.edit_group = selected_groups;
             Utils.setContentArea(data.view_area, "modify_SAG");
+        }else{
+            Utils.setLabel(error_text, "not an admin of the selected group", Color.RED);
+            pause.play();
         }
         
     }

@@ -46,9 +46,9 @@ public class ArticleManagementTest {
         body = "";
         authors = "";
         
-        // Create a mock Singleton
-        Singleton mockSingleton = mock(Singleton.class);
-        groupArticlesHelper = new GroupArticlesHelper(mockConnection, mockStatement, mock(EncryptionHelper.class), mockSingleton);
+        // Create a mock Singleton and EncryptionHelper
+        EncryptionHelper mockEncryptionHelper = mock(EncryptionHelper.class);
+        groupArticlesHelper = new GroupArticlesHelper(mockConnection, mockPreparedStatement, mockEncryptionHelper);
     }
 
     @Test

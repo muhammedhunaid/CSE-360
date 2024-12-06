@@ -1,4 +1,4 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import asu.cse360project.Article;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
@@ -8,8 +8,8 @@ import asu.cse360project.User;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Singleton;
 import asu.cse360project.backup_container;
-import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +66,7 @@ class GroupArticlesHelperTest {
         singleton.user_db.createTables();
         
         // Initialize GroupArticlesHelper with Singleton
-        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
+        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper);
         
         // Create Backups directory if it doesn't exist
         new File("Backups").mkdirs();
@@ -85,7 +85,7 @@ class GroupArticlesHelperTest {
         // Reset Singleton for each test
         singleton = Singleton.getInstance();
         singleton.user_db = new UserHelper(connection, statement);
-        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
+        groupArticlesHelper = new GroupArticlesHelper(connection, statement, encryptionHelper);
     }
 
     @AfterEach
@@ -135,7 +135,7 @@ class GroupArticlesHelperTest {
         statement.execute("INSERT INTO User_Groups (id, group_id, admin) VALUES (1, 1, true)");
 
         // Create test user with correct constructor
-        User testUser = new User("testUser", "Test", "student", "false", 1);
+        User testUser = new User("testUser", "Test", "", "User", "Test", "test@test.com", "student", "", 1);
 
         // Test
         ArrayList<Integer> groupIds = new ArrayList<>();
@@ -162,7 +162,7 @@ class GroupArticlesHelperTest {
         statement.execute("INSERT INTO User_Groups (id, group_id, admin) VALUES (1, 1, true)");
 
         // Create test user with correct constructor
-        User testUser = new User("testUser", "Test", "student", "false", 1);
+        User testUser = new User("testUser", "Test", "", "User", "Test", "test@test.com", "student", "", 1);
 
         // Create and perform backup
         ArrayList<Integer> groupIds = new ArrayList<>();
@@ -207,7 +207,7 @@ class GroupArticlesHelperTest {
         // Setup test data
         statement.execute("INSERT INTO Groups (group_id, group_name, special) VALUES (1, 'General Group', false)");
         statement.execute("INSERT INTO cse360users (id, username, password, role, first) VALUES (1, 'testUser', 'password', 'student', 'Test')");
-        User testUser = new User("testUser", "Test", "student", "false", 1);
+        User testUser = new User("testUser", "Test", "", "User", "Test", "test@test.com", "student", "", 1);
 
         // Test
         boolean result = groupArticlesHelper.addUsertoGeneralGroups(testUser);

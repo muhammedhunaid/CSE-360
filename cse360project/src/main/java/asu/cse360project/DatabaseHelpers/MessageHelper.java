@@ -4,9 +4,10 @@ package asu.cse360project.DatabaseHelpers;
 import java.sql.*;
 import java.util.ArrayList;
 
-import asu.cse360project.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import asu.cse360project.Message;
 
 /**
  * 
@@ -14,7 +15,7 @@ import javafx.collections.ObservableList;
  * 
  * <p> Description: A class to handle database operations for messages. </p>
  * 
- * <p> Copyright: Tu35 © 2024 </p>
+ * <p> Copyright: Tu35 2024 </p>
  * 
  * @version 1.00	2024-11-17 Using Singleton class to create and get database connection 
  * 
@@ -47,8 +48,22 @@ public class MessageHelper{
                 + "search_id INT AUTO_INCREMENT PRIMARY KEY,"
 				+ "user_id INT NOT NULL, " // Primary key with auto-incrementing ID
 				+ "search TEXT NOT NULL);";
-		statement.execute(searchesTable); // Execute the SQL command to create the table
+		statement.execute(searchesTable); // Execute the SQL command to create the table        
 	}
+
+    public void testCreateTables() throws SQLException {
+        createTables();
+
+        // Check if the tables were created successfully
+        ResultSet rs = statement.executeQuery("FROM messages SELECT *;");
+        
+        // use assert to check if the tables were created successfully
+        assert rs != null;
+        
+        // Close the result set
+        rs.close();
+
+    }
 
 	public void addSearch(String search, int user_id) {
 		String sql = "INSERT INTO searches (user_id, search) VALUES (?, ?)";
@@ -72,6 +87,9 @@ public class MessageHelper{
 	}
 
     public boolean newMsg(String text, String user, String type, int user_id) {
+        // ensure only "General" or "Specific" messages are sent
+        assert type.equals("General") || type.equals("Specific");
+
         String insertQuery = "INSERT INTO messages (username, text, type, user_id) VALUES (?, ?, ?, ?)"; // SQL query for inserting a new user
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) { // Create prepared statement to prevent SQL injection
@@ -85,13 +103,45 @@ public class MessageHelper{
             int rowsInserted = insertStmt.executeUpdate(); 
             if (rowsInserted > 0) {
                 System.out.println("Message inserted successfully."); // Print success message
-                return false;
+                return true;
             } else {
                 System.out.println("Failed to insert message."); // Print failure message
                 return false;
             }
         } catch (SQLException e) {
             return false;
+        }        
+    }
+
+    public void testNewMsg() {
+        // Test the newMsg method
+        boolean result = newMsg("Hello", "user", "General", 1);
+        // now check if the message was inserted successfully
+        assert result;
+
+        // Go into DB and check if the message was inserted
+        ObservableList<Message> messages = FXCollections.observableArrayList();
+        try {
+            messages = getAllMsg("General");
+            assert messages.size() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (Message message : messages) {
+            if (message.getText().equals("Hello")) {
+                assert message.getUsername().equals("user");
+                assert message.getType().equals("General");
+            }
+        }
+
+        // remove the message with SQL query
+        String deleteQuery = "DELETE FROM messages WHERE text = 'Hello'";
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+            int rowsDeleted = deleteStmt.executeUpdate();
+            assert rowsDeleted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     

@@ -18,7 +18,7 @@ import asu.cse360project.DatabaseHelpers.DatabaseHelper;
  * 
  * <p> Description: A class to control the main JavaFX application. </p>
  * 
- * <p> Copyright: Tu35 © 2024 </p>
+ * <p> Copyright: Tu35 2024 </p>
  * 
  * @author Tu35
  * 

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import asu.cse360project.User;
 import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
 
 public class UserHelper{
 
@@ -81,7 +82,12 @@ public class UserHelper{
 	
 
     // Method to add a new user with username, password, and role
-    public void addUser(String username, String password, String role) throws SQLException {
+    public boolean addUser(String username, String password, String role) throws SQLException {
+		if(userNameExists(username))
+		{
+			return false;
+		}
+
         String insertQuery = "INSERT INTO cse360users (username, role, password) VALUES (?, ?, ?)"; // SQL query for adding a user
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) { // Create prepared statement
@@ -94,18 +100,24 @@ public class UserHelper{
             int rowsInserted = insertStmt.executeUpdate(); 
             if (rowsInserted > 0) {
                 System.out.println(username + "User inserted successfully."); // Print success message
+				return true;
             } else {
-                System.out.println("Failed to insert user."); // Print failure message
+				System.out.println("Failed to insert user."); // Print failure message
+				return false;
             }
-
         } catch (SQLException e) {
-            e.printStackTrace(); // Print the stack trace for SQL exceptions
+            return false;
         }
     }
 
     // Method to finalize account setup with additional user details
-    public void finishAccountSetup(String username, String first_name, String middle_name, String last_name, String pref_name, String email) throws SQLException {
-        String updateUserQuery = "UPDATE cse360users SET first = ?, last = ?, middle = ?, email = ?, preffered = ? WHERE username = ?"; // SQL update query
+    public boolean finishAccountSetup(String username, String first_name, String middle_name, String last_name, String pref_name, String email) throws SQLException {
+        if(userNameExists(username))
+		{
+			return false;
+		}
+
+		String updateUserQuery = "UPDATE cse360users SET first = ?, last = ?, middle = ?, email = ?, preffered = ? WHERE username = ?"; // SQL update query
         try (PreparedStatement pstmt = connection.prepareStatement(updateUserQuery)) { // Create prepared statement
             // Set user details in the prepared statement
             pstmt.setString(1, first_name);
@@ -115,7 +127,10 @@ public class UserHelper{
             pstmt.setString(5, pref_name);
             pstmt.setString(6, username); // Set username for the WHERE clause
             pstmt.executeUpdate(); // Execute the update
-        }
+			return true;
+        } catch (Exception e) {
+			return false;
+		}
     }
 
     // Method to reset the OTP and password for a user
@@ -267,6 +282,24 @@ public class UserHelper{
 			
 			if (rs.next()) {
 				// If the count is greater than 0, the user exists
+				return rs.getInt(1) > 0;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace(); // Print the stack trace if there's a SQL error
+		}
+		return false; // If an error occurs, assume user doesn't exist
+	}
+
+	//method to determine if username already in system
+	public boolean userNameExists(String uname) {
+		// SQL query to count users with the given email
+		String query = "SELECT COUNT(*) FROM cse360users WHERE username = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, uname); // Set the usernamef in the query
+			ResultSet rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				// If the count is greater than 0, the username exists
 				return rs.getInt(1) > 0;
 			}
 		} catch (SQLException e) {

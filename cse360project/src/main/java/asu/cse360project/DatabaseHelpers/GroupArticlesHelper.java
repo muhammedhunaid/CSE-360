@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import asu.cse360project.Article;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.backup_container;
-import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
  */
 public class GroupArticlesHelper{	
 
-    Singleton data = null;
+    public  Singleton data = Singleton.getInstance();
     private Connection connection = null; // Connection to the database
     private Statement statement = null; // Statement for executing SQL queries
     
@@ -45,7 +45,8 @@ public class GroupArticlesHelper{
      * @param data The singleton instance for shared data.
      * @throws SQLException If an SQL exception occurs.
      */
-    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper, Singleton data) throws SQLException{
+    public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
+        data = Singleton.getInstance();
         this.connection = connection;
         this.statement = statement;
         this.encryptionHelper = encryptionHelper;
@@ -564,7 +565,7 @@ public class GroupArticlesHelper{
     }
 
     //return array list of group objects that an article belongs to 
-    private ArrayList<Group> getArticleGroups(Long id) throws SQLException {
+    public ArrayList<Group> getArticleGroups(Long id) throws SQLException {
         ArrayList<Group> groups = new ArrayList<>();
         String query = 
             "SELECT * " + 
@@ -767,7 +768,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Backs up articles belonging to specified groups into a file and updates user backup records.
-    public void backup(ArrayList<Integer> groups, String file_name, User user) throws SQLException {
+    public boolean backup(ArrayList<Integer> groups, String file_name, User user) throws SQLException {
         ObservableList<Article> observableArticlesList = ListMultipleGroupsArticles(groups);
         ArrayList<Article> articleList = new ArrayList<>(observableArticlesList);
         ArrayList<Group> articleGroups = new ArrayList<>();
@@ -782,6 +783,9 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
         // Write articles and groups to a file and update user backup records.
         if (writeArticlesToFile(new backup_container(articleList, articleGroups), file_name)) {
             data.user_db.updateBackupFiles(user.getUsername(), file_name);
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -847,7 +851,7 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Writes a backup container object to a file.
-    private boolean writeArticlesToFile(backup_container backup, String fileName) {
+    public boolean writeArticlesToFile(backup_container backup, String fileName) {
         try (FileOutputStream fos = new FileOutputStream("Backups/" + fileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(backup); // Serialize the backup object to the file.
@@ -963,13 +967,15 @@ private void linkArticles(long articleId, ArrayList<Long> links) throws SQLExcep
     }
 
     // Deletes all user associations with a group based on the user ID.
-    public Boolean deleteSAGUsers(int id) throws SQLException {
-        String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ?;";
+    public Boolean deleteSAGUsers(int id, int group_id) throws SQLException {
+        String deleteGroupSQL = "DELETE FROM User_Groups WHERE id = ? AND group_id = ?;";
 
         try (PreparedStatement pstmt = connection.prepareStatement(deleteGroupSQL)) {
             // Execute the delete operation for the specified user ID.
             pstmt.setInt(1, id);
+            pstmt.setInt(2, group_id);
             pstmt.executeUpdate();
+            System.out.println("delted!!!!!");
             return true; // Return true if deletion is successful.
         } catch (SQLException e) {
             return false; // Return false if an exception occurs.

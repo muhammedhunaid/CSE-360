@@ -40,9 +40,7 @@ public class DatabaseHelper {
 			user_helper = new UserHelper(connection, statement);
             //initialize the encryptionhelper object which will be used in encryption and decryption
             encryptionHelper = new EncryptionHelper();
-            // Create a new Singleton instance for GroupArticlesHelper
-            Singleton singleton = new Singleton();
-			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper, singleton);
+			groups_articles_helper = new GroupArticlesHelper(connection, statement, encryptionHelper);
 			msg_helper = new MessageHelper(connection, statement);
 
 			createTables();  // Call method to create necessary tables if they don't already exist
@@ -74,6 +72,12 @@ public class DatabaseHelper {
         return true; // Return true if the result set is empty
     }
 
+	// Method to check if the database is empty
+    public void clearDatabase() throws SQLException {
+        String query = "DROP ALL OBJECTS"; // SQL query to clear database
+        statement.executeUpdate(query); // Execute the query and store the result
+    }
+
 		
 	public void closeConnection() {
 		try { 
@@ -89,7 +93,7 @@ public class DatabaseHelper {
 	}
 
 	// Method to create tables in the database
-	private void createTables() throws SQLException {
+	public void createTables() throws SQLException {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();
