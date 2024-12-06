@@ -23,6 +23,7 @@ import asu.cse360project.DatabaseHelpers.DatabaseHelper;
  * @author Tu35
  * 
  * @version 1.00	2024-10-30 JavaFX "Main" class for the application
+ * @version 2.00	2024-11-01 Added database connection and initialization
  * 
  */
 public class App extends Application {

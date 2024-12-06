@@ -22,8 +22,8 @@ public class Group implements Serializable{
 	private String name;
 	private Integer id;
     private boolean special;
-    private ArrayList<User> admin_users;
-    private ArrayList<User> viewer_users;
+    private ArrayList<User> admin_users; //list of privaleged users
+    private ArrayList<User> viewer_users; //list of non-privaleged users
 	
     // Constructor to initialize a User with specific details
     public Group(String name, Integer id, boolean special, ArrayList<User> admin_users, ArrayList<User> viewer_users) {
