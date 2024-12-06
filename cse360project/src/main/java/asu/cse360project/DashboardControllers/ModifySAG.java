@@ -105,7 +105,7 @@ public class ModifySAG implements Initializable{
                 return;
             }
 
-            data.group_articles_db.deleteSAGUsers(selectedSAGUser.getId());
+            data.group_articles_db.deleteSAGUsers(selectedSAGUser.getId(), data.edit_group.get(0));
             getSAGUsers();
         }
     }

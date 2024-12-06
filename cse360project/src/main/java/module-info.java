@@ -9,6 +9,7 @@ module asu.cse360project {
     requires junit;
 
     requires jdk.incubator.vector;
+    //requires org.junit.jupiter.platform;
 
     opens asu.cse360project to javafx.fxml;
     opens asu.cse360project.DashboardControllers to javafx.fxml;

@@ -1,4 +1,4 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import asu.cse360project.Article;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
@@ -8,11 +8,9 @@ import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
 import asu.cse360project.backup_container;
 import javafx.collections.ObservableList;
-import javafx.collections.FXCollections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.sql.*;
 import java.util.ArrayList;

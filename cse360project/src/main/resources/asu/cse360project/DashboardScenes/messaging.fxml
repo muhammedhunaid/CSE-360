@@ -1,37 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<HBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.DashboardControllers.MessageController">
+<HBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.MessageController">
    <children>
       <BorderPane prefHeight="555.0" prefWidth="723.0">
       <top>
-      	<Label alignment="BASELINE_CENTER" prefHeight="122.0" prefWidth="723.0" text="Send a message to the help system" >
+      	<Label alignment="BASELINE_CENTER" prefHeight="122.0" prefWidth="723.0" text="Send a message to the help system">
              <font>
-                <Font name="System Bold" size="15.0" />
+                <Font name="System Bold" size="16.0" />
              </font>
       	</Label>
       </top>
@@ -43,7 +27,7 @@
 	                        <RadioButton fx:id="spc_btn" mnemonicParsing="false" text="Specific Message" />
 	                     </children>
 	              </HBox>
-		         <TextField fx:id="message_box" prefHeight="225.0" prefWidth="5.0" alignment="TOP_LEFT" promptText="Enter Message here" />	
+		         <TextField fx:id="message_box" alignment="TOP_LEFT" prefHeight="225.0" prefWidth="5.0" promptText="Enter Message here" />	
 	         <HBox alignment="CENTER" prefWidth="313.0" spacing="10.0">
                  <children>
                     <Button mnemonicParsing="false" onAction="#sendToDB" prefHeight="40.0" prefWidth="101.0" text="Send" />

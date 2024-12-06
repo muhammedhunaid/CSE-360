@@ -1,4 +1,4 @@
-package asu.cse360project;
+package asu.cse360project.Testing;
 
 import java.util.ArrayList;
 
@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
+import asu.cse360project.Article;
 import asu.cse360project.DatabaseHelpers.DatabaseHelper;
 import asu.cse360project.DatabaseHelpers.GroupArticlesHelper;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;

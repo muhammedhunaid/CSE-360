@@ -71,6 +71,12 @@ public class DatabaseHelper {
         return true; // Return true if the result set is empty
     }
 
+	// Method to check if the database is empty
+    public void clearDatabase() throws SQLException {
+        String query = "DROP ALL OBJECTS"; // SQL query to clear database
+        statement.executeUpdate(query); // Execute the query and store the result
+    }
+
 		
 	public void closeConnection() {
 		try { 
@@ -86,7 +92,7 @@ public class DatabaseHelper {
 	}
 
 	// Method to create tables in the database
-	private void createTables() throws SQLException {
+	public void createTables() throws SQLException {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();

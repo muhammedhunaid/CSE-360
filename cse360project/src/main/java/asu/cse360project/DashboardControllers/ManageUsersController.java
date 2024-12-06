@@ -2,9 +2,11 @@ package asu.cse360project.DashboardControllers;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
+import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
@@ -23,7 +25,6 @@ import javafx.scene.text.Text;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Before;
 
 /**
  * Controller class for managing users in the system.
@@ -34,6 +35,7 @@ public class ManageUsersController implements Initializable {
     Singleton data = Singleton.getInstance();
     // Variables to keep track of user actions and selected user
     boolean adding_user = false;
+    public String role = "";
     private User selectedUser = null;
     Alert alert;
     ObservableList<User> all_Users; // List to hold all users
@@ -106,22 +108,14 @@ public class ManageUsersController implements Initializable {
     void changeRole(ActionEvent event) {
         if (selectedUser != null) {
             Utils.enableNode(change_role_box); // Enable role change if a user is selected
+        }else{
+            Utils.setLabel(error_label, "No User Selected", Color.RED); // Show error if no user is selected
         }
-        Utils.setLabel(error_label, "No User Selected", Color.RED); // Show error if no user is selected
     }
 
     // Method to confirm and apply role changes or add new user
     @FXML
     void confirm_role(ActionEvent event) {
-        boolean admin = admin_btn.selectedProperty().getValue();
-        boolean instructer = instructor_btn.selectedProperty().getValue();
-        boolean student = student_btn.selectedProperty().getValue();
-
-        // If no role is selected, return
-        if (!admin && !instructer && !student) {
-            return;
-        }
-
         // Set appropriate confirmation message for adding or changing role
         if (adding_user) {
             alert.setContentText("Are you sure you want to add a user");
@@ -129,21 +123,27 @@ public class ManageUsersController implements Initializable {
             alert.setContentText("Are you sure you want to change a user's role");
         }
 
+
+        if(!adding_user) {
+            role = getRole();
+
+            if(role.equals("")) {
+                return;
+            }
+
+            try {
+            ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(selectedUser.getId()));
+            if (onlyAdminofGroups(user_groups, selectedUser) && role.equals("student")) {
+                Utils.setLabel(error_label, "Cannot change role becuase changing role would remove only admin of a group", Color.RED); // Show error if no user is selected
+                return;
+            }
+            } catch (SQLException e) {
+                return;
+            }
+        }
+
         // Show confirmation dialog and handle user response
         alert.showAndWait().ifPresent(response -> {
-             // Determine the selected role(s)
-            String role = "";
-            if (admin) {
-                role += "admin,";
-            }
-            if (instructer) {
-                role += "instructor,";
-            }
-            if (student) {
-                role += "student,";
-            }
-            role = role.substring(0, role.length() - 1); // Remove trailing comma
-
             if (response == ButtonType.OK) {    
                 // If adding a new user
                 if (adding_user) {
@@ -164,6 +164,39 @@ public class ManageUsersController implements Initializable {
         instructor_btn.setSelected(false);
         student_btn.setSelected(false);
         Utils.disableNode(change_role_box);
+    }
+
+    public String getRole()
+    {
+        boolean admin = admin_btn.selectedProperty().getValue();
+        boolean instructer = instructor_btn.selectedProperty().getValue();
+        boolean student = student_btn.selectedProperty().getValue();
+
+        String role = "";
+        if (admin) {
+            role += "admin,";
+        }
+        if (instructer) {
+            role += "instructor,";
+        }
+        if (student) {
+            role += "student,";
+        }
+
+        if(!role.isEmpty()) {
+            role.substring(0, role.length() - 1); // Remove trailing comma        
+        }
+        return role;
+    }
+
+    public boolean onlyAdminofGroups(ArrayList<Group> groups, User user) {
+        for (Group g : groups)
+        {
+            if(g.isOnlyAdmin(user)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Method to add new user
@@ -193,6 +226,21 @@ public class ManageUsersController implements Initializable {
 
     private void changeUserRole(String role)
     {
+        if(selectedUser == null) {
+            return;
+        }
+
+        if (selectedUser != null) {
+            try {
+                data.user_db.changeRole(selectedUser.getUsername(), role); // Update user role in database
+                int user_index = all_Users.indexOf(selectedUser);
+                all_Users.get(user_index).setRole(role); // Update role in the list
+                table.refresh(); // Refresh table to show changes
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Input validation
         if (role == null || role.trim().isEmpty()) {
             throw new IllegalArgumentException("Role cannot be null or empty");
@@ -230,6 +278,16 @@ public class ManageUsersController implements Initializable {
 
         if(data.getAppUser().getLoginRole().equals("instructor") && selectedUser.isAdmin()) {
             Utils.setLabel(error_label, "Cannot remove admins from system", Color.RED); // Show error if no user is selected
+            return;
+        }
+
+        try {
+            ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId()));
+            if (onlyAdminofGroups(user_groups, selectedUser)) {
+                Utils.setLabel(error_label, "Cannot delete user becuase it would remove only admin of a group", Color.RED); // Show error if no user is selected
+                return;
+            }
+        } catch (SQLException e) {
             return;
         }
 

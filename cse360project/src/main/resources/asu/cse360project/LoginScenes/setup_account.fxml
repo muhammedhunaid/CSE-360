@@ -10,30 +10,30 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<HBox alignment="CENTER" prefHeight="420.0" prefWidth="492.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="asu.cse360project.LoginControllers.SetupAccountController">
+<HBox alignment="CENTER" prefHeight="420.0" prefWidth="492.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.LoginControllers.SetupAccountController">
    <children>
       <VBox alignment="CENTER" prefHeight="548.0" prefWidth="376.0" spacing="10.0">
          <children>
-            <Label text="Finish Setting Up Account" textAlignment="CENTER">
+            <Label prefHeight="31.0" prefWidth="259.0" text="Finish Setting Up Account" textAlignment="CENTER">
                <font>
-                  <Font size="21.0" />
+                  <Font name="System Bold" size="21.0" />
                </font>
             </Label>
-            <TextField fx:id="email_field" prefHeight="25.0" prefWidth="435.0" promptText="Email" />
+            <TextField fx:id="email_field" prefHeight="33.0" prefWidth="355.0" promptText="Email" translateY="10.0" />
             <Text fx:id="email_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="349.13671875" />
-            <TextField fx:id="first_name_field" promptText="First Name">
+            <TextField fx:id="first_name_field" promptText="First Name" translateY="10.0">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </TextField>
             <Text fx:id="first_name_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="349.13671875" />
-            <TextField fx:id="middle_name_field" promptText="Middle Name" />
+            <TextField fx:id="middle_name_field" promptText="Middle Name" translateY="10.0" />
             <Text fx:id="middle_name_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="349.13671875" />
-            <TextField fx:id="last_name_field" promptText="Last Name" />
+            <TextField fx:id="last_name_field" promptText="Last Name" translateY="10.0" />
             <Text fx:id="last_name_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="349.13671875" />
-            <PasswordField fx:id="pref_name_field" promptText="Preffered First Name (optional)" />
+            <PasswordField fx:id="pref_name_field" promptText="Preffered First Name (optional)" translateY="10.0" />
             <Text fx:id="pref_name_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="349.13671875" />
-            <Button mnemonicParsing="false" onAction="#finish" prefHeight="25.0" prefWidth="114.0" text="Finish" />
+            <Button mnemonicParsing="false" onAction="#finish" prefHeight="35.0" prefWidth="111.0" text="Finish" translateY="10.0" />
             <Label prefHeight="20.0" prefWidth="348.0" />
          </children>
          <padding>
