@@ -1,38 +1,34 @@
 package asu.cse360project;
 
-
-/*******
- * <p> Message. </p>
- * 
- * <p> Description: A class to represent a message in the application. </p>
- * 
- * <p> Copyright: Tu35 © 2024 </p>
- * 
- * @version 1.00	2024-11-17 Added data fields and methods to the class
- * 
+/**
+ * Represents a message in the application's communication system.
+ * Messages can be of different types (e.g., text messages, notifications)
+ * and contain information about both the content and the sender.
+ * This class provides methods to manage message content and metadata.
+ *
+ * @author Tu35
+ * @version 1.00 2024-11-17 Initial version with core messaging functionality
  */
-
 public class Message {
-    
-    // The username of the sender of the message
+    /** Username of the message sender */
     private String username;
     
-    // The type of the message (e.g., text message, notification, etc.)
+    /** Type of message (e.g., text message, notification) */
     private String type;
     
-    // The content of the message (e.g., the text or body of the message)
+    /** Content/body of the message */
     private String text;
     
-    // The user ID of the sender (unique identifier for the user)
+    /** Unique identifier of the sender */
     private int user_id;
 
     /**
-     * Constructs a new Message object with the specified details.
+     * Constructs a new Message with complete details.
      * 
-     * @param username The username of the user sending the message
-     * @param type The type of the message (e.g., "text", "notification")
-     * @param text The content or body of the message
-     * @param user_id The unique user ID of the sender
+     * @param username Username of the message sender
+     * @param type Type of message (e.g., "text", "notification")
+     * @param text Content/body of the message
+     * @param user_id Unique identifier of the sender
      */
     public Message(String username, String type, String text, int user_id) {
         this.username = username;
@@ -42,81 +38,74 @@ public class Message {
     }
 
     /**
-     * Retrieves the username of the sender.
-     * 
-     * @return The username of the sender
+     * Gets the username of the message sender.
+     * @return The sender's username
      */
     public String getUsername() { 
         return username; 
     }
 
     /**
-     * Sets the username of the sender.
-     * 
-     * @param username The new username of the sender
+     * Sets the username of the message sender.
+     * @param username New username to set
      */
     public void setUsername(String username) { 
         this.username = username; 
     }
 
     /**
-     * Retrieves the type of the message.
-     * 
-     * @return The type of the message (e.g., "text", "notification")
+     * Gets the type of message.
+     * @return The message type (e.g., "text", "notification")
      */
     public String getType() { 
         return type; 
     }
 
     /**
-     * Sets the type of the message.
-     * 
-     * @param type The new type of the message (e.g., "text", "notification")
+     * Sets the type of message.
+     * @param type New message type to set
      */
     public void setType(String type) { 
         this.type = type; 
     }
 
     /**
-     * Retrieves the content or body of the message.
-     * 
-     * @return The content of the message
+     * Gets the content/body of the message.
+     * @return The message content
      */
     public String getText() { 
         return text; 
     }
 
     /**
-     * Sets the content or body of the message.
-     * 
-     * @param text The new content of the message
+     * Sets the content/body of the message.
+     * @param text New message content to set
      */
     public void setText(String text) { 
         this.text = text; 
     }
 
     /**
-     * Retrieves the user ID of the sender.
-     * 
-     * @return The user ID of the sender
+     * Gets the unique identifier of the message sender.
+     * @return The sender's user ID
      */
     public int getUser_id() { 
         return user_id; 
     }
 
     /**
-     * Sets the user ID of the sender.
-     * 
-     * @param user_id The new user ID of the sender
+     * Sets the unique identifier of the message sender.
+     * @param user_id New user ID to set
      */
     public void setUser_id(int user_id) { 
         this.user_id = user_id; 
     }
 
     /**
-     * Provides a string representation of the Message object.     * 
-     * @return A string representation of the message in the format: 
-     *         "<username>, <type>, <text>"
+     * Returns a string representation of the Message object.
+     * Includes username, type, and content of the message.
+     * 
+     * @return A formatted string containing message details
      */
     @Override
     public String toString() {

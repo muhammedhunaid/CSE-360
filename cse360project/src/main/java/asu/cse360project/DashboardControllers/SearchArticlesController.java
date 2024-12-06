@@ -1,14 +1,15 @@
-/*******
- * <p> SearchArticlesController. </p>
+/**
+ * Controller class for managing article search and display functionality in the application.
+ * Provides features for searching, viewing, and managing articles and groups, including:
+ * - Article searching and filtering
+ * - Group management
+ * - Access level control
+ * - Backup management
  * 
- * <p> Description: A controller class for managing the search and display of articles and groups in the JavaFX application. </p>
- * 
- * <p> Copyright: Tu35 </p>
+ * This controller implements Initializable to support JavaFX initialization.
  * 
  * @author Tu35
- * 
- * @version 1.00	2024-11-01 Initial version with search functionalities
- * 
+ * @version 1.00 2024-11-01 Initial version with search functionalities
  */
 package asu.cse360project.DashboardControllers;
 
@@ -58,46 +59,108 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
-
-
+/**
+ * Controller class for managing article search and display functionality in the application.
+ * Provides features for searching, viewing, and managing articles and groups, including:
+ * - Article searching and filtering
+ * - Group management
+ * - Access level control
+ * - Backup management
+ * 
+ * This controller implements Initializable to support JavaFX initialization.
+ * 
+ * @author Tu35
+ * @version 1.00 2024-11-01 Initial version with search functionalities
+ */
 public class SearchArticlesController implements Initializable{
+    /** Singleton instance for managing application state */
     Singleton data = Singleton.getInstance();
+    
+    /** Flag for special addition mode */
     boolean add_special = false;
+    
+    /** Stores the last search query */
     String last_search = "";
+    
+    /** Delay timer for search operations */
     PauseTransition pause;
 
-    //table variables
-    ObservableList<Article> articles_list  = FXCollections.observableArrayList();;
+    /** Observable list of articles for TableView */
+    ObservableList<Article> articles_list = FXCollections.observableArrayList();
+    
+    /** Observable list of groups for TableView */
     ObservableList<Group> groups_list = FXCollections.observableArrayList();
-    ObservableList<String> all_backups; // List to hold all group names
+    
+    /** List of available backup names */
+    ObservableList<String> all_backups;
+    
+    /** Currently selected group IDs */
     ArrayList<Integer> selected_groups = new ArrayList<>();
+    
+    /** Currently selected article */
     Article selectedArticle;
+    
+    /** Currently selected group */
     Group selectedGroup;
+    
+    /** Helper for encryption operations */
     EncryptionHelper encryptionHelper;
-    String selectedBackup; 
+    
+    /** Currently selected backup name */
+    String selectedBackup;
+    
+    /** Alert dialog for user notifications */
     Alert alert;
 
+    // FXML injected fields
+    /** Label for displaying error messages */
     @FXML private Label error_text;
+    
+    /** Main scroll pane for the view */
     @FXML private ScrollPane scroll_pane;
 
-    //buttons
+    /** Dropdown button for selecting access level */
     @FXML private MenuButton level_btn;
+    
+    /** Container for top UI elements */
     @FXML private HBox top_pane;
+    
+    /** Container for bottom UI elements */
     @FXML private VBox bottom_box;
+    
+    /** Stack pane for layered UI elements */
     @FXML private StackPane botttom_pane;
+    
+    /** Toggle button for switching between edit and view modes */
     @FXML private ToggleButton edit_view_btn;
 
-    //article table JavaFX elements
+    // Article table components
+    /** TableView for displaying articles */
     @FXML private TableView<Article> article_table;
+    
+    /** Column for article abstracts */
     @FXML private TableColumn<Article, String> article_abstract;
+    
+    /** Column for article authors */
     @FXML private TableColumn<Article, String> article_author;
+    
+    /** Column for article titles */
     @FXML private TableColumn<Article, String> article_title;
+    
+    /** Column for article IDs */
     @FXML private TableColumn<Article, String> article_id_col;
 
-    //group table JavaFX elements
+    // Group table components
+    /** TableView for displaying groups */
     @FXML private TableView<Group> group_table;
+    
+    /** Column for group IDs */
     @FXML private TableColumn<Group, String> group_id;
+    
+    /** Column for group names */
     @FXML private TableColumn<Group, String> group_name;
+    
+    /** Column for group administrators */
     @FXML private TableColumn<Group, String> group_admin;
 
     //backups table
@@ -123,7 +186,6 @@ public class SearchArticlesController implements Initializable{
     @FXML private Text groups_selected_txt;
     
     @FXML private Button edit_article_btn;
-
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -735,4 +797,3 @@ public class SearchArticlesController implements Initializable{
     }
 
 }
-
