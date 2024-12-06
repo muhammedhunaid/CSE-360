@@ -1,3 +1,15 @@
+/*******
+ * <p> ViewMessageController. </p>
+ * 
+ * <p> Description: A controller class for managing messages in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-11-01 Initial version with basic message viewing functionalities
+ * 
+ */
 package asu.cse360project.DashboardControllers;
 
 import java.net.URL;
@@ -39,6 +51,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 //		
 //		
 //	}
+
+
+
 	
 public class ViewMessageController implements Initializable {
 
