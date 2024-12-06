@@ -21,7 +21,7 @@
 
 <ScrollPane fx:id="scroll_pane" prefHeight="1365.0" prefWidth="1282.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.SearchArticlesController">
    <content>
-      <BorderPane prefHeight="1352.0" prefWidth="1283.0">
+      <BorderPane prefHeight="1440.0" prefWidth="1283.0" translateY="10.0">
          <bottom>
             <StackPane fx:id="botttom_pane" alignment="TOP_CENTER" prefHeight="790.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
                <children>
@@ -55,6 +55,11 @@
             <VBox alignment="TOP_CENTER" prefHeight="380.0" prefWidth="1071.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
                   <ToggleButton fx:id="edit_view_btn" mnemonicParsing="false" onAction="#editView" prefHeight="25.0" prefWidth="99.0" text="Edit View" />
+                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="546.0" text="Search Articles">
+                     <font>
+                        <Font name="System Bold" size="22.0" />
+                     </font>
+                  </Label>
                   <HBox alignment="CENTER" prefHeight="30.0" prefWidth="845.0" spacing="5.0">
                      <children>
                         <TextField fx:id="keyword_input" prefHeight="30.0" prefWidth="529.0" promptText="Searching uses words, names, or phrases in the title, author, or abstract" />
@@ -90,8 +95,8 @@
                               <TableView fx:id="group_table" prefHeight="220.0" prefWidth="296.0">
                                  <columns>
                                     <TableColumn fx:id="group_id" prefWidth="81.0" text="ID" />
-                                    <TableColumn fx:id="group_name" prefWidth="165.0" text="Name" />
-                                    <TableColumn fx:id="group_admin" prefWidth="49.0" text="Admin" />
+                                    <TableColumn fx:id="group_name" prefWidth="151.0" text="Name" />
+                                    <TableColumn fx:id="group_admin" prefWidth="63.0" text="Admin" />
                                  </columns>
                               </TableView>
                            </children>
@@ -126,9 +131,9 @@
             </VBox>
          </center>
          <top>
-            <HBox fx:id="top_pane" alignment="CENTER" prefHeight="138.0" prefWidth="1071.0" spacing="3.0" BorderPane.alignment="CENTER">
+            <HBox fx:id="top_pane" alignment="CENTER" prefHeight="168.0" prefWidth="1283.0" spacing="3.0" BorderPane.alignment="CENTER">
                <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="3.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="3.0" translateX="-50.0">
                      <children>
                         <Label text="Article Settings">
                            <font>
@@ -140,7 +145,7 @@
                         <Button mnemonicParsing="false" onAction="#deleteArticle" prefHeight="25.0" prefWidth="109.0" text="Delete Article" />
                      </children>
                   </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="111.0" spacing="3.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="111.0" spacing="3.0" translateX="-15.0">
                      <children>
                         <Label text="Group Settings">
                            <font>
@@ -154,7 +159,7 @@
                         <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="114.0" text="Backup Group(s)" />
                      </children>
                   </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="138.0" prefWidth="121.0" spacing="3.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="138.0" prefWidth="121.0" spacing="3.0" translateX="20.0">
                      <children>
                         <Label text="Backup Settings">
                            <font>
@@ -167,7 +172,7 @@
                         <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="25.0" prefWidth="112.0" text="Delete" />
                      </children>
                   </VBox>
-                  <VBox alignment="CENTER" prefHeight="175.0" prefWidth="313.0">
+                  <VBox alignment="CENTER" prefHeight="175.0" prefWidth="313.0" translateX="55.0">
                      <children>
                         <Label alignment="CENTER" prefHeight="17.0" prefWidth="108.0" text="Backups">
                            <font>
