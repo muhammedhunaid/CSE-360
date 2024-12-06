@@ -9,42 +9,64 @@ import java.sql.Statement;
 
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
-/*******
- * <p> DatabaseHelper. </p>
+/**
+ * Core database management class that handles database connections and initialization.
+ * This class serves as the primary interface for database operations, managing:
+ * - Database connection establishment and closure
+ * - Table creation and initialization
+ * - Helper class instantiation for specific database operations
+ * - Basic database state queries
  * 
- * <p> Description: A controller class for managing users in the JavaFX application. </p>
- * 
- * <p> Copyright: Tu35 2024 </p>
- * 
+ * The class uses H2 database for data persistence and provides access to specialized
+ * helper classes for user, group, article, and message operations.
+ *
  * @author Tu35
- * 
- * @version 1.00	2024-10-30 Initial version with basic user management database queries
- * @version 2.00	2024-11-01 Added database connection and initialization for new features
- * @version 3.00	2024-11-15 Enhanced database connections and added encryption/decryption
- * 
+ * @version 3.00 2024-11-15 Enhanced database connections and added encryption/decryption
+ * @version 2.00 2024-11-01 Added database connection and initialization for new features
+ * @version 1.00 2024-10-30 Initial version with basic user management
  */
-
 public class DatabaseHelper {
-    // JDBC driver name and database URL
-    static final String JDBC_DRIVER = "org.h2.Driver";   // H2 database JDBC driver
-    static final String DB_URL = "jdbc:h2:~/cse360ProjectDatabase";  // H2 database connection URL
+    /** H2 database JDBC driver class name */
+    static final String JDBC_DRIVER = "org.h2.Driver";
+    
+    /** H2 database connection URL */
+    static final String DB_URL = "jdbc:h2:~/cse360ProjectDatabase";
+    
+    /** Default H2 database username */
+    static final String USER = "sa";
+    
+    /** Default H2 database password (empty) */
+    static final String PASS = "";
 
-    // Database credentials
-    static final String USER = "sa"; // Default username for H2
-    static final String PASS = ""; // Default password for H2 (empty)
+    /** Active database connection */
+    private Connection connection = null;
+    
+    /** SQL statement for executing queries */
+    private Statement statement = null;
 
-    private Connection connection = null; // Connection to the database
-    private Statement statement = null; // Statement for executing SQL queries
-    // PreparedStatement pstmt; // Uncomment if needed for additional prepared statements
+    /** Helper for user-related database operations */
+    private UserHelper user_helper;
+    
+    /** Helper for group and article related database operations */
+    private GroupArticlesHelper groups_articles_helper;
+    
+    /** Helper for message-related database operations */
+    private MessageHelper msg_helper;
 
-	private UserHelper user_helper;
-	private GroupArticlesHelper groups_articles_helper;
-	private MessageHelper msg_helper;
-
-    //Declare the encryptionHelper object whcih will help us encrypt and decrypt objects
+    /** Helper for encryption/decryption operations */
     private EncryptionHelper encryptionHelper;
 
-    // Method to establish a connection to the database
+    /**
+     * Establishes a connection to the H2 database and initializes helper classes.
+     * This method:
+     * 1. Loads the JDBC driver
+     * 2. Creates a database connection
+     * 3. Initializes helper classes
+     * 4. Creates necessary database tables
+     *
+     * @throws SQLException If a database access error occurs
+     * @throws Exception If the JDBC driver cannot be loaded
+     */
     public void connectToDatabase() throws SQLException, Exception {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver for H2
@@ -65,19 +87,37 @@ public class DatabaseHelper {
         }
     }
 
-	public UserHelper getUser_helper() {
+    /**
+     * Gets the user helper instance for user-related database operations.
+     * @return UserHelper instance
+     */
+    public UserHelper getUser_helper() {
 		return user_helper;
 	}
 
-	public GroupArticlesHelper getGroupArticlesHelper() {
+    /**
+     * Gets the group and articles helper instance for related database operations.
+     * @return GroupArticlesHelper instance
+     */
+    public GroupArticlesHelper getGroupArticlesHelper() {
 		return groups_articles_helper;		
 	}
 	
-	public MessageHelper getMessageHelper() {
+    /**
+     * Gets the message helper instance for message-related database operations.
+     * @return MessageHelper instance
+     */
+    public MessageHelper getMessageHelper() {
 		return msg_helper;
 	}
 
-    // Method to check if the database is empty
+    /**
+     * Checks if the database has any users.
+     * This is typically used to determine if initial setup is required.
+     *
+     * @return true if no users exist in the database, false otherwise
+     * @throws SQLException If a database access error occurs
+     */
     public boolean isDatabaseEmpty() throws SQLException {
         String query = "SELECT COUNT(*) AS count FROM cse360users"; // SQL query to count the number of users
         ResultSet resultSet = statement.executeQuery(query); // Execute the query and store the result
@@ -87,14 +127,24 @@ public class DatabaseHelper {
         return true; // Return true if the result set is empty
     }
 
-	// Method to check if the database is empty
+    /**
+     * Clears all data from the database by dropping all objects.
+     * This is a destructive operation that cannot be undone.
+     *
+     * @throws SQLException If a database access error occurs
+     */
     public void clearDatabase() throws SQLException {
         String query = "DROP ALL OBJECTS"; // SQL query to clear database
         statement.executeUpdate(query); // Execute the query and store the result
     }
 
 		
-	public void closeConnection() {
+    /**
+     * Closes the database connection and associated resources.
+     * This method should be called when the database connection is no longer needed
+     * to free up system resources.
+     */
+    public void closeConnection() {
 		try { 
 			if (statement != null) statement.close(); // Close the statement if it exists
 		} catch (SQLException se2) { 
@@ -107,8 +157,18 @@ public class DatabaseHelper {
 		} 
 	}
 
-	// Method to create tables in the database
-	public void createTables() throws SQLException {
+    /**
+     * Creates all necessary database tables if they don't exist.
+     * This includes tables for:
+     * - Users
+     * - Articles
+     * - Groups
+     * - Messages
+     * - Relationships between entities
+     *
+     * @throws SQLException If a database access error occurs
+     */
+    public void createTables() throws SQLException {
 		// SQL command to create the tables if it doesn't exist
 		user_helper.createTables();
 		groups_articles_helper.createAllTables();
