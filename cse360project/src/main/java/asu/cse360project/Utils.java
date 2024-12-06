@@ -3,6 +3,7 @@ package asu.cse360project;
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -11,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 // Utility class for validation and UI management in the application
 public class Utils {
     // Regular expressions for validating usernames, passwords, emails, and names
@@ -21,6 +23,62 @@ public class Utils {
     
     // Characters allowed in the invite code
     private static String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    // Utility method to show temporary feedback messages
+    private static PauseTransition feedbackPause;
+
+    public static void showTemporaryFeedback(Text feedbackText, String message, Color color) {
+        if (feedbackPause != null) {
+            feedbackPause.stop();
+        }
+        
+        feedbackText.setText(message);
+        feedbackText.setFill(color);
+        enableNode(feedbackText);
+
+        feedbackPause = new PauseTransition(Duration.seconds(2));
+        feedbackPause.setOnFinished(event -> disableNode(feedbackText));
+        feedbackPause.play();
+    }
+
+    public static void showTemporaryFeedback(Label feedbackLabel, String message, Color color) {
+        if (feedbackPause != null) {
+            feedbackPause.stop();
+        }
+        
+        feedbackLabel.setText(message);
+        feedbackLabel.setTextFill(color);
+        enableNode(feedbackLabel);
+
+        feedbackPause = new PauseTransition(Duration.seconds(2));
+        feedbackPause.setOnFinished(event -> disableNode(feedbackLabel));
+        feedbackPause.play();
+    }
+
+    // Convenience methods for common feedback types
+    public static void showErrorFeedback(Text feedbackText, String message) {
+        showTemporaryFeedback(feedbackText, message, Color.RED);
+    }
+
+    public static void showErrorFeedback(Label feedbackLabel, String message) {
+        showTemporaryFeedback(feedbackLabel, message, Color.RED);
+    }
+
+    public static void showSuccessFeedback(Text feedbackText, String message) {
+        showTemporaryFeedback(feedbackText, message, Color.GREEN);
+    }
+
+    public static void showSuccessFeedback(Label feedbackLabel, String message) {
+        showTemporaryFeedback(feedbackLabel, message, Color.GREEN);
+    }
+
+    public static void showInfoFeedback(Text feedbackText, String message) {
+        showTemporaryFeedback(feedbackText, message, Color.BLUE);
+    }
+
+    public static void showInfoFeedback(Label feedbackLabel, String message) {
+        showTemporaryFeedback(feedbackLabel, message, Color.BLUE);
+    }
 
     // Validate the provided username based on specified criteria
     public static String validateUsername(String username) {

@@ -113,49 +113,48 @@ public class ManageUsersController implements Initializable {
         boolean instructer = instructor_btn.selectedProperty().getValue();
         boolean student = student_btn.selectedProperty().getValue();
 
-        // If no role is selected, return
         if (!admin && !instructer && !student) {
+            Utils.showErrorFeedback(error_label, "Please select at least one role");
             return;
         }
 
-        // Set appropriate confirmation message for adding or changing role
+        String role = "";
+        if (admin) {
+            role += "admin,";
+        }
+        if (instructer) {
+            role += "instructor,";
+        }
+        if (student) {
+            role += "student,";
+        }
+        role = role.substring(0, role.length() - 1);
+
         if (adding_user) {
-            alert.setContentText("Are you sure you want to add a user");
+            alert.setContentText("Are you sure you want to add a user with role(s): " + role + "?");
         } else {
-            alert.setContentText("Are you sure you want to change a user's role");
+            alert.setContentText("Are you sure you want to change the user's role to: " + role + "?");
         }
 
-        // Show confirmation dialog and handle user response
+        String finalRole = role;
         alert.showAndWait().ifPresent(response -> {
-             // Determine the selected role(s)
-            String role = "";
-            if (admin) {
-                role += "admin,";
-            }
-            if (instructer) {
-                role += "instructor,";
-            }
-            if (student) {
-                role += "student,";
-            }
-            role = role.substring(0, role.length() - 1); // Remove trailing comma
-
             if (response == ButtonType.OK) {    
-                // If adding a new user
-                if (adding_user) {
-                    addUser(role);
-                    return;
-                }else{
-                    // If changing an existing user's role
-                    changeRole(role);
-                    return;
-                }             
+                try {
+                    if (adding_user) {
+                        addUser(finalRole);
+                        Utils.showSuccessFeedback(error_label, "User added successfully!");
+                    } else {
+                        changeRole(finalRole);
+                        Utils.showSuccessFeedback(error_label, "User role updated successfully!");
+                    }
+                } catch (Exception e) {
+                    Utils.showErrorFeedback(error_label, "Error: " + e.getMessage());
+                }
             } else {
-                Utils.setLabel(error_label, "No User Roles Changed", Color.BLACK); // No role change made
+                Utils.showInfoFeedback(error_label, "Operation cancelled");
             }
         });
 
-        // Reset role buttons and disable role change box
         admin_btn.setSelected(false);
         instructor_btn.setSelected(false);
         student_btn.setSelected(false);
@@ -195,43 +194,36 @@ public class ManageUsersController implements Initializable {
     void delete(ActionEvent event) {
         if(selectedUser == null)
         {
+            Utils.showErrorFeedback(error_label, "Please select a user to delete");
             return;
         }
 
         if(selectedUser.getUsername().equals(data.getAppUser().getUsername()))
         {
-            Utils.setLabel(error_label, "Cannot remove self from system", Color.RED); // Show error if no user is selected
+            Utils.showErrorFeedback(error_label, "Cannot remove self from system");
             return;
         }
 
         if(data.getAppUser().getLoginRole().equals("instructor") && selectedUser.isAdmin()) {
-            Utils.setLabel(error_label, "Cannot remove admins from system", Color.RED); // Show error if no user is selected
+            Utils.showErrorFeedback(error_label, "Cannot remove admins from system");
             return;
         }
 
-        if (!selectedUser.getUsername().equals(data.getAppUser().getUsername())) {
-            // Show confirmation dialog for deleting user
-            alert.setContentText("Are you sure you want to delete user");
-            alert.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    // Remove user from list and database
-                    boolean removed;
-                    try {
-                        removed = data.user_db.deleteUser(selectedUser);
-                    } catch (SQLException e) {
-                        removed = false;
-                    }
-                    if(removed) {
-                        Utils.setLabel(error_label, "User Removed", Color.BLACK); // Show success message
-                        all_Users.remove(all_Users.indexOf(selectedUser));
-                    }else{
-                        Utils.setLabel(error_label, "Error removing User", Color.BLACK); // Show success message
-                    }
-                } else {
-                    return;
+        alert.setContentText("Are you sure you want to delete user: " + selectedUser.getUsername() + "?");
+        
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    data.user_db.deleteUser(selectedUser);
+                    Utils.showSuccessFeedback(error_label, "User deleted successfully!");
+                    all_Users.remove(all_Users.indexOf(selectedUser));
+                } catch (Exception e) {
+                    Utils.showErrorFeedback(error_label, "Error deleting user: " + e.getMessage());
                 }
-            });
-        }
+            } else {
+                Utils.showInfoFeedback(error_label, "Delete operation cancelled");
+            }
+        });
     }
 
     // Method to reset a selected user's password
@@ -252,7 +244,7 @@ public class ManageUsersController implements Initializable {
                 }
             });
         } else {
-            Utils.setLabel(error_label, "No User Selected", Color.RED); // Show error if no user is selected
+            Utils.showErrorFeedback(error_label, "No User Selected");
         }
     }
 
@@ -264,12 +256,11 @@ public class ManageUsersController implements Initializable {
             if (user.getUsername().equals(username)) {
                 table.getSelectionModel().select(user); // Highlight the row if user is found
                 table.scrollTo(user); // Scroll to the row
-                Utils.setLabel(error_label, "User Found", Color.GREEN); // Show success message
+                Utils.showSuccessFeedback(error_label, "User Found");
                 return;
             } else {
-                Utils.setLabel(error_label, "User not Found", Color.RED); // Show error if user is not found
+                Utils.showErrorFeedback(error_label, "User not Found");
             }
         }
     }
 }
-

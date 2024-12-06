@@ -189,21 +189,25 @@ public class UserHelper{
 			try (ResultSet rs = pstmt.executeQuery()) {
 				// If user exists, retrieve their details
 				if (rs.next()) {
-					String role = rs.getString("role"); // Get user's role
-					int id = rs.getInt("id"); // Get user's id
-					String firstName = rs.getString("first"); // Get user's first name
-					Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
-					String pw_reset_string = "";
-					// Convert password_reset to string if it's not null
-					if (password_reset != null) {
-						pw_reset_string = password_reset.toString();
-					}
-					// Return a User object with the retrieved details
-					return new User(username, firstName, role, pw_reset_string, id);
-				} else {
-					System.out.println("User does not exist."); // Log if user is not found
-					return null; // Return null if user doesn't exist
-				}
+                    String role = rs.getString("role"); // Get user's role
+                    int id = rs.getInt("id"); // Get user's id
+                    String firstName = rs.getString("first"); // Get user's first name
+                    String middleName = rs.getString("middle"); // Get user's middle name
+                    String lastName = rs.getString("last"); // Get user's last name
+                    String prefName = rs.getString("preffered"); // Get user's preferred name
+                    String email = rs.getString("email"); // Get user's email
+                    Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
+                    String pw_reset_string = "";
+                    // Convert password_reset to string if it's not null
+                    if (password_reset != null) {
+                        pw_reset_string = password_reset.toString();
+                    }
+                    // Return a User object with the retrieved details
+                    return new User(username, firstName, middleName, lastName, prefName, email, role, pw_reset_string, id);
+                } else {
+                    System.out.println("User does not exist."); // Log if user is not found
+                    return null; // Return null if user doesn't exist
+                }
 			}
 		}
 	}
@@ -397,4 +401,27 @@ public class UserHelper{
         }
 
 	}
+
+	public User validateUser(String username, String password) throws SQLException {
+        String query = "SELECT * FROM cse360users WHERE username = ? AND password = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setRole(rs.getString("role"));
+                user.setFirst_name(rs.getString("first"));
+                user.setMiddle_name(rs.getString("middle"));
+                user.setLast_name(rs.getString("last"));
+                user.setPref_name(rs.getString("preffered"));
+                user.setEmail(rs.getString("email"));
+                return user;
+            }
+        }
+        return null;
+    }
 }

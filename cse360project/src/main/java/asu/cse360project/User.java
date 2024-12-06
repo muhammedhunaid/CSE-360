@@ -8,7 +8,7 @@ public class User implements Comparable<User>, Serializable{
      * 
      * <p> Description: This class provides methods to get and set user details, check user roles, and manage login roles. User class represents a user with specific details such as username, role, first name, and password reset status </p>
      * 
-     * <p> Copyright: Tu35 © 2024 </p>
+     * <p> Copyright: Tu35 2024 </p>
      * 
      * @author Tu35
      * 
@@ -22,13 +22,21 @@ public class User implements Comparable<User>, Serializable{
     private int id; //User's id
     private String role; // User's role (e.g., admin, instructor, student)
     private String first_name; // User's first name
+    private String middle_name; // User's middle name
+    private String last_name; // User's last name
+    private String pref_name; // User's preferred name
+    private String email; // User's email
     private String password_reset; // Indicator for password reset status
     private String login_role = ""; // Role the user is currently logged in as
 
     // Constructor to initialize a User with specific details
-    public User(String username, String first_name, String role, String password_reset, int id) {
+    public User(String username, String first_name, String middle_name, String last_name, String pref_name, String email, String role, String password_reset, int id) {
         this.username = username;
         this.first_name = first_name;
+        this.middle_name = middle_name;
+        this.last_name = last_name;
+        this.pref_name = pref_name;
+        this.email = email;
         this.role = role;
         this.password_reset = password_reset;
         this.id = id;
@@ -38,6 +46,10 @@ public class User implements Comparable<User>, Serializable{
     public User() {
         this.username = "";
         this.first_name = "";
+        this.middle_name = "";
+        this.last_name = "";
+        this.pref_name = "";
+        this.email = "";
         this.role = "";
         this.password_reset = "";
     }
@@ -72,12 +84,48 @@ public class User implements Comparable<User>, Serializable{
         return first_name;
     }
 
+    public void setFirst_name(String first_name) {
+        this.first_name = first_name;
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getMiddle_name() {
+        return middle_name;
+    }
+
+    public void setMiddle_name(String middle_name) {
+        this.middle_name = middle_name;
+    }
+
+    public String getLast_name() {
+        return last_name;
+    }
+
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
+    }
+
+    public String getPref_name() {
+        return pref_name;
+    }
+
+    public void setPref_name(String pref_name) {
+        this.pref_name = pref_name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     // Method to check if the user has an admin role
@@ -129,6 +177,10 @@ public class User implements Comparable<User>, Serializable{
     public String toString() {
         return "User{" +
                 "first name=" + first_name +
+                ", middle name=" + middle_name +
+                ", last name=" + last_name +
+                ", preferred name=" + pref_name +
+                ", email=" + email +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
                 '}'; // Returns a formatted string with the user's first name, username, and role
