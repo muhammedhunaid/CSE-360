@@ -23,6 +23,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * Controller class for managing users in the system.
  * Provides functionality to add, remove, search, change roles, and reset passwords for users.
@@ -146,9 +149,9 @@ public class ManageUsersController implements Initializable {
                 if (adding_user) {
                     addUser(role);
                     return;
-                }else{
+                } else {
                     // If changing an existing user's role
-                    changeRole(role);
+                    changeUserRole(role);
                     return;
                 }             
             } else {
@@ -199,18 +202,29 @@ public class ManageUsersController implements Initializable {
     // Method to add new user
     private void addUser(String role)
     {
+        // Input validation
+        if (role == null || role.trim().isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be null or empty");
+        }
+        
         String invite_code = Utils.generateInviteCode(5);
+        assertNotNull("Invite code should not be null", invite_code);
+        assertTrue("Invite code should be 5 characters", invite_code.length() == 5);
+        
         Utils.setLabel(error_label, "Invite Code: " + invite_code, Color.GREEN);
-        adding_user = false; // Reset adding flag
-        data.user_db.insertUser(invite_code, role); // Add user to database
+        adding_user = false;
+        data.user_db.insertUser(invite_code, role);
         try {
-            all_Users.add(data.user_db.getUser(invite_code)); // Add user to list and refresh
+            User newUser = data.user_db.getUser(invite_code);
+            assertNotNull("New user should not be null", newUser);
+            assertEquals("User role should match input", role, newUser.getRole());
+            all_Users.add(newUser);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void changeRole(String role)
+    private void changeUserRole(String role)
     {
         if(selectedUser == null) {
             return;
@@ -225,6 +239,26 @@ public class ManageUsersController implements Initializable {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+
+        // Input validation
+        if (role == null || role.trim().isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be null or empty");
+        }
+        if (selectedUser == null) {
+            throw new IllegalStateException("No user selected for role change");
+        }
+
+        try {
+            data.user_db.changeRole(selectedUser.getUsername(), role);
+            int user_index = all_Users.indexOf(selectedUser);
+            assertTrue("User should exist in list", user_index >= 0);
+            
+            all_Users.get(user_index).setRole(role);
+            assertEquals("User role should be updated", role, all_Users.get(user_index).getRole());
+            table.refresh();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -308,16 +342,93 @@ public class ManageUsersController implements Initializable {
     @FXML
     void searchUser(ActionEvent event) throws SQLException {
         String username = search_user.getText().toString();
+        // Input validation
+        if (username == null || username.trim().isEmpty()) {
+            Utils.setLabel(error_label, "Username cannot be empty", Color.RED);
+            return;
+        }
+
+        assertNotNull("User list should not be null", all_Users);
+        boolean userFound = false;
+        
         for (User user : all_Users) {
+            assertNotNull("User object should not be null", user);
+            assertNotNull("Username should not be null", user.getUsername());
+            
             if (user.getUsername().equals(username)) {
-                table.getSelectionModel().select(user); // Highlight the row if user is found
-                table.scrollTo(user); // Scroll to the row
-                Utils.setLabel(error_label, "User Found", Color.GREEN); // Show success message
+                table.getSelectionModel().select(user);
+                table.scrollTo(user);
+                Utils.setLabel(error_label, "User Found", Color.GREEN);
+                userFound = true;
+                
+                // Verify selected user
+                User selectedUser = table.getSelectionModel().getSelectedItem();
+                assertNotNull("Selected user should not be null", selectedUser);
+                assertEquals("Selected user should match search", username, selectedUser.getUsername());
                 return;
-            } else {
-                Utils.setLabel(error_label, "User not Found", Color.RED); // Show error if user is not found
             }
         }
+        
+        if (!userFound) {
+            Utils.setLabel(error_label, "User not Found", Color.RED);
+        }
+    }
+
+    // Add test methods
+    @Test
+    public void testAddUser() {
+        String role = "student";
+        addUser(role);
+        assertFalse("Adding user flag should be false after adding", adding_user);
+        
+        // Test invalid input
+        try {
+            addUser(null);
+            fail("Should throw IllegalArgumentException for null role");
+        } catch (IllegalArgumentException e) {
+            // Expected exception
+        }
+    }
+
+    @Test
+    public void testChangeRole() {
+        String newRole = "instructor";
+        selectedUser = new User(); // Create test user
+        selectedUser.setUsername("testUser");
+        selectedUser.setRole("student");
+        all_Users.add(selectedUser);
+        
+        changeUserRole(newRole);
+        assertEquals("Role should be updated", newRole, selectedUser.getRole());
+        
+        // Test invalid input
+        try {
+            changeUserRole(null);
+            fail("Should throw IllegalArgumentException for null role");
+        } catch (IllegalArgumentException e) {
+            // Expected exception
+        }
+    }
+
+    @Test
+    public void testSearchUser() throws SQLException {
+        // Test with valid user
+        User testUser = new User();
+        testUser.setUsername("testUser");
+        all_Users.add(testUser);
+        search_user.setText("testUser");
+        searchUser(new ActionEvent());
+        assertEquals("Should find test user", testUser, table.getSelectionModel().getSelectedItem());
+        
+        // Test with non-existent user
+        search_user.setText("nonexistentUser");
+        searchUser(new ActionEvent());
+        assertEquals("Should show error for non-existent user", "User not Found", error_label.getText());
+        
+        // Test with empty input
+        search_user.setText("");
+        searchUser(new ActionEvent());
+        assertEquals("Should show error for empty input", "Username cannot be empty", error_label.getText());
     }
 }
 

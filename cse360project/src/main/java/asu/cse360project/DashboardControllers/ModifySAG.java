@@ -12,11 +12,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.fxml.Initializable;
 
 public class ModifySAG implements Initializable{
 
@@ -62,6 +63,18 @@ public class ModifySAG implements Initializable{
                 selectedSAGUser = newSelection;
             }
         });
+
+        addTooltips();
+    }
+
+    void addTooltips() {
+        Tooltip addAdminTooltip = new Tooltip("Add the selected user as an Admin to the group.");
+        Tooltip addViewerTooltip = new Tooltip("Add the selected user as a Viewer to the group.");
+        Tooltip deleteViewerTooltip = new Tooltip("Remove the selected user from the group.");
+
+        add_admin.setTooltip(addAdminTooltip);
+        add_viewer.setTooltip(addViewerTooltip);
+        delete_viewer.setTooltip(deleteViewerTooltip);
     }
 
     @FXML

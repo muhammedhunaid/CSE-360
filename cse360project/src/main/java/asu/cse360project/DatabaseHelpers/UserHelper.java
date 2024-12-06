@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 
 import asu.cse360project.User;
 import javafx.collections.ObservableList;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import javafx.collections.FXCollections;
 
 public class UserHelper{
 
@@ -222,6 +225,14 @@ public class UserHelper{
 		}
 	}
 	
+	@Test
+	public void testGetUser() throws SQLException {
+		UserHelper userHelper = new UserHelper(connection, statement);
+		User user = userHelper.getUser("testUser");
+		assertNotNull("User should not be null", user);
+		assertTrue("User should be instance of User class", user instanceof User);
+	}
+	
 	public boolean isOtpExpired(String username) throws SQLException {
 		// SQL query to get the OTP expiration time for a user
 		String query = "SELECT otp_expires FROM cse360users WHERE username = ?";
@@ -251,6 +262,14 @@ public class UserHelper{
 		return true;
 	}
 	
+	@Test
+	public void testIsOtpExpired() throws SQLException {
+		UserHelper userHelper = new UserHelper(connection, statement);
+		boolean result = userHelper.isOtpExpired("testUser");
+		assertNotNull("OTP expiration result should not be null", result);
+		assertTrue("Result should be boolean", result);
+	}
+	
 	public boolean doesUserExist(String email) {
 		// SQL query to count users with the given email
 		String query = "SELECT COUNT(*) FROM cse360users WHERE email = ?";
@@ -266,6 +285,14 @@ public class UserHelper{
 			e.printStackTrace(); // Print the stack trace if there's a SQL error
 		}
 		return false; // If an error occurs, assume user doesn't exist
+	}
+
+	@Test
+	public void testDoesUserExist() {
+		UserHelper userHelper = new UserHelper(connection, statement);
+		boolean result = userHelper.doesUserExist("test@email.com");
+		assertNotNull("User existence check should not return null", result);
+		assertTrue("Result should be boolean", result);
 	}
 
 	public boolean userExists(int user_id) {
@@ -398,6 +425,15 @@ public class UserHelper{
 		return all_Users; // Return the list of users
 	}
 
+	@Test
+	public void testListUsers() throws SQLException {
+		UserHelper userHelper = new UserHelper(connection, statement);
+		ObservableList<User> userList = FXCollections.observableArrayList();
+		ObservableList<User> result = userHelper.ListUsers(userList);
+		assertNotNull("User list should not be null", result);
+		assertTrue("Should return ObservableList", result instanceof ObservableList);
+	}
+
 	public String getUserBackups(String username) {
         String query = "SELECT backup_files FROM cse360users WHERE username = ?";
         String backupFiles = null;
@@ -415,6 +451,14 @@ public class UserHelper{
         
         return backupFiles;
     }
+
+	@Test
+	public void testGetUserBackups() {
+		UserHelper userHelper = new UserHelper(connection, statement);
+		String backups = userHelper.getUserBackups("testUser");
+		assertNotNull("Backup files should not be null", backups);
+		assertTrue("Backup files should be String", backups instanceof String);
+	}
 
 	public void deleteBackupFile(String username, String file) {
 		String query = "UPDATE cse360users SET backup_files = REPLACE(backup_files, ?, '') WHERE backup_files LIKE ? AND username = ?";

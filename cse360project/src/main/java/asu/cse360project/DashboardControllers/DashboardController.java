@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import asu.cse360project.*;
+import asu.cse360project.Singleton;
+import asu.cse360project.User;
+import asu.cse360project.Utils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -54,7 +59,23 @@ public class DashboardController implements Initializable {
         }
         
         data.content_area = contentArea;
+
+        addTooltips();
+
     }
+
+    void addTooltips() {
+        // Create tooltips
+        Tooltip sendTooltip = new Tooltip("Click to send a message to your instructor or peers.");
+        Tooltip viewTooltip = new Tooltip("Click to view messages you have received.");
+        Tooltip manageTooltip = new Tooltip("Click to manage users in the system (Admin only).");
+
+        // Attach tooltips to buttons
+        send_message_btn.setTooltip(sendTooltip);
+        view_message_btn.setTooltip(viewTooltip);
+        manage_users_btn.setTooltip(manageTooltip);
+    }
+
 
     @FXML
     void manageUsers(ActionEvent event) throws IOException {
