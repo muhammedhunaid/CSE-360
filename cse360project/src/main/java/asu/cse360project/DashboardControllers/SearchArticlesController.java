@@ -8,15 +8,33 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import asu.cse360project.*;
+import asu.cse360project.Article;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
+import asu.cse360project.Group;
+import asu.cse360project.Singleton;
+import asu.cse360project.User;
+import asu.cse360project.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -132,6 +150,19 @@ public class SearchArticlesController implements Initializable{
         });
 
         disableByRole();
+
+        addTooltips();
+    }
+
+    void addTooltips() {
+        Tooltip editViewTooltip = new Tooltip("Toggle between edit view and search view.");
+        Tooltip levelTooltip = new Tooltip("Set the difficulty level for filtering articles.");
+        Tooltip editArticleTooltip = new Tooltip("Edit the selected article.");
+    
+        // Attach tooltips to buttons that exist
+        edit_view_btn.setTooltip(editViewTooltip);
+        level_btn.setTooltip(levelTooltip);
+        edit_article_btn.setTooltip(editArticleTooltip);
     }
 
     private void disableByRole() {
