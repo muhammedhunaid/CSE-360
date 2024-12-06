@@ -1,3 +1,17 @@
+/*******
+ * <p> CreateAccountController. </p>
+ * 
+ * <p> Description: A controller class for handling the creation of user accounts in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic account creation functionality
+ * @version 2.00	2024-11-01 Added validation for username and password fields
+ * @version 3.00	2024-11-15 Enhanced error handling and feedback mechanisms
+ * 
+ */
 package asu.cse360project.LoginControllers;
 
 import asu.cse360project.Utils;
@@ -20,6 +34,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+
 
 // Controller class for creating a user account, implementing Initializable for setup
 public class CreateAccountController implements Initializable{
