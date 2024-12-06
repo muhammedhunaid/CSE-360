@@ -1,3 +1,15 @@
+/*******
+ * <p> SearchArticlesController. </p>
+ * 
+ * <p> Description: A controller class for managing the search and display of articles and groups in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-11-01 Initial version with search functionalities
+ * 
+ */
 package asu.cse360project.DashboardControllers;
 
 import java.io.File;
@@ -45,6 +57,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+
 
 public class SearchArticlesController implements Initializable{
     Singleton data = Singleton.getInstance();
