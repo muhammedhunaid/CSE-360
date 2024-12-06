@@ -52,54 +52,53 @@ public class CreateAccountController implements Initializable{
 
     @FXML   // Method to handle the join button action for creating accounts
     void join(ActionEvent event) throws IOException, InterruptedException, SQLException {
-        // Get input from text fields and validate the inputs
-
-        // Retrieve username and password input from fields
         String username = username_field.getText();
         String password = password_field.getText();
 
-        // Validate password and username inputs
+        if (username.isEmpty() || password.isEmpty() || re_password_field.getText().isEmpty()) {
+            Utils.showErrorFeedback(username_error, "Please fill in all fields");
+            return;
+        }
+
         String validate_pw = Utils.validatePassword(password);
         String validate_uname = Utils.validateUsername(username);
 
-        // Check if the password and username are valid; true if valid, false otherwise
         boolean valid_pw = Utils.isValid(password_error, validate_pw);
         boolean valid_uname = Utils.isValid(username_error, validate_uname);
-        boolean same = false; // Flag to check if passwords match
+        boolean same = false;
 
-        // Check if the entered password and re-entered password match
         if(password_field.getText().compareTo(re_password_field.getText()) == 0) {
-            same = true; // Set flag to true if passwords match
+            same = true;
+            Utils.disableNode(re_password_error);
         } else {
-            // Display error if passwords do not match
-            Utils.setLabel(re_password_error, "Passwords don't match.", Color.RED);
-            same = false; // Set flag to false
+            Utils.showErrorFeedback(re_password_error, "Passwords don't match");
+            return;
         }
 
-        // Proceed if username and password are valid and match
         if(valid_pw && valid_uname && same) {
-            // Add user to database based on whether setting up admin or regular user
-            if(data.setting_up_admin) {
-                data.user_db.addUser(username, password, "admin"); // Add as admin
-                data.setting_up_admin = false; // Switch off admin setup
-            } else {
-                data.user_db.register(currentUser.getUsername(), username, password); // Register user
-                User user = data.user_db.getUser(username);
-                data.group_articles_db.addUsertoGeneralGroups(user);
-            }          
-            
-            // Temporarily display "Account created" message before changing to login screen
-            Utils.setLabel(title, "Account Created", Color.GREEN);
-            PauseTransition pause = new PauseTransition();
-            pause.setDuration(Duration.seconds(2)); // Pause for 2 seconds
-            pause.setOnFinished(ActionEvent -> {
-                try {
-                    Utils.setRoot("LoginScenes/login"); // Switch to the login screen after the pause
-                } catch (IOException e) {
-                    e.printStackTrace(); // Print stack trace if an exception occurs
-                }
-            });
-            pause.play(); // Start the pause transition
+            try {
+                if(data.setting_up_admin) {
+                    data.user_db.addUser(username, password, "admin");
+                    data.setting_up_admin = false;
+                } else {
+                    data.user_db.register(currentUser.getUsername(), username, password);
+                    User user = data.user_db.getUser(username);
+                    data.group_articles_db.addUsertoGeneralGroups(user);
+                }          
+                
+                Utils.showSuccessFeedback(title, "Account created successfully!");
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(e -> {
+                    try {
+                        Utils.setRoot("LoginScenes/login");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                pause.play();
+            } catch (Exception e) {
+                Utils.showErrorFeedback(username_error, "Error creating account: " + e.getMessage());
+            }
         }
     }
 }

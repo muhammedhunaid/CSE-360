@@ -22,7 +22,11 @@ import javafx.collections.ObservableList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+/**
+ * @author Group 9
+ * @version 1.0
+ * @since 2022-02-20
+ */
 public class BackupRestoreTest {
 
     @Nested
@@ -39,9 +43,9 @@ public class BackupRestoreTest {
         public void setUp() {
             searchArticlesController = new SearchArticlesController(); // Replace with the actual class name
             dataMock = Singleton.getInstance();
-            mockUser1 = new User("test_user", null, null, null, 0);
-            mockUser2 = new User("mock_user", null, null, null, 0);
-            mockUser3 = new User("another_user", null, null, null, 0);
+            mockUser1 = new User("test_user", "Test", "", "User", "Test", "test@test.com", "student", "", 1);
+            mockUser2 = new User("mock_user", "Mock", "", "User", "Mock", "mock@test.com", "instructor", "", 2);
+            mockUser3 = new User("another_user", "Another", "", "User", "Another", "another@test.com", "admin", "", 3);
             dataMock.setAppUser(mockUser1);
             groupsList = FXCollections.observableArrayList();
             searchArticlesController.setGroups_list(groupsList);

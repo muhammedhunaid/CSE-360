@@ -1,4 +1,5 @@
 package asu.cse360project.DatabaseHelpers;
+import asu.cse360project.Singleton;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -100,5 +101,3 @@ public class DatabaseHelper {
 	}
 
 }
-
-

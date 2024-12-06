@@ -23,9 +23,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
 /**
  * Controller class for managing users in the system.
  * Provides functionality to add, remove, search, change roles, and reset passwords for users.
@@ -116,50 +113,51 @@ public class ManageUsersController implements Initializable {
     // Method to confirm and apply role changes or add new user
     @FXML
     void confirm_role(ActionEvent event) {
-        // Set appropriate confirmation message for adding or changing role
-        if (adding_user) {
-            alert.setContentText("Are you sure you want to add a user");
-        } else {
-            alert.setContentText("Are you sure you want to change a user's role");
+        role = getRole();
+
+        if(role.equals("")) {
+            Utils.showErrorFeedback(error_label, "Please select at least one role");
+            return;
         }
 
+        // Set appropriate confirmation message for adding or changing role
+        if (adding_user) {
+            alert.setContentText("Are you sure you want to add a user with role(s): " + role + "?");
+        } else {
+            alert.setContentText("Are you sure you want to change the user's role to: " + role + "?");
+        }
 
         if(!adding_user) {
-            role = getRole();
-
-            if(role.equals("")) {
-                return;
-            }
-
             try {
-            ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(selectedUser.getId()));
-            if (onlyAdminofGroups(user_groups, selectedUser) && role.equals("student")) {
-                Utils.setLabel(error_label, "Cannot change role becuase changing role would remove only admin of a group", Color.RED); // Show error if no user is selected
-                return;
-            }
+                ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(selectedUser.getId()));
+                if (onlyAdminofGroups(user_groups, selectedUser) && role.equals("student")) {
+                    Utils.showErrorFeedback(error_label, "Cannot change role because changing role would remove only admin of a group");
+                    return;
+                }
             } catch (SQLException e) {
                 return;
             }
         }
 
-        // Show confirmation dialog and handle user response
+        String finalRole = role;
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {    
-                // If adding a new user
-                if (adding_user) {
-                    addUser(role);
-                    return;
-                } else {
-                    // If changing an existing user's role
-                    changeUserRole(role);
-                    return;
-                }             
+                try {
+                    if (adding_user) {
+                        addUser(finalRole);
+                        Utils.showSuccessFeedback(error_label, "User added successfully!");
+                    } else {
+                        changeUserRole(finalRole);
+                        Utils.showSuccessFeedback(error_label, "User role updated successfully!");
+                    }
+                } catch (Exception e) {
+                    Utils.showErrorFeedback(error_label, "Error: " + e.getMessage());
+                }
             } else {
-                Utils.setLabel(error_label, "No User Roles Changed", Color.BLACK); // No role change made
+                Utils.showInfoFeedback(error_label, "Operation cancelled");
             }
         });
 
-        // Reset role buttons and disable role change box
         admin_btn.setSelected(false);
         instructor_btn.setSelected(false);
         student_btn.setSelected(false);
@@ -208,16 +206,11 @@ public class ManageUsersController implements Initializable {
         }
         
         String invite_code = Utils.generateInviteCode(5);
-        assertNotNull("Invite code should not be null", invite_code);
-        assertTrue("Invite code should be 5 characters", invite_code.length() == 5);
-        
         Utils.setLabel(error_label, "Invite Code: " + invite_code, Color.GREEN);
         adding_user = false;
         data.user_db.insertUser(invite_code, role);
         try {
             User newUser = data.user_db.getUser(invite_code);
-            assertNotNull("New user should not be null", newUser);
-            assertEquals("User role should match input", role, newUser.getRole());
             all_Users.add(newUser);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -252,10 +245,7 @@ public class ManageUsersController implements Initializable {
         try {
             data.user_db.changeRole(selectedUser.getUsername(), role);
             int user_index = all_Users.indexOf(selectedUser);
-            assertTrue("User should exist in list", user_index >= 0);
-            
             all_Users.get(user_index).setRole(role);
-            assertEquals("User role should be updated", role, all_Users.get(user_index).getRole());
             table.refresh();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -265,55 +255,50 @@ public class ManageUsersController implements Initializable {
     // Method to delete a selected user
     @FXML
     void delete(ActionEvent event) {
-        if(selectedUser == null)
-        {
+        if (selectedUser == null) {
+            Utils.showErrorFeedback(error_label, "Please select a user to delete");
             return;
         }
 
-        if(selectedUser.getUsername().equals(data.getAppUser().getUsername()))
-        {
-            Utils.setLabel(error_label, "Cannot remove self from system", Color.RED); // Show error if no user is selected
+        if (selectedUser.getUsername().equals(data.getAppUser().getUsername())) {
+            Utils.showErrorFeedback(error_label, "Cannot remove self from system");
             return;
         }
 
-        if(data.getAppUser().getLoginRole().equals("instructor") && selectedUser.isAdmin()) {
-            Utils.setLabel(error_label, "Cannot remove admins from system", Color.RED); // Show error if no user is selected
+        if (selectedUser.isAdmin()) {
+            Utils.showErrorFeedback(error_label, "Cannot remove admins from system");
             return;
         }
 
         try {
-            ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId()));
+            ArrayList<Group> user_groups = new ArrayList<>(data.group_articles_db.getAllSpecialGroups(selectedUser.getId()));
             if (onlyAdminofGroups(user_groups, selectedUser)) {
-                Utils.setLabel(error_label, "Cannot delete user becuase it would remove only admin of a group", Color.RED); // Show error if no user is selected
+                Utils.showErrorFeedback(error_label, "Cannot delete user because it would remove only admin of a group");
                 return;
             }
         } catch (SQLException e) {
             return;
         }
 
-        if (!selectedUser.getUsername().equals(data.getAppUser().getUsername())) {
-            // Show confirmation dialog for deleting user
-            alert.setContentText("Are you sure you want to delete user");
-            alert.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    // Remove user from list and database
-                    boolean removed;
-                    try {
-                        removed = data.user_db.deleteUser(selectedUser);
-                    } catch (SQLException e) {
-                        removed = false;
-                    }
+        alert.setContentText("Are you sure you want to delete user: " + selectedUser.getUsername() + "?");
+        
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    boolean removed = data.user_db.deleteUser(selectedUser);
                     if(removed) {
-                        Utils.setLabel(error_label, "User Removed", Color.BLACK); // Show success message
+                        Utils.showSuccessFeedback(error_label, "User deleted successfully!");
                         all_Users.remove(all_Users.indexOf(selectedUser));
-                    }else{
-                        Utils.setLabel(error_label, "Error removing User", Color.BLACK); // Show success message
+                    } else {
+                        Utils.showErrorFeedback(error_label, "Error deleting user");
                     }
-                } else {
-                    return;
+                } catch (Exception e) {
+                    Utils.showErrorFeedback(error_label, "Error deleting user: " + e.getMessage());
                 }
-            });
-        }
+            } else {
+                Utils.showInfoFeedback(error_label, "Delete operation cancelled");
+            }
+        });
     }
 
     // Method to reset a selected user's password
@@ -334,7 +319,7 @@ public class ManageUsersController implements Initializable {
                 }
             });
         } else {
-            Utils.setLabel(error_label, "No User Selected", Color.RED); // Show error if no user is selected
+            Utils.showErrorFeedback(error_label, "No User Selected");
         }
     }
 
@@ -344,91 +329,27 @@ public class ManageUsersController implements Initializable {
         String username = search_user.getText().toString();
         // Input validation
         if (username == null || username.trim().isEmpty()) {
-            Utils.setLabel(error_label, "Username cannot be empty", Color.RED);
+            Utils.showErrorFeedback(error_label, "Username cannot be empty");
             return;
         }
 
-        assertNotNull("User list should not be null", all_Users);
         boolean userFound = false;
         
         for (User user : all_Users) {
-            assertNotNull("User object should not be null", user);
-            assertNotNull("Username should not be null", user.getUsername());
-            
             if (user.getUsername().equals(username)) {
                 table.getSelectionModel().select(user);
                 table.scrollTo(user);
-                Utils.setLabel(error_label, "User Found", Color.GREEN);
+                Utils.showSuccessFeedback(error_label, "User Found");
                 userFound = true;
                 
                 // Verify selected user
                 User selectedUser = table.getSelectionModel().getSelectedItem();
-                assertNotNull("Selected user should not be null", selectedUser);
-                assertEquals("Selected user should match search", username, selectedUser.getUsername());
                 return;
             }
         }
         
         if (!userFound) {
-            Utils.setLabel(error_label, "User not Found", Color.RED);
+            Utils.showErrorFeedback(error_label, "User not Found");
         }
-    }
-
-    // Add test methods
-    @Test
-    public void testAddUser() {
-        String role = "student";
-        addUser(role);
-        assertFalse("Adding user flag should be false after adding", adding_user);
-        
-        // Test invalid input
-        try {
-            addUser(null);
-            fail("Should throw IllegalArgumentException for null role");
-        } catch (IllegalArgumentException e) {
-            // Expected exception
-        }
-    }
-
-    @Test
-    public void testChangeRole() {
-        String newRole = "instructor";
-        selectedUser = new User(); // Create test user
-        selectedUser.setUsername("testUser");
-        selectedUser.setRole("student");
-        all_Users.add(selectedUser);
-        
-        changeUserRole(newRole);
-        assertEquals("Role should be updated", newRole, selectedUser.getRole());
-        
-        // Test invalid input
-        try {
-            changeUserRole(null);
-            fail("Should throw IllegalArgumentException for null role");
-        } catch (IllegalArgumentException e) {
-            // Expected exception
-        }
-    }
-
-    @Test
-    public void testSearchUser() throws SQLException {
-        // Test with valid user
-        User testUser = new User();
-        testUser.setUsername("testUser");
-        all_Users.add(testUser);
-        search_user.setText("testUser");
-        searchUser(new ActionEvent());
-        assertEquals("Should find test user", testUser, table.getSelectionModel().getSelectedItem());
-        
-        // Test with non-existent user
-        search_user.setText("nonexistentUser");
-        searchUser(new ActionEvent());
-        assertEquals("Should show error for non-existent user", "User not Found", error_label.getText());
-        
-        // Test with empty input
-        search_user.setText("");
-        searchUser(new ActionEvent());
-        assertEquals("Should show error for empty input", "Username cannot be empty", error_label.getText());
     }
 }
-

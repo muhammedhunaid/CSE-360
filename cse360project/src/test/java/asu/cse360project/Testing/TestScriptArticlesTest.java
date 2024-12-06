@@ -1,10 +1,10 @@
 package asu.cse360project.Testing;
-import org.junit.Test;
-import org.junit.Before;    
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;    
     
 public class TestScriptArticlesTest {
 
-    @Before
+    @BeforeEach
     public void setup(){
         
     }
@@ -14,4 +14,3 @@ public class TestScriptArticlesTest {
         
     }
 }
-    

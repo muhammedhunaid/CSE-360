@@ -10,15 +10,12 @@ import java.util.ResourceBundle;
 
 import asu.cse360project.Article;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
-<<<<<<< HEAD
 import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleStringProperty;
-=======
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
->>>>>>> main
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

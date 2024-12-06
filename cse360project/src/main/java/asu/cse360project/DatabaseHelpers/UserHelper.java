@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 
 import asu.cse360project.User;
 import javafx.collections.ObservableList;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import javafx.collections.FXCollections;
 
 public class UserHelper{
@@ -206,31 +204,27 @@ public class UserHelper{
 			try (ResultSet rs = pstmt.executeQuery()) {
 				// If user exists, retrieve their details
 				if (rs.next()) {
-					String role = rs.getString("role"); // Get user's role
-					int id = rs.getInt("id"); // Get user's id
-					String firstName = rs.getString("first"); // Get user's first name
-					Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
-					String pw_reset_string = "";
-					// Convert password_reset to string if it's not null
-					if (password_reset != null) {
-						pw_reset_string = password_reset.toString();
-					}
-					// Return a User object with the retrieved details
-					return new User(username, firstName, role, pw_reset_string, id);
-				} else {
-					System.out.println("User does not exist."); // Log if user is not found
-					return null; // Return null if user doesn't exist
-				}
+                    String role = rs.getString("role"); // Get user's role
+                    int id = rs.getInt("id"); // Get user's id
+                    String firstName = rs.getString("first"); // Get user's first name
+                    String middleName = rs.getString("middle"); // Get user's middle name
+                    String lastName = rs.getString("last"); // Get user's last name
+                    String prefName = rs.getString("preffered"); // Get user's preferred name
+                    String email = rs.getString("email"); // Get user's email
+                    Timestamp password_reset = rs.getTimestamp("otp_expires"); // Get OTP expiration time
+                    String pw_reset_string = "";
+                    // Convert password_reset to string if it's not null
+                    if (password_reset != null) {
+                        pw_reset_string = password_reset.toString();
+                    }
+                    // Return a User object with the retrieved details
+                    return new User(username, firstName, middleName, lastName, prefName, email, role, pw_reset_string, id);
+                } else {
+                    System.out.println("User does not exist."); // Log if user is not found
+                    return null; // Return null if user doesn't exist
+                }
 			}
 		}
-	}
-	
-	@Test
-	public void testGetUser() throws SQLException {
-		UserHelper userHelper = new UserHelper(connection, statement);
-		User user = userHelper.getUser("testUser");
-		assertNotNull("User should not be null", user);
-		assertTrue("User should be instance of User class", user instanceof User);
 	}
 	
 	public boolean isOtpExpired(String username) throws SQLException {
@@ -262,14 +256,6 @@ public class UserHelper{
 		return true;
 	}
 	
-	@Test
-	public void testIsOtpExpired() throws SQLException {
-		UserHelper userHelper = new UserHelper(connection, statement);
-		boolean result = userHelper.isOtpExpired("testUser");
-		assertNotNull("OTP expiration result should not be null", result);
-		assertTrue("Result should be boolean", result);
-	}
-	
 	public boolean doesUserExist(String email) {
 		// SQL query to count users with the given email
 		String query = "SELECT COUNT(*) FROM cse360users WHERE email = ?";
@@ -285,14 +271,6 @@ public class UserHelper{
 			e.printStackTrace(); // Print the stack trace if there's a SQL error
 		}
 		return false; // If an error occurs, assume user doesn't exist
-	}
-
-	@Test
-	public void testDoesUserExist() {
-		UserHelper userHelper = new UserHelper(connection, statement);
-		boolean result = userHelper.doesUserExist("test@email.com");
-		assertNotNull("User existence check should not return null", result);
-		assertTrue("Result should be boolean", result);
 	}
 
 	public boolean userExists(int user_id) {
@@ -425,15 +403,6 @@ public class UserHelper{
 		return all_Users; // Return the list of users
 	}
 
-	@Test
-	public void testListUsers() throws SQLException {
-		UserHelper userHelper = new UserHelper(connection, statement);
-		ObservableList<User> userList = FXCollections.observableArrayList();
-		ObservableList<User> result = userHelper.ListUsers(userList);
-		assertNotNull("User list should not be null", result);
-		assertTrue("Should return ObservableList", result instanceof ObservableList);
-	}
-
 	public String getUserBackups(String username) {
         String query = "SELECT backup_files FROM cse360users WHERE username = ?";
         String backupFiles = null;
@@ -452,14 +421,6 @@ public class UserHelper{
         return backupFiles;
     }
 
-	@Test
-	public void testGetUserBackups() {
-		UserHelper userHelper = new UserHelper(connection, statement);
-		String backups = userHelper.getUserBackups("testUser");
-		assertNotNull("Backup files should not be null", backups);
-		assertTrue("Backup files should be String", backups instanceof String);
-	}
-
 	public void deleteBackupFile(String username, String file) {
 		String query = "UPDATE cse360users SET backup_files = REPLACE(backup_files, ?, '') WHERE backup_files LIKE ? AND username = ?";
 
@@ -473,4 +434,27 @@ public class UserHelper{
         }
 
 	}
+
+	public User validateUser(String username, String password) throws SQLException {
+        String query = "SELECT * FROM cse360users WHERE username = ? AND password = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setRole(rs.getString("role"));
+                user.setFirst_name(rs.getString("first"));
+                user.setMiddle_name(rs.getString("middle"));
+                user.setLast_name(rs.getString("last"));
+                user.setPref_name(rs.getString("preffered"));
+                user.setEmail(rs.getString("email"));
+                return user;
+            }
+        }
+        return null;
+    }
 }

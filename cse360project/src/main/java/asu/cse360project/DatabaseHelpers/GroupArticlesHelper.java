@@ -41,6 +41,8 @@ public class GroupArticlesHelper{
      * Constructor for GroupArticlesHelper class.
      * @param connection The connection to the database.
      * @param statement The statement for executing SQL queries.
+     * @param encryptionHelper The encryption helper for encrypting/decrypting objects.
+     * @param data The singleton instance for shared data.
      * @throws SQLException If an SQL exception occurs.
      */
     public GroupArticlesHelper(Connection connection, Statement statement, EncryptionHelper encryptionHelper) throws SQLException{
@@ -48,6 +50,7 @@ public class GroupArticlesHelper{
         this.connection = connection;
         this.statement = statement;
         this.encryptionHelper = encryptionHelper;
+        this.data = data;
     }
 
     /**

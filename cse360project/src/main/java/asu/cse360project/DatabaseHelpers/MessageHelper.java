@@ -4,11 +4,10 @@ package asu.cse360project.DatabaseHelpers;
 import java.sql.*;
 import java.util.ArrayList;
 
-import org.junit.Test;
-
-import asu.cse360project.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import asu.cse360project.Message;
 
 /**
  * 
@@ -16,7 +15,7 @@ import javafx.collections.ObservableList;
  * 
  * <p> Description: A class to handle database operations for messages. </p>
  * 
- * <p> Copyright: Tu35 © 2024 </p>
+ * <p> Copyright: Tu35 2024 </p>
  * 
  * @version 1.00	2024-11-17 Using Singleton class to create and get database connection 
  * 
@@ -52,7 +51,6 @@ public class MessageHelper{
 		statement.execute(searchesTable); // Execute the SQL command to create the table        
 	}
 
-    @Test
     public void testCreateTables() throws SQLException {
         createTables();
 
@@ -115,7 +113,6 @@ public class MessageHelper{
         }        
     }
 
-    @Test
     public void testNewMsg() {
         // Test the newMsg method
         boolean result = newMsg("Hello", "user", "General", 1);

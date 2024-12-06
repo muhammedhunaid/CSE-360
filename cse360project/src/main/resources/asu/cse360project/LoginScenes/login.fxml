@@ -11,7 +11,7 @@
 
 <HBox alignment="CENTER" prefHeight="437.0" prefWidth="492.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.LoginControllers.LoginController">
    <children>
-      <VBox alignment="CENTER" prefHeight="803.0" prefWidth="376.0" spacing="10.0">
+      <VBox alignment="CENTER" prefHeight="803.0" prefWidth="376.0" spacing="15.0">
          <children>
             <Label text="Login" textAlignment="CENTER">
                <font>
@@ -25,14 +25,14 @@
                </VBox.margin>
             </TextField>
             <Text fx:id="login_error" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="353.13671875" />
-            <Button mnemonicParsing="false" onAction="#login" prefHeight="25.0" prefWidth="114.0" text="Login" translateY="-27.0" />
+            <Button mnemonicParsing="false" onAction="#login" prefHeight="25.0" prefWidth="114.0" text="Login" />
             <Label prefHeight="31.0" prefWidth="42.0" text="Join" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="21.0" />
                </font>
             </Label>
             <TextField fx:id="invite_code_textfield" prefHeight="25.0" prefWidth="235.0" promptText="Invite Code" />
-            <Button mnemonicParsing="false" onAction="#join" prefHeight="25.0" prefWidth="114.0" text="Join" translateY="-2.0" />
+            <Button mnemonicParsing="false" onAction="#join" prefHeight="25.0" prefWidth="114.0" text="Join" />
             <Label prefHeight="20.0" prefWidth="296.0" />
          </children>
          <padding>

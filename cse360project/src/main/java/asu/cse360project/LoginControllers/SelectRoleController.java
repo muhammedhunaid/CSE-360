@@ -7,12 +7,14 @@ import java.util.ResourceBundle;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.RadioButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 // Controller class for allowing logged-in users to select a role for signing in
 public class SelectRoleController implements Initializable {
@@ -56,49 +58,51 @@ public class SelectRoleController implements Initializable {
 
     @FXML
     void select(ActionEvent event) throws IOException {
-        // Initialize flags to track selected roles
         boolean check_admin = false;
         boolean check_instructor = false;
         boolean check_student = false;
-        currUser.resetLoginRole(); // Reset the user's login role before selecting a new one
+        currUser.resetLoginRole();
         
-        // Check if the admin role is selectable and update login role if selected
         if (admin) {
-            check_admin = admin_button.selectedProperty().getValue(); // Get the selected state of the admin button
+            check_admin = admin_button.selectedProperty().getValue();
             if (check_admin) {
-                currUser.setLoginRole("admin"); // Set the user's login role to admin
+                currUser.setLoginRole("admin");
             }
         }
 
-        // Check if the instructor role is selectable and update login role if selected
         if (instructor) {
-            check_instructor = instructor_button.selectedProperty().getValue(); // Get the selected state of the instructor button
+            check_instructor = instructor_button.selectedProperty().getValue();
             if (check_instructor) {
-                currUser.setLoginRole("instructor"); // Set the user's login role to instructor
+                currUser.setLoginRole("instructor");
             }
         }
 
-        // Check if the student role is selectable and update login role if selected
         if (student) {
-            check_student = student_button.selectedProperty().getValue(); // Get the selected state of the student button
+            check_student = student_button.selectedProperty().getValue();
             if (check_student) {
-                currUser.setLoginRole("student"); // Set the user's login role to student
+                currUser.setLoginRole("student");
             }
         }
         
-        // Check if no role was selected
-        if (data.getAppUser().getLoginRole() == "") {
-            Utils.setText(error_text, "No Role Selected", Color.RED); // Display error message for no role selection
-            return; // Exit the method if no role is selected
+        if (data.getAppUser().getLoginRole().isEmpty()) {
+            Utils.showErrorFeedback(error_text, "Please select a role");
+            return;
         }
 
-        // Check if multiple roles were selected
         if ((check_admin ? 1 : 0) + (check_instructor ? 1 : 0) + (check_student ? 1 : 0) > 1) {
-            Utils.setText(error_text, "Multiple Roles Selected", Color.RED); // Display error message for multiple selections
-            return; // Exit the method if multiple roles are selected
+            Utils.showErrorFeedback(error_text, "Please select only one role");
+            return;
         }
 
-        // Navigate to the dashboard if a single role was successfully selected
-        Utils.setRoot("DashboardScenes/dashboard");
+        Utils.showSuccessFeedback(error_text, "Role selected successfully!");
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(e -> {
+            try {
+                Utils.setRoot("DashboardScenes/dashboard");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        pause.play();
     }
 }

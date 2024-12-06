@@ -1,5 +1,6 @@
 package asu.cse360project.Testing;
 
+import asu.cse360project.Article;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ import javafx.collections.ObservableList;
      * 
      * <p> Description: This class contains a test script to test the Article methods in the GroupArticlesHelper class. </p>
      * 
-     * <p> Copyright: Tu35 © 2024 </p>
+     * <p> Copyright: Tu35 2024 </p>
      * 
      * @author Tu35
      * 
@@ -97,7 +98,7 @@ public class TestScriptArticles {
 
         String body1 = "THis is some random chunk of garbage text used to test the encryption $%@# 2748-34 method in the database";
         String body2 = "THis is eiyha hpeuifhwefuewy [wefuyweuf tey[fuwew]] $%@# 2748-34 method in the database";
-        String body3 = " uoifpw9fy23 8r9237pr839r71t379rt97 ^_ *&($^(*#$_&*@ $Y(* ye8yqfiuasd afghfua yfoaieuyf[q9FYY AIFH GPHSDI]))) in the database";
+        String body3 = " uoifpw9fy23 8r9237pr839r71t379rt97 ^_ *&($^(*#$_&*@ $Y(* ye8yqfiuasd afghfua yfoaieuyf[q9FYY AIFH GPHSDI))) in the database";
 
         // Article data
         System.out.println("Adding articles...");
