@@ -12,6 +12,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -54,15 +55,22 @@
          <center>
             <VBox alignment="TOP_CENTER" prefHeight="380.0" prefWidth="1071.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
-                  <ToggleButton fx:id="edit_view_btn" mnemonicParsing="false" onAction="#editView" prefHeight="25.0" prefWidth="99.0" text="Edit View" />
+                  <ToggleButton fx:id="edit_view_btn" mnemonicParsing="false" onAction="#editView" prefHeight="25.0" prefWidth="99.0" text="Edit View">
+                     <tooltip>
+                        <Tooltip text="Switch between search and edit views" />
+                     </tooltip>
+                  </ToggleButton>
                   <HBox alignment="CENTER" prefHeight="30.0" prefWidth="845.0" spacing="5.0">
                      <children>
-                        <TextField fx:id="keyword_input" prefHeight="30.0" prefWidth="529.0" promptText="Searching uses words, names, or phrases in the title, author, or abstract" />
+                        <TextField fx:id="keyword_input" prefHeight="30.0" prefWidth="529.0" promptText="Search by title, author, or abstract" />
                         <HBox />
                         <MenuButton fx:id="level_btn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Level">
+                           <tooltip>
+                              <Tooltip text="Filter articles by difficulty level" />
+                           </tooltip>
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#setBeginner" text="Beginner" />
-                              <MenuItem mnemonicParsing="false" onAction="#setIntermidiate" text="intermediate" />
+                              <MenuItem mnemonicParsing="false" onAction="#setIntermidiate" text="Intermediate" />
                               <MenuItem mnemonicParsing="false" onAction="#setAdvanced" text="Advanced" />
                               <MenuItem mnemonicParsing="false" onAction="#setExpert" text="Expert" />
                               <MenuItem mnemonicParsing="false" onAction="#setAll" text="All" />
@@ -74,9 +82,21 @@
                      <children>
                         <VBox alignment="CENTER" spacing="5.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#selectGroup" prefHeight="25.0" prefWidth="102.0" text="Filter Group" />
-                              <Button mnemonicParsing="false" onAction="#removeGroup" prefHeight="25.0" prefWidth="99.0" text="Un-Filter Group" />
-                              <Button mnemonicParsing="false" onAction="#searchArticles" prefHeight="25.0" prefWidth="99.0" text="Search" />
+                              <Button mnemonicParsing="false" onAction="#selectGroup" prefHeight="25.0" prefWidth="102.0" text="Filter Group">
+                                 <tooltip>
+                                    <Tooltip text="Filter articles by selected group" />
+                                 </tooltip>
+                              </Button>
+                              <Button mnemonicParsing="false" onAction="#removeGroup" prefHeight="25.0" prefWidth="99.0" text="Un-Filter Group">
+                                 <tooltip>
+                                    <Tooltip text="Remove group filter" />
+                                 </tooltip>
+                              </Button>
+                              <Button mnemonicParsing="false" onAction="#searchArticles" prefHeight="25.0" prefWidth="99.0" text="Search">
+                                 <tooltip>
+                                    <Tooltip text="Search articles based on input keywords" />
+                                 </tooltip>
+                              </Button>
                            </children>
                         </VBox>
                         <VBox prefHeight="195.0" prefWidth="296.0" spacing="10.0">
@@ -84,7 +104,11 @@
                               <HBox alignment="CENTER" prefHeight="29.0" prefWidth="277.0" spacing="5.0">
                                  <children>
                                     <TextField fx:id="groups_input" prefHeight="33.0" prefWidth="201.0" promptText="Search Group ID or Name" />
-                                    <Button mnemonicParsing="false" onAction="#searchGroups" prefHeight="32.0" prefWidth="68.0" text="Search" />
+                                    <Button mnemonicParsing="false" onAction="#searchGroups" prefHeight="32.0" prefWidth="68.0" text="Search">
+                                       <tooltip>
+                                          <Tooltip text="Search for a group by ID or name" />
+                                       </tooltip>
+                                    </Button>
                                  </children>
                               </HBox>
                               <TableView fx:id="group_table" prefHeight="220.0" prefWidth="296.0">
@@ -100,7 +124,11 @@
                               <HBox alignment="CENTER" prefHeight="81.0" prefWidth="573.0" spacing="5.0">
                                  <children>
                                     <TextField fx:id="articles_input" prefHeight="25.0" prefWidth="218.0" promptText="Search Article ID or Title" />
-                                    <Button mnemonicParsing="false" onAction="#SearchArticles" prefHeight="33.0" prefWidth="64.0" text="Search" />
+                                    <Button mnemonicParsing="false" onAction="#SearchArticles" prefHeight="33.0" prefWidth="64.0" text="Search">
+                                       <tooltip>
+                                          <Tooltip text="Search for an article by ID or title" />
+                                       </tooltip>
+                                    </Button>
                                  </children>
                               </HBox>
                               <TableView fx:id="article_table" prefHeight="319.0" prefWidth="562.0">
@@ -134,9 +162,21 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="109.0" text="Add Article" />
-                        <Button fx:id="edit_article_btn" mnemonicParsing="false" onAction="#updateArticle" prefHeight="25.0" prefWidth="109.0" text="Edit Article" />
-                        <Button mnemonicParsing="false" onAction="#deleteArticle" prefHeight="25.0" prefWidth="109.0" text="Delete Article" />
+                        <Button mnemonicParsing="false" onAction="#addArticle" prefHeight="25.0" prefWidth="109.0" text="Add Article">
+                           <tooltip>
+                              <Tooltip text="Add a new article" />
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="edit_article_btn" mnemonicParsing="false" onAction="#updateArticle" prefHeight="25.0" prefWidth="109.0" text="Edit Article">
+                           <tooltip>
+                              <Tooltip text="Edit the selected article" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#deleteArticle" prefHeight="25.0" prefWidth="109.0" text="Delete Article">
+                           <tooltip>
+                              <Tooltip text="Delete the selected article" />
+                           </tooltip>
+                        </Button>
                      </children>
                   </VBox>
                   <VBox alignment="TOP_CENTER" prefHeight="157.0" prefWidth="111.0" spacing="3.0">
@@ -146,11 +186,31 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="109.0" text="Add Group" />
-                        <Button mnemonicParsing="false" onAction="#addSAG" prefHeight="25.0" prefWidth="109.0" text="Add SAG Group" />
-                        <Button mnemonicParsing="false" onAction="#deleteGroup" prefHeight="25.0" prefWidth="109.0" text="Delete Group" />
-                        <Button mnemonicParsing="false" onAction="#updateAccess" prefHeight="25.0" prefWidth="109.0" text="Update Acess" />
-                        <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="114.0" text="Backup Group(s)" />
+                        <Button mnemonicParsing="false" onAction="#addGroup" prefHeight="25.0" prefWidth="109.0" text="Add Group">
+                           <tooltip>
+                              <Tooltip text="Add a new group" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#addSAG" prefHeight="25.0" prefWidth="109.0" text="Add SAG Group">
+                           <tooltip>
+                              <Tooltip text="Add a new Special Access Group" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#deleteGroup" prefHeight="25.0" prefWidth="109.0" text="Delete Group">
+                           <tooltip>
+                              <Tooltip text="Delete the selected group" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#updateAccess" prefHeight="25.0" prefWidth="109.0" text="Update Access">
+                           <tooltip>
+                              <Tooltip text="Update access for the selected group" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#backupGroups" prefHeight="25.0" prefWidth="114.0" text="Backup Group(s)">
+                           <tooltip>
+                              <Tooltip text="Backup selected groups" />
+                           </tooltip>
+                        </Button>
                      </children>
                   </VBox>
                   <VBox alignment="TOP_CENTER" prefHeight="138.0" prefWidth="121.0" spacing="3.0">
@@ -160,10 +220,26 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <Button mnemonicParsing="false" onAction="#backupAll" prefHeight="25.0" prefWidth="114.0" text="Backup All" />
-                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="25.0" prefWidth="113.0" text="Restore" />
-                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="25.0" prefWidth="113.0" text="Merge" />
-                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="25.0" prefWidth="112.0" text="Delete" />
+                        <Button mnemonicParsing="false" onAction="#backupAll" prefHeight="25.0" prefWidth="114.0" text="Backup All">
+                           <tooltip>
+                              <Tooltip text="Backup all groups" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#restore" prefHeight="25.0" prefWidth="113.0" text="Restore">
+                           <tooltip>
+                              <Tooltip text="Restore data from a backup" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#merge" prefHeight="25.0" prefWidth="113.0" text="Merge">
+                           <tooltip>
+                              <Tooltip text="Merge backups" />
+                           </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#delete_backup" prefHeight="25.0" prefWidth="112.0" text="Delete">
+                           <tooltip>
+                              <Tooltip text="Delete the selected backup" />
+                           </tooltip>
+                        </Button>
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="175.0" prefWidth="313.0">
