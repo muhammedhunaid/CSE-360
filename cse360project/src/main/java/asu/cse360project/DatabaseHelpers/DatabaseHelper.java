@@ -9,6 +9,21 @@ import java.sql.Statement;
 
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 
+/*******
+ * <p> DatabaseHelper. </p>
+ * 
+ * <p> Description: A controller class for managing users in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic user management database queries
+ * @version 2.00	2024-11-01 Added database connection and initialization for new features
+ * @version 3.00	2024-11-15 Enhanced database connections and added encryption/decryption
+ * 
+ */
+
 public class DatabaseHelper {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";   // H2 database JDBC driver

@@ -8,6 +8,20 @@ import asu.cse360project.User;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
+/*******
+ * <p> UserHelper. </p>
+ * 
+ * <p> Description: A controller class for managing users in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic user management database queries
+ * @version 2.00	2024-11-01 Added database connection and initialization for new features
+ * 
+ */
+
 public class UserHelper{
 
     private Connection connection = null; // Connection to the database
