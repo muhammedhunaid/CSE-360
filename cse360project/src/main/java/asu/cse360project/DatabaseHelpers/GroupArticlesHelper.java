@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import asu.cse360project.Article;
+import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import asu.cse360project.Group;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.backup_container;
-import asu.cse360project.EncryptionHelpers.EncryptionHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

@@ -6,15 +6,24 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import asu.cse360project.*;
+import asu.cse360project.Article;
 import asu.cse360project.EncryptionHelpers.EncryptionHelper;
+import asu.cse360project.Group;
+import asu.cse360project.Singleton;
+import asu.cse360project.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory; 
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton; 
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 /**
  * 
@@ -96,6 +105,8 @@ public class CEArticleController implements Initializable {
         articles_list = FXCollections.observableArrayList();
         groups_list = FXCollections.observableArrayList();
 
+        addTooltips();
+
         // Attempt to load all groups, including special groups (All Articles, Ungrouped Articles) from database
         try {
             groups_list = data.group_articles_db.getAllSpecialGroups(data.getAppUser().getId());
@@ -138,6 +149,31 @@ public class CEArticleController implements Initializable {
                 e.printStackTrace();
             }
         }
+    }
+
+    void addTooltips() {
+        Tooltip levelTooltip = new Tooltip("Select the article's difficulty level (e.g., beginner, advanced).");
+        level.setTooltip(levelTooltip);
+    
+        Tooltip searchArticleTooltip = new Tooltip("Search for an article by ID.");
+        Tooltip searchGroupTooltip = new Tooltip("Search for a group by ID.");
+        search_article.setTooltip(searchArticleTooltip);
+        search_group.setTooltip(searchGroupTooltip);
+    
+        Tooltip descriptionTooltip = new Tooltip("Enter a short description of the article.");
+        description.setTooltip(descriptionTooltip);
+    
+        Tooltip keywordsTooltip = new Tooltip("Enter keywords for the article, separated by commas.");
+        keywords.setTooltip(keywordsTooltip);
+    
+        Tooltip authorsTooltip = new Tooltip("Enter the names of the authors.");
+        authors.setTooltip(authorsTooltip);
+    
+        Tooltip titleTooltip = new Tooltip("Enter the title of the article.");
+        title.setTooltip(titleTooltip);
+    
+        Tooltip bodyTooltip = new Tooltip("Enter the full content of the article.");
+        body.setTooltip(bodyTooltip);
     }
 
     // Populates the UI fields with the selected article’s content
