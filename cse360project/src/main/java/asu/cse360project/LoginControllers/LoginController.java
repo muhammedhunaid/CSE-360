@@ -1,3 +1,17 @@
+/*******
+ * <p> LoginController. </p>
+ * 
+ * <p> Description: A controller class for handling user login and account setup in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic login and account setup functionalities
+ * @version 2.00	2024-11-01 Added password reset and OTP validation features
+ * @version 3.00	2024-11-15 Enhanced user role management and navigation logic
+ * 
+ */
 package asu.cse360project.LoginControllers;
 
 import asu.cse360project.Utils;
@@ -15,10 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-/**
- * Controller class for the Login screen.
- * Handles user login and account creation via an invite code.
- */
+
 public class LoginController implements Initializable {
 
     Singleton data = Singleton.getInstance();

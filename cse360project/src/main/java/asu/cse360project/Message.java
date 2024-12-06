@@ -12,11 +12,6 @@ package asu.cse360project;
  * 
  */
 
-//Class representing a group in the application
-/**
- * This class represents a message in the application. A message contains details about the sender,
- * the type of the message, and the content of the message.
- */
 public class Message {
     
     // The username of the sender of the message

@@ -1,3 +1,16 @@
+/*******
+ * <p> NewPwController. </p>
+ * 
+ * <p> Description: A controller class for the scene where users can create a new password in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic password reset functionality
+ * @version 2.00	2024-11-01 Added password validation and error handling
+ * 
+ */
 package asu.cse360project.LoginControllers;
 
 import java.io.IOException;
