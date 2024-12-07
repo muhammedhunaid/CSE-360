@@ -115,6 +115,14 @@ public class User implements Serializable, Comparable<User> {
     }
 
     /**
+     * Sets the password reset status.
+     * @param reset_status The new password reset status
+     */
+    public void setPwReset(String reset_status) {
+        this.password_reset = reset_status;
+    }
+
+    /**
      * Sets the user's role.
      * @param role The new role to assign to the user
      */

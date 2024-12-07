@@ -78,22 +78,23 @@ public class LoginController implements Initializable {
         data.setAppUser(user);
 
         // Check if the user needs to reset their password
-        if (user.need_password_reset()) {   
-            // Check if the one-time password (OTP) has expired
+        if (user.need_password_reset()) {
             Boolean otp_expired = data.user_db.isOtpExpired(user.getUsername());
-            if (otp_expired) {   
+            if (otp_expired) {
                 // Display error message if OTP has expired
-                Utils.setText(login_error, "One time password has expired," + user.getPwReset(), Color.RED);
+                Utils.setText(login_error, "One time password has expired. Please contact administrator.", Color.RED);
                 return;
             } else {
-                // If OTP is still valid, prompt the user to set a new password
+                // If OTP is valid, prompt the user to set a new password
                 Utils.setRoot("LoginScenes/new_pw");
                 return;
             }
         }
         
-        // If the user hasn't set up their account information (like first name)
-        if (user.getFirst_name() == null) {
+        // If the user hasn't set up their account information completely
+        if (user.getFirst_name() == null || user.getLast_name() == null || 
+            user.getEmail() == null || user.getFirst_name().isEmpty() || 
+            user.getLast_name().isEmpty() || user.getEmail().isEmpty()) {
             // Navigate to the account setup screen
             Utils.setRoot("LoginScenes/setup_account");
             return;
@@ -110,7 +111,6 @@ public class LoginController implements Initializable {
         user.setLoginRole(user.getRole());        
         Utils.setRoot("DashboardScenes/dashboard");
         return;
-
     }
 
     /**

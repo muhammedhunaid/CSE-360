@@ -126,12 +126,7 @@ public class UserHelper{
 
     // Method to finalize account setup with additional user details
     public boolean finishAccountSetup(String username, String first_name, String middle_name, String last_name, String pref_name, String email) throws SQLException {
-        if(userNameExists(username))
-		{
-			return false;
-		}
-
-		String updateUserQuery = "UPDATE cse360users SET first = ?, last = ?, middle = ?, email = ?, preffered = ? WHERE username = ?"; // SQL update query
+        String updateUserQuery = "UPDATE cse360users SET first = ?, last = ?, middle = ?, email = ?, preffered = ? WHERE username = ?"; // SQL update query
         try (PreparedStatement pstmt = connection.prepareStatement(updateUserQuery)) { // Create prepared statement
             // Set user details in the prepared statement
             pstmt.setString(1, first_name);
@@ -140,20 +135,22 @@ public class UserHelper{
             pstmt.setString(4, email);
             pstmt.setString(5, pref_name);
             pstmt.setString(6, username); // Set username for the WHERE clause
-            pstmt.executeUpdate(); // Execute the update
-			return true;
+            
+            int rowsUpdated = pstmt.executeUpdate(); // Execute the update
+            return rowsUpdated > 0; // Return true if any rows were updated
         } catch (Exception e) {
-			return false;
-		}
+            System.out.println("Error updating user details: " + e.getMessage());
+            return false;
+        }
     }
 
     // Method to reset the OTP and password for a user
     public void resetOTPPassword(String username, String password) throws SQLException {
-        String updateUserQuery = "UPDATE cse360users SET otp_expires = ?, password = ? WHERE username = ?"; // SQL update query
+        String updateUserQuery = "UPDATE cse360users SET password = ?, otp_expires = ? WHERE username = ?"; // SQL update query
         try (PreparedStatement pstmt = connection.prepareStatement(updateUserQuery)) { // Create prepared statement
-            // Set expiration time for OTP and new password
-            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().plusDays(3))); // Set OTP expiration to 3 days from now
-            pstmt.setString(2, password); // Set new password
+            // Set the new password and OTP expiration
+            pstmt.setString(1, password); // Set new password
+            pstmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().plusDays(3))); // Set OTP expiration to 3 days from now
             pstmt.setString(3, username); // Set username for the WHERE clause
             pstmt.executeUpdate(); // Execute the update
         }
@@ -466,6 +463,15 @@ public class UserHelper{
                 user.setLast_name(rs.getString("last"));
                 user.setPref_name(rs.getString("preffered"));
                 user.setEmail(rs.getString("email"));
+                
+                // Get OTP expiration timestamp
+                java.sql.Timestamp otp_expires = rs.getTimestamp("otp_expires");
+                if (otp_expires != null) {
+                    user.setPwReset(otp_expires.toString());
+                } else {
+                    user.setPwReset("");
+                }
+                
                 return user;
             }
         }
