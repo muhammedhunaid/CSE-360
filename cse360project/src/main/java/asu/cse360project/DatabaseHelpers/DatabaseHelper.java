@@ -57,6 +57,17 @@ public class DatabaseHelper {
     private EncryptionHelper encryptionHelper;
 
     /**
+     * Initializes a new DatabaseHelper instance.
+     * Sets up the database connection and initializes helper classes for specific operations.
+     * 
+     * @throws SQLException if database connection or initialization fails
+     * @throws Exception if JDBC driver loading fails
+     */
+    public DatabaseHelper() throws SQLException, Exception {
+        connectToDatabase();
+    }
+
+    /**
      * Establishes a connection to the H2 database and initializes helper classes.
      * This method:
      * 1. Loads the JDBC driver
@@ -88,24 +99,62 @@ public class DatabaseHelper {
     }
 
     /**
-     * Gets the user helper instance for user-related database operations.
-     * @return UserHelper instance
+     * Establishes a connection to the H2 database.
+     * Attempts to load the JDBC driver and create a connection using specified credentials.
+     * 
+     * @throws SQLException if connection attempt fails
+     * @throws ClassNotFoundException if H2 JDBC driver cannot be loaded
      */
-    public UserHelper getUser_helper() {
-		return user_helper;
+    private void getConnection() throws SQLException, ClassNotFoundException {
+        Class.forName(JDBC_DRIVER); // Load the JDBC driver for H2
+        connection = DriverManager.getConnection(DB_URL, USER, PASS); // Establish the connection
+        statement = connection.createStatement(); // Create a statement for executing SQL commands
+    }
+
+    /**
+     * Creates all necessary database tables if they don't exist.
+     * This includes tables for users, groups, articles, and messages.
+     * 
+     * @throws SQLException if table creation fails
+     */
+    public void createTables() throws SQLException {
+		// SQL command to create the tables if it doesn't exist
+		user_helper.createTables();
+		groups_articles_helper.createAllTables();
+		msg_helper.createTables();
 	}
 
     /**
-     * Gets the group and articles helper instance for related database operations.
-     * @return GroupArticlesHelper instance
+     * Retrieves the active database connection.
+     * 
+     * @return Connection object representing the current database connection
+     */
+    public Connection getDBConnection() {
+        return connection;
+    }
+
+    /**
+     * Retrieves the UserHelper instance for user-related database operations.
+     * 
+     * @return UserHelper object for managing user data
+     */
+    public UserHelper getUser_helper() {
+        return user_helper;
+    }
+
+    /**
+     * Retrieves the GroupArticlesHelper instance for group and article related operations.
+     * 
+     * @return GroupArticlesHelper object for managing groups and articles
      */
     public GroupArticlesHelper getGroupArticlesHelper() {
 		return groups_articles_helper;		
 	}
 	
     /**
-     * Gets the message helper instance for message-related database operations.
-     * @return MessageHelper instance
+     * Retrieves the MessageHelper instance for message-related database operations.
+     * 
+     * @return MessageHelper object for managing messages
      */
     public MessageHelper getMessageHelper() {
 		return msg_helper;
@@ -138,41 +187,33 @@ public class DatabaseHelper {
         statement.executeUpdate(query); // Execute the query and store the result
     }
 
-		
     /**
-     * Closes the database connection and associated resources.
-     * This method should be called when the database connection is no longer needed
-     * to free up system resources.
+     * Closes the database connection and all associated resources.
      */
     public void closeConnection() {
-		try { 
-			if (statement != null) statement.close(); // Close the statement if it exists
-		} catch (SQLException se2) { 
-			se2.printStackTrace(); // Print stack trace if closing fails
-		} 
-		try { 
-			if (connection != null) connection.close(); // Close the connection if it exists
-		} catch (SQLException se) { 
-			se.printStackTrace(); // Print stack trace if closing fails
-		} 
-	}
+        try {
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
-     * Creates all necessary database tables if they don't exist.
-     * This includes tables for:
-     * - Users
-     * - Articles
-     * - Groups
-     * - Messages
-     * - Relationships between entities
-     *
-     * @throws SQLException If a database access error occurs
+     * Closes all active database resources including statement and connection.
+     * Should be called when database operations are complete.
      */
-    public void createTables() throws SQLException {
-		// SQL command to create the tables if it doesn't exist
-		user_helper.createTables();
-		groups_articles_helper.createAllTables();
-		msg_helper.createTables();
-	}
+    public void close() {
+        try { 
+            if (statement != null) statement.close(); // Close the statement if it exists
+        } catch (SQLException se2) { 
+            se2.printStackTrace(); // Print stack trace if closing fails
+        } 
+        try { 
+            if (connection != null) connection.close(); // Close the connection if it exists
+        } catch (SQLException se) { 
+            se.printStackTrace(); // Print stack trace if closing fails
+        }
+    }
 
 }

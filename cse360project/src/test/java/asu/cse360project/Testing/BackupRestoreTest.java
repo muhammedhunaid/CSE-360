@@ -99,14 +99,15 @@ public class BackupRestoreTest {
     @Nested
     class GroupRestoreTest {
 
-        DatabaseHelper dbh = new DatabaseHelper();
+        DatabaseHelper dbh;
         GroupArticlesHelper gah;
         UserHelper uh;
         String backup_file = "bk1";
         Singleton data = Singleton.getInstance();
 
         @BeforeEach
-        void setUp() throws SQLException, Exception {
+        void setUp() throws Exception {
+            dbh = new DatabaseHelper();
             dbh.connectToDatabase();
             gah = dbh.getGroupArticlesHelper();
             uh = dbh.getUser_helper();

@@ -1,4 +1,3 @@
-
 package asu.cse360project.DashboardControllers;
 
 import java.net.URL;
@@ -24,30 +23,44 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-/*******
- * <p> ManageUsersController. </p>
+/**
+ * Controller class for managing users in the application.
+ * This class handles all user management operations including:
+ * - User creation and deletion
+ * - Role assignment and modification
+ * - User information display and updates
+ * - Group membership management
  * 
- * <p> Description: A controller class for managing users in the JavaFX application. </p>
- * 
- * <p> Copyright: Tu35 2024 </p>
- * 
+ * The controller implements JavaFX's Initializable interface and provides
+ * a comprehensive user management interface through various UI components
+ * and database interactions.
+ *
  * @author Tu35
- * 
- * @version 1.00	2024-10-30 Initial version with basic user management functionalities
- * @version 2.00	2024-11-01 Added database connection and initialization
- * @version 3.00	2024-11-15 Enhanced role management and added user deletion functionality
- * 
+ * @version 3.00 2024-11-15 Enhanced role management and added user deletion functionality
+ * @version 2.00 2024-11-01 Added database connection and initialization
+ * @version 1.00 2024-10-30 Initial version with basic user management functionalities
  */
-
 public class ManageUsersController implements Initializable {
 
+    /** Singleton instance for sharing data across the application */
     Singleton data = Singleton.getInstance();
-    // Variables to keep track of user actions and selected user
+    
+    /** Flag indicating if a new user is being added */
     boolean adding_user = false;
+    
+    /** Currently selected role for user creation/modification */
     public String role = "";
+    
+    /** Currently selected user in the interface */
     private User selectedUser = null;
+    
+    /** Alert dialog for user notifications */
     Alert alert;
-    ObservableList<User> all_Users; // List to hold all users
+    
+    /** Observable list of all users in the system */
+    ObservableList<User> all_Users;
+    
+    /** Observable list of all articles in the system */
     ObservableList<Article> all_articles;
 
     // FXML elements for the UI
@@ -64,7 +77,13 @@ public class ManageUsersController implements Initializable {
     @FXML private TableView<User> table;
     @FXML private TableColumn<User, String> username_col;
 
-    // Initialization method to set up the UI and load user data
+    /**
+     * Initializes the controller after FXML injection is complete.
+     * Sets up table columns, loads initial data, and configures event handlers.
+     *
+     * @param location The location used to resolve relative paths for the root object
+     * @param resources The resources used to localize the root object
+     */
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
 
@@ -105,14 +124,24 @@ public class ManageUsersController implements Initializable {
         });
     }
 
-    // Method to handle the 'Add User' action
+    /**
+     * Handles the action when the 'Add User' button is clicked.
+     * Enables the role change box and sets the adding_user flag to true.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void add(ActionEvent event) {
         Utils.enableNode(change_role_box); // Enable role change box
         adding_user = true; // Set flag for adding new user
     }
 
-    // Method to handle 'Change Role' action
+    /**
+     * Handles the action when the 'Change Role' button is clicked.
+     * Enables the role change box if a user is selected.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void changeRole(ActionEvent event) {
         if (selectedUser != null) {
@@ -122,7 +151,12 @@ public class ManageUsersController implements Initializable {
         }
     }
 
-    // Method to confirm and apply role changes or add new user
+    /**
+     * Handles the action when the 'Confirm Role' button is clicked.
+     * Applies role changes or adds a new user after confirmation.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void confirm_role(ActionEvent event) {
         role = getRole();
@@ -176,6 +210,11 @@ public class ManageUsersController implements Initializable {
         Utils.disableNode(change_role_box);
     }
 
+    /**
+     * Retrieves the currently selected role(s) from the radio buttons.
+     *
+     * @return A comma-separated string of selected roles
+     */
     public String getRole()
     {
         boolean admin = admin_btn.selectedProperty().getValue();
@@ -199,6 +238,13 @@ public class ManageUsersController implements Initializable {
         return role;
     }
 
+    /**
+     * Checks if a user is the only admin of any groups.
+     *
+     * @param groups The list of groups to check
+     * @param user The user to check
+     * @return True if the user is the only admin of any group, false otherwise
+     */
     public boolean onlyAdminofGroups(ArrayList<Group> groups, User user) {
         for (Group g : groups)
         {
@@ -209,7 +255,11 @@ public class ManageUsersController implements Initializable {
         return false;
     }
 
-    // Method to add new user
+    /**
+     * Adds a new user to the system with the specified role.
+     *
+     * @param role The role to assign to the new user
+     */
     private void addUser(String role)
     {
         // Input validation
@@ -229,6 +279,11 @@ public class ManageUsersController implements Initializable {
         }
     }
 
+    /**
+     * Changes the role of the currently selected user.
+     *
+     * @param role The new role to assign to the user
+     */
     private void changeUserRole(String role)
     {
         if(selectedUser == null) {
@@ -264,7 +319,11 @@ public class ManageUsersController implements Initializable {
         }
     }
 
-    // Method to delete a selected user
+    /**
+     * Deletes the currently selected user from the system.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void delete(ActionEvent event) {
         if (selectedUser == null) {
@@ -313,7 +372,11 @@ public class ManageUsersController implements Initializable {
         });
     }
 
-    // Method to reset a selected user's password
+    /**
+     * Resets the password of the currently selected user.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void resetPassword(ActionEvent event) {
         if (selectedUser != null) {
@@ -335,7 +398,11 @@ public class ManageUsersController implements Initializable {
         }
     }
 
-    // Method to search for a user in the table by username
+    /**
+     * Searches for a user in the table by username.
+     *
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void searchUser(ActionEvent event) throws SQLException {
         String username = search_user.getText().toString();
