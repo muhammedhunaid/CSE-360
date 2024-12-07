@@ -1,14 +1,18 @@
 /**
  * Controller class for managing article search and display functionality in the application.
- * Provides features for searching, viewing, and managing articles and groups, including:
- * - Article searching and filtering
- * - Group management
- * - Access level control
- * - Backup management
+ * This controller provides a comprehensive interface for:
+ * - Searching and filtering articles by keywords, groups, and difficulty levels
+ * - Managing article groups and access permissions
+ * - Creating and restoring backups of articles and groups
+ * - Viewing and editing article content with encryption support
  * 
- * This controller implements Initializable to support JavaFX initialization.
- * 
+ * The controller implements role-based access control, allowing different
+ * functionality for administrators, instructors, and students. It also
+ * maintains search history and provides an intuitive interface for
+ * article and group management.
+ *
  * @author Tu35
+ * @version 2.00 2024-12-06 Enhanced documentation and added encryption support
  * @version 1.00 2024-11-01 Initial version with search functionalities
  */
 package asu.cse360project.DashboardControllers;
@@ -34,22 +38,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -79,10 +69,10 @@ public class SearchArticlesController implements Initializable{
     /** Flag for special addition mode */
     boolean add_special = false;
     
-    /** Stores the last search query */
+    /** Stores the last search query for history tracking */
     String last_search = "";
     
-    /** Delay timer for search operations */
+    /** Delay timer for search operations and error messages */
     PauseTransition pause;
 
     /** Observable list of articles for TableView */
@@ -94,16 +84,16 @@ public class SearchArticlesController implements Initializable{
     /** List of available backup names */
     ObservableList<String> all_backups;
     
-    /** Currently selected group IDs */
+    /** Currently selected group IDs for filtering */
     ArrayList<Integer> selected_groups = new ArrayList<>();
     
-    /** Currently selected article */
+    /** Currently selected article in the UI */
     Article selectedArticle;
     
-    /** Currently selected group */
+    /** Currently selected group in the UI */
     Group selectedGroup;
     
-    /** Helper for encryption operations */
+    /** Helper for encryption/decryption operations */
     EncryptionHelper encryptionHelper;
     
     /** Currently selected backup name */
@@ -187,6 +177,18 @@ public class SearchArticlesController implements Initializable{
     
     @FXML private Button edit_article_btn;
 
+    /**
+     * Initializes the controller after FXML injection is complete.
+     * Sets up:
+     * - Table columns and data bindings
+     * - Event listeners for UI components
+     * - Initial data loading
+     * - Role-based access control
+     * - Error handling and tooltips
+     *
+     * @param location The location used to resolve relative paths
+     * @param resources The resources used to localize the root object
+     */
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         // Initialize alert for confirmation dialogs
@@ -233,6 +235,10 @@ public class SearchArticlesController implements Initializable{
         addTooltips();
     }
 
+    /**
+     * Adds tooltips to UI components for better user experience.
+     * Tooltips provide helpful descriptions of button functions and input fields.
+     */
     void addTooltips() {
         Tooltip editViewTooltip = new Tooltip("Toggle between edit view and search view.");
         Tooltip levelTooltip = new Tooltip("Set the difficulty level for filtering articles.");
@@ -244,6 +250,11 @@ public class SearchArticlesController implements Initializable{
         edit_article_btn.setTooltip(editArticleTooltip);
     }
 
+    /**
+     * Disables certain UI components based on user role.
+     * - Students cannot edit articles or view admin columns
+     * - Admins cannot edit articles directly
+     */
     private void disableByRole() {
         if (data.getAppUser().getLoginRole().equals("student")) {
             Utils.disableNode(edit_view_btn);
@@ -255,14 +266,29 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
-    //get all articles from picked group
+    /**
+     * Retrieves and displays articles based on current filters.
+     * Articles are filtered by:
+     * - Selected groups
+     * - Difficulty level
+     * - Search keywords
+     * - User's role and permissions
+     *
+     * @throws SQLException if database access fails
+     */
     public void getArticles() throws SQLException {
         User user = data.getAppUser();
         articles_list = data.group_articles_db.searchArticles(selected_groups, level, search_keywords, user.getId(), user.getLoginRole());
         article_table.setItems(articles_list);
     }
 
-    //get all groups user can access
+    /**
+     * Retrieves and displays groups accessible to the current user.
+     * For non-student users, includes an "Ungrouped" option.
+     * Also loads special groups based on user permissions.
+     *
+     * @throws SQLException if database access fails
+     */
     public void getGroups() throws SQLException {
         groups_list.clear();
         if(!data.getAppUser().getLoginRole().equals("student")) {
@@ -272,7 +298,10 @@ public class SearchArticlesController implements Initializable{
         group_table.setItems(groups_list);
     }
                   
-    //helper method for setting up Article table
+    /**
+     * Helper method for setting up Article table.
+     * Configures table columns and data bindings.
+     */
     private void makeArticleTable() {
         // Set up table columns to display Article information
         article_title.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -305,7 +334,10 @@ public class SearchArticlesController implements Initializable{
         });
     }
     
-    //helper method for setting up Group table
+    /**
+     * Helper method for setting up Group table.
+     * Configures table columns and data bindings.
+     */
     private void makeGroupTable() {
         // Set up table columns to display Group information
         group_id.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -341,6 +373,13 @@ public class SearchArticlesController implements Initializable{
         });
     }
 
+    /**
+     * Creates a wrapped text cell for table columns.
+     * Enables text wrapping in table cells for better content display.
+     *
+     * @param <T> The type of the TableColumn
+     * @param column The column to apply wrapping to
+     */
     private <T> void createWrappedColumn (TableColumn<T, String> column) {
         column.setCellFactory(tc -> {
             TableCell<T, String> cell = new TableCell<>();
@@ -353,6 +392,13 @@ public class SearchArticlesController implements Initializable{
         });
     }
 
+    /**
+     * Handles article search based on keywords.
+     * Updates the search history if the search criteria changes.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML //set get keywords searched
     void searchArticles(ActionEvent event) throws SQLException {
         search_keywords = keyword_input.getText();
@@ -370,6 +416,12 @@ public class SearchArticlesController implements Initializable{
         getArticles();
     }
 
+    /**
+     * Searches for a specific article by ID or title.
+     * Scrolls to and selects the matching article if found.
+     *
+     * @param event The triggering action event
+     */
     @FXML
     void SearchArticles(ActionEvent event) {
         Long article_id = (long) -1;
@@ -397,6 +449,12 @@ public class SearchArticlesController implements Initializable{
         pause.play();
     }
 
+    /**
+     * Searches for a specific group by ID or name.
+     * Scrolls to and selects the matching group if found.
+     *
+     * @param event The triggering action event
+     */
     @FXML
     void searchGroups(ActionEvent event) {
         int grp_id = -1;
@@ -424,37 +482,72 @@ public class SearchArticlesController implements Initializable{
         pause.play();
     }
 
+    /**
+     * Updates the level filter to show only advanced articles.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML   //set search level to advanced
     void setAdvanced(ActionEvent event) throws SQLException {
         level = "advanced";
         level_btn.setText("Advanced");
     }
 
+    /**
+     * Updates the level filter to show only beginner articles.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML //set search level to beginner
     void setBeginner(ActionEvent event) throws SQLException {
         level = "beginner";
         level_btn.setText("Beginner");
     }
 
+    /**
+     * Updates the level filter to show only expert articles.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML //set search level to expert
     void setExpert(ActionEvent event) throws SQLException {
         level = "expert";
         level_btn.setText("Expert");
     }
 
+    /**
+     * Removes all level filters to show articles of all levels.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML //set search level to all
     void setAll(ActionEvent event) throws SQLException {
         level = "all";
         level_btn.setText("All");
     }
 
+    /**
+     * Updates the level filter to show only intermediate articles.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML //set search level to Intermidiate
     void setIntermidiate(ActionEvent event) throws SQLException {
         level = "intermediate";
         level_btn.setText("Intermediate");
     }
 
-    // Populates the UI fields with the selected article’s content
+    /**
+     * Displays the selected article's content in the view area.
+     * Decrypts the article body if the user is not an admin.
+     *
+     * @throws Exception if decryption fails
+     */
     private void viewArticle() throws Exception { 
         String headTxt = "id: " + String.valueOf(selectedArticle.getId()); // Article ID
         headTxt += "    Groups: " + selectedArticle.getGroup_names().toString(); // Article groups
@@ -474,17 +567,26 @@ public class SearchArticlesController implements Initializable{
     }
 
     /**
-     * Handles the add article action.
-     * @param event The action event.
-     * @throws IOException If an I/O exception occurs.
-    * @throws SQLException 
-    */
+     * Initiates the article creation process.
+     * Switches to the create/edit article view.
+     *
+     * @param event The triggering action event
+     * @throws IOException if view navigation fails
+     * @throws SQLException if database access fails
+     */
     @FXML
     void addArticle(ActionEvent event) throws IOException, SQLException {
         data.editing_article = false; // Indicate that a new article is being created
         Utils.setContentArea(data.view_area, "create_edit_article"); // Set the content area to the create/edit article view
     }
 
+    /**
+     * Shows a dialog for creating a new group.
+     * Updates the groups list after successful creation.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void addGroup(ActionEvent event) throws SQLException {
         add_special = false;
@@ -498,6 +600,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Creates a special group.
+     * Updates the groups list after successful creation.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void addSAG(ActionEvent event) throws SQLException {
         add_special = true;
@@ -512,6 +621,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Creates a backup of the current group data.
+     * Allows users to specify a backup name.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void backupGroups(ActionEvent event) throws SQLException {
         if(selected_groups.size() > 0)
@@ -544,16 +660,13 @@ public class SearchArticlesController implements Initializable{
         setBackupsTable();
     }
 
-    public boolean adminOfGroups() throws SQLException {
-        for(int group_id : selected_groups) {
-            Group g = data.group_articles_db.getGroup(group_id);
-            if(group_id > 0 && !g.isAdmin(data.getAppUser())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /**
+     * Creates a backup of all system data.
+     * Includes articles, groups, and user data.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void backupAll(ActionEvent event) throws SQLException {
         // Create a TextInputDialog
@@ -578,28 +691,13 @@ public class SearchArticlesController implements Initializable{
         });
     }
 
-    public ArrayList<Integer> getAdminGroups() throws SQLException {
-        ArrayList<Integer> all = new ArrayList<>();
-        for(Group group: groups_list) {
-            if(group.getId() == 0) {
-                all.add(0);
-            }else{
-                if(group.getAdmin_users() != null && group.getAdmin_users().contains(data.getAppUser())) {
-                    all.add(group.getId());
-                }
-            }
-        }
-        return all;
-    }
-
-    public void setGroups_list(ObservableList<Group> groups_list) {
-        this.groups_list = groups_list;
-    }
-
-    public void setData(Singleton data) {
-        this.data = data;
-    }
-
+    /**
+     * Deletes the selected article after confirmation.
+     * Only available to users with appropriate permissions.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void deleteArticle(ActionEvent event) {
         if(selectedArticle != null) // Check if an article is selected
@@ -622,6 +720,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Deletes the selected group after confirmation.
+     * Only available to group administrators.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void deleteGroup(ActionEvent event) throws SQLException {
         if(selectedGroup == null) {
@@ -640,6 +745,11 @@ public class SearchArticlesController implements Initializable{
         groups_list.remove(groups_list.indexOf(selectedGroup));
     }
 
+    /**
+     * Deletes the selected backup file.
+     *
+     * @param event The triggering action event
+     */
     @FXML
     void delete_backup(ActionEvent event) {
         if(selectedBackup != null)
@@ -650,6 +760,11 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Removes a file from the file system.
+     *
+     * @param file_name The name of the file to remove
+     */
     private void removeFile(String file_name) {
         String filePath = "Backups/" + file_name; // Update this to the file you want to delete
         File file = new File(filePath);
@@ -666,6 +781,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Merges data from a selected backup.
+     * Requires confirmation before proceeding.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void merge(ActionEvent event) {
         if(selectedBackup != null)
@@ -686,6 +808,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Restores data from a selected backup.
+     * Requires confirmation before proceeding.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void restore(ActionEvent event) {
         if(selectedBackup != null)
@@ -706,6 +835,14 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Updates access permissions for a selected group.
+     * Only available to group administrators.
+     *
+     * @param event The triggering action event
+     * @throws IOException if view navigation fails
+     * @throws SQLException if database access fails
+     */
     @FXML
     void updateAccess(ActionEvent event) throws IOException, SQLException {
         if(selected_groups.size() > 1 || selected_groups.isEmpty())
@@ -722,6 +859,14 @@ public class SearchArticlesController implements Initializable{
         
     }
 
+    /**
+     * Edits the selected article.
+     * Switches to the create/edit article view.
+     *
+     * @param event The triggering action event
+     * @throws IOException if view navigation fails
+     * @throws SQLException if database access fails
+     */
     @FXML
     void updateArticle(ActionEvent event) throws IOException, SQLException {
         if(selectedArticle != null) // Check if an article is selected
@@ -732,6 +877,12 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Toggles between edit and view modes.
+     * Updates UI components based on the selected mode.
+     *
+     * @param event The triggering action event
+     */
     @FXML   //change to edit view
     void editView(ActionEvent event) throws IOException {
         if(edit_view_btn.isSelected())
@@ -748,7 +899,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
-    // Method to show the popup with the two options
+    /**
+     * Shows a dialog for creating a new group.
+     * Returns true if the group is created successfully.
+     *
+     * @return true if the group is created, false otherwise
+     * @throws SQLException if database access fails
+     */
     private boolean showGroupNamePopup() throws SQLException {
         // Create a TextInputDialog
         TextInputDialog dialog = new TextInputDialog();
@@ -768,6 +925,13 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Selects a group for filtering.
+     * Adds the group ID to the selected groups list.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void selectGroup(ActionEvent event) throws SQLException {
         if(selectedGroup != null && !selected_groups.contains(selectedGroup.getId()))
@@ -777,6 +941,12 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Removes a group from the selected groups list.
+     *
+     * @param event The triggering action event
+     * @throws SQLException if database access fails
+     */
     @FXML
     void removeGroup(ActionEvent event) throws SQLException {
         if(selectedGroup != null && selected_groups.contains(selectedGroup.getId()))
@@ -786,6 +956,9 @@ public class SearchArticlesController implements Initializable{
         }
     }
     
+    /**
+     * Sets up the backups table with available backup names.
+     */
     private void setBackupsTable() {
         String list = data.user_db.getUserBackups(data.getAppUser().getUsername());
         System.out.println(list);
@@ -796,4 +969,57 @@ public class SearchArticlesController implements Initializable{
         }
     }
 
+    /**
+     * Checks if the user is an administrator of the selected groups.
+     *
+     * @return true if the user is an admin, false otherwise
+     * @throws SQLException if database access fails
+     */
+    public boolean adminOfGroups() throws SQLException {
+        for(int group_id : selected_groups) {
+            Group g = data.group_articles_db.getGroup(group_id);
+            if(group_id > 0 && !g.isAdmin(data.getAppUser())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Retrieves a list of groups that the user is an administrator of.
+     *
+     * @return A list of group IDs
+     * @throws SQLException if database access fails
+     */
+    public ArrayList<Integer> getAdminGroups() throws SQLException {
+        ArrayList<Integer> all = new ArrayList<>();
+        for(Group group: groups_list) {
+            if(group.getId() == 0) {
+                all.add(0);
+            }else{
+                if(group.getAdmin_users() != null && group.getAdmin_users().contains(data.getAppUser())) {
+                    all.add(group.getId());
+                }
+            }
+        }
+        return all;
+    }
+
+    /**
+     * Sets the groups list for the controller.
+     *
+     * @param groups_list The new groups list
+     */
+    public void setGroups_list(ObservableList<Group> groups_list) {
+        this.groups_list = groups_list;
+    }
+
+    /**
+     * Sets the singleton instance for the controller.
+     *
+     * @param data The new singleton instance
+     */
+    public void setData(Singleton data) {
+        this.data = data;
+    }
 }

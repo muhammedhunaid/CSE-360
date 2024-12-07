@@ -26,67 +26,134 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 /**
+ * Controller class for creating and editing articles in the application.
+ * This controller manages the Create/Edit Article interface and provides functionality for:
+ * - Creating new articles with comprehensive metadata
+ * - Editing existing articles and their properties
+ * - Managing article permissions and access levels
+ * - Linking articles to groups and other articles
+ * - Handling article encryption and storage
  * 
- * <p> CEArticleController class </p>
- * 
- * <p> The CEArticleController class manages the Create/Edit Article interface in a JavaFX application.
- * This controller allows users to create, edit, and manage articles with various properties, including title,
- * authors, abstract, body, keywords, and permissions. Users can link articles to multiple groups and add 
- * cross-references to other articles.  </p>
- * 
- * <p> Copyright: Tu35 © 2024 </p>
- * 
+ * The controller implements JavaFX's Initializable interface and provides
+ * a rich user interface for article management through various UI components
+ * and database interactions.
+ *
  * @author Tu35
- * 
- * @version 1.00	2024-11-18 JavaFX controller class for creating and editing articles
- * 
+ * @version 2.00 2024-12-06 Enhanced documentation and added encryption support
+ * @version 1.00 2024-11-18 Initial version with core article management functionality
  */
 public class CEArticleController implements Initializable {
 
-     // Singleton instance for accessing shared data
-    Singleton data = Singleton.getInstance();
+    /** Singleton instance for accessing shared application data */
+    private Singleton data = Singleton.getInstance();
+    
+    /** Current access level of the article being edited */
     String article_level = "";
+    
+    /** Observable list of all articles in the system */
     ObservableList<Article> articles_list;
+    
+    /** Observable list of all groups in the system */
     ObservableList<Group> groups_list;
+    
+    /** List of group IDs associated with the current article */
     ArrayList<Integer> groups = new ArrayList<>();
-    ArrayList<Long> refrences = new ArrayList<>();
-    private Article selectedArticle = null;
-    private Group selectedGroup = null;
-    EncryptionHelper encryptionHelper;
 
+    /** List of article references associated with the current article */
+    ArrayList<Long> references = new ArrayList<>();
 
-    //////////JavaFX elements ///////////////////////////
+    // FXML Injected Components
+    
+    /** Table column for article title */
+    @FXML
+    private TableColumn<Article, String> article_col;
+    
+    /** Table column for article authors */
+    @FXML
+    private TableColumn<Article, String> authors_col;
+    
+    /** Table column for article ID */
+    @FXML
+    private TableColumn<Article, Long> article_id_col;
+    
+    /** Table view for displaying available articles */
+    @FXML
+    private TableView<Article> article_table;
+    
+    /** Table column for group name */
+    @FXML
+    private TableColumn<Group, String> group_col;
+    
+    /** Table column for group ID */
+    @FXML
+    private TableColumn<Group, Integer> group_id_col;
+    
+    /** Table view for displaying available groups */
+    @FXML
+    private TableView<Group> group_table;
 
-    // tableViews and columns
-    @FXML private TableColumn<Article, String> article_col;
-    @FXML private TableColumn<Article, String> authors_col;
-    @FXML private TableColumn<Article, Long> article_id_col;
-    @FXML private TableView<Article> article_table;
-    @FXML private TableColumn<Group, String> group_col;
-    @FXML private TableColumn<Group, Integer> group_id_col;
-    @FXML private TableView<Group> group_table;
+    /** Text area for article body/content */
+    @FXML
+    private TextArea body;
+    
+    /** Text field for article description */
+    @FXML
+    private TextField description;
+    
+    /** Text field for article keywords */
+    @FXML
+    private TextField keywords;
+    
+    /** Text field for article authors */
+    @FXML
+    private TextField authors;
+    
+    /** Text field for searching articles */
+    @FXML
+    private TextField search_article;
+    
+    /** Text field for searching groups */
+    @FXML
+    private TextField search_group;
+    
+    /** Text field for article title */
+    @FXML
+    private TextField title;
 
-    //text input
-    @FXML private TextArea body;
-    @FXML private TextField description;
-    @FXML private TextField keywords;
-    @FXML private TextField authors;
-    @FXML private TextField search_article;
-    @FXML private TextField search_group;
-    @FXML private TextField title;
+    /** Label for displaying group links */
+    @FXML
+    private Label group_links;
+    
+    /** Label for displaying article links */
+    @FXML
+    private Label article_links;
+    
+    /** Label for displaying title */
+    @FXML
+    private Label title_label;
 
-    //labels
-    @FXML private Label group_links;
-    @FXML private Label article_links;
-    @FXML private Label title_label;
+    /** Menu button for selecting article access level */
+    @FXML
+    private MenuButton level;
+    
+    /** Selected article for editing */
+    private Article selectedArticle;
+    
+    /** Selected group for article assignment */
+    private Group selectedGroup;
+    
+    /** Helper for encryption/decryption operations */
+    private EncryptionHelper encryptionHelper;
 
-    //user input
-    @FXML private MenuButton level;
-    /////////////////////////////////////////////////////
-
-    // Initializes the controller and sets up tables ahd populates with groups and articles
+    /**
+     * Initializes the controller after FXML injection is complete.
+     * Sets up table columns, loads initial data, and configures event handlers.
+     *
+     * @param location The location used to resolve relative paths for the root object
+     * @param resources The resources used to localize the root object
+     */
     @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
+    public void initialize(URL location, ResourceBundle resources) {
         try {
             encryptionHelper = new EncryptionHelper();
         } catch (Exception e) {
@@ -151,6 +218,9 @@ public class CEArticleController implements Initializable {
         }
     }
 
+    /**
+     * Adds tooltips to UI components for better user experience.
+     */
     void addTooltips() {
         Tooltip levelTooltip = new Tooltip("Select the article's difficulty level (e.g., beginner, advanced).");
         level.setTooltip(levelTooltip);
@@ -176,7 +246,11 @@ public class CEArticleController implements Initializable {
         body.setTooltip(bodyTooltip);
     }
 
-    // Populates the UI fields with the selected article’s content
+    /**
+     * Populates the UI fields with the selected article’s content.
+     * 
+     * @throws Exception if encryption/decryption fails
+     */
     private void setContent() throws Exception {
         Article article = data.article;
 
@@ -189,21 +263,29 @@ public class CEArticleController implements Initializable {
         article_level = article.getLevel();
         article_links.setText("Article Links: " + article.getReferences().toString()); //fill groups
         group_links.setText("Groups links: " + article.getGroups().toString()); //fill refrences
-        refrences = article.getReferences(); //set refrences
+        references = article.getReferences(); //set refrences
         groups = article.getGroups(); //sert groups
     }
 
-    // Removes the selected article from articles references
+    /**
+     * Removes the selected article from articles references.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void removeArticle(ActionEvent event) {
         if(selectedArticle != null) 
         {
-            refrences.remove(Long.valueOf(selectedArticle.getId())); //remove article from refrences 
-            article_links.setText("Article Links: " + refrences.toString()); //update UI
+            references.remove(Long.valueOf(selectedArticle.getId())); //remove article from refrences 
+            article_links.setText("Article Links: " + references.toString()); //update UI
         }
     }
 
-    // Removes the selected group from the group links
+    /**
+     * Removes the selected group from the group links.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void removeGroup(ActionEvent event) {
         if(selectedGroup != null)
@@ -213,17 +295,25 @@ public class CEArticleController implements Initializable {
         }
     }
 
-    // Adds the selected article to the references list
+    /**
+     * Adds the selected article to the references list.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void addArticle(ActionEvent event) {
-        if(selectedArticle != null && !refrences.contains(selectedArticle.getId()))
+        if(selectedArticle != null && !references.contains(selectedArticle.getId()))
         {
-            refrences.add(selectedArticle.getId()); //add article to list of article refrences
-            article_links.setText("Article Links: " + refrences.toString()); //update UI
+            references.add(selectedArticle.getId()); //add article to list of article refrences
+            article_links.setText("Article Links: " + references.toString()); //update UI
         }
     }
 
-     // Adds the selected group to the group links list
+    /**
+     * Adds the selected group to the group links list.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void addGroup(ActionEvent event) {
         if(selectedGroup != null)
@@ -233,47 +323,80 @@ public class CEArticleController implements Initializable {
         }
     }
 
-    // Sets the article level to 'advanced'
+    /**
+     * Sets the article level to 'advanced'.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void advanced(ActionEvent event) {
         article_level = "advanced";
         level.setText("advanced");
     }
 
-     // Sets the article level to 'beginner'
+    /**
+     * Sets the article level to 'beginner'.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void beginner(ActionEvent event) {
         article_level = "beginner";
         level.setText("beginner");
     }
 
-    // Sets the article level to 'expert'
+    /**
+     * Sets the article level to 'expert'.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void expert(ActionEvent event) {
         article_level = "expert";
         level.setText("expert");
     }
 
-    // Sets the article level to 'intermediate'
+    /**
+     * Sets the article level to 'intermediate'.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void intermediate(ActionEvent event) {
         article_level = "intermediate";
         level.setText("intermediate");
     }
 
-     // Cancels the editing or creation of an article and returns to the manage articles page
+    /**
+     * Cancels the editing or creation of an article and returns to the manage articles page.
+     * 
+     * @param event The action event triggered by the button click
+     * @throws IOException if navigation fails
+     */
     @FXML
     void cancel(ActionEvent event) throws IOException {
         Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
+    /**
+     * Sets the article level based on the provided level text.
+     * 
+     * @param level_txt The level text to set
+     */
     void setLevel(String level_txt) {
         level.setText(level_txt);
     }
 
-    // Submits the article by adding it or updating it in the database
+    /**
+     * Submits the article by adding it or updating it in the database.
+     * 
+     * @param event The action event triggered by the button click
+     * @throws SQLException if database operation fails
+     * @throws IOException if encryption/decryption fails
+     * @throws Exception if other errors occur
+     */
     @FXML
-    void submit(ActionEvent event) throws IOException, SQLException, Exception {
+    void submit(ActionEvent event) throws SQLException, IOException, Exception {
         //get text
         String title_text = title.getText();
         String description_text = description.getText();
@@ -286,19 +409,23 @@ public class CEArticleController implements Initializable {
  
         if(data.editing_article) //update article if editing
         {
-            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, refrences);
+            data.group_articles_db.updateArticle(data.article.getId(), title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, references);
             data.editing_article = false; //update singelton to show no longer editing
             data.article = null; // update singelton to remove article no longer working with
             data.sa_controller.getArticles();
         }else{ //create new article
-            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, refrences);
+            data.group_articles_db.addArticle(title_text, description_text, keyword_text, body_text, article_level, authors_text, "", groups, references);
             data.sa_controller.getArticles();
         }
 
         Utils.setContentArea(data.view_area, data.view_box);  // Navigate to manage articles view
     }
 
-    // Searches for a group based on the input group ID and selects it in the UI
+    /**
+     * Searches for a group based on the input group ID and selects it in the UI.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void searchGroup(ActionEvent event) {
         int grp_id = -1;
@@ -319,12 +446,16 @@ public class CEArticleController implements Initializable {
         }
     }
 
-     // Searches for an article based on the input article ID and selects it in the UI
+    /**
+     * Searches for an article based on the input article ID and selects it in the UI.
+     * 
+     * @param event The action event triggered by the button click
+     */
     @FXML
     void searchArticle(ActionEvent event) {
         Long article_id = (long) -1;
         try{ //try to cast input to Long, return if not
-            article_id = Long.parseLong(search_group.getText().toString());
+            article_id = Long.parseLong(search_article.getText().toString());
         } catch (NumberFormatException e) {
             return;
         }

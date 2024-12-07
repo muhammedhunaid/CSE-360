@@ -31,9 +31,17 @@ public class App extends Application {
     // The main JavaFX scene that will be displayed
     private static Scene scene;
     
-    // Instance of the DatabaseHelper class to handle database operations
-    private static final DatabaseHelper databaseHelper = new DatabaseHelper();
+    /** Instance of the DatabaseHelper class to handle database operations */
+    private static final DatabaseHelper databaseHelper;
     Singleton data;
+
+    static {
+        try {
+            databaseHelper = new DatabaseHelper();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize database: " + e.getMessage(), e);
+        }
+    }
 
     @Override
     // Initializes the primary stage and sets the login scene
