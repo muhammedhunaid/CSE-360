@@ -59,9 +59,6 @@ public class App extends Application {
             Utils.setRoot("LoginScenes/create_account"); // Load the account creation screen for the first admin
         }
 
-        // Display all in db for debugging purposes
-        databaseHelper.getUser_helper().displayUsersByAdmin();
-
         // Handle the event when the application is closed, ensuring the database connection is closed
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -70,6 +67,11 @@ public class App extends Application {
                 System.out.println("Closing db");
             }
         });
+
+        SetupBackupRestoreManualTesting.HowTo();
+        
+        // Display all in db for debugging purposes
+        databaseHelper.getUser_helper().displayUsersByAdmin();
     }
 
     // Main method to launch the JavaFX application

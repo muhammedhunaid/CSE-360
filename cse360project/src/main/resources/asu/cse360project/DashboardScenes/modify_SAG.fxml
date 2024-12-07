@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.ModifySAG">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="asu.cse360project.DashboardControllers.ModifySAG">
    <children>
       <BorderPane prefHeight="400.0" prefWidth="606.0">
          <top>
@@ -23,9 +23,9 @@
                <children>
                   <VBox prefHeight="400.0" prefWidth="466.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#addAdmin" prefHeight="44.0" prefWidth="130.0" text="Add Admin" />
-                        <Button mnemonicParsing="false" onAction="#addViewer" prefHeight="46.0" prefWidth="130.0" text="Add Viewer" />
-                        <Button mnemonicParsing="false" onAction="#deleteViewer" prefHeight="48.0" prefWidth="130.0" text="Delete User" />
+                        <Button fx:id="add_admin" mnemonicParsing="false" onAction="#addAdmin" prefHeight="44.0" prefWidth="130.0" text="Add Admin" />
+                        <Button fx:id="add_viewer" mnemonicParsing="false" onAction="#addViewer" prefHeight="46.0" prefWidth="130.0" text="Add Viewer" />
+                        <Button fx:id="delete_viewer" mnemonicParsing="false" onAction="#deleteViewer" prefHeight="48.0" prefWidth="130.0" text="Delete User" />
                         <Button mnemonicParsing="false" onAction="#back" prefHeight="48.0" prefWidth="130.0" text="Back" />
                      </children>
                   </VBox>
