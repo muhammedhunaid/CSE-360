@@ -1,3 +1,17 @@
+/*******
+ * <p> Utils. </p>
+ * 
+ * <p> Description: A utility class for validation and UI management in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with validation methods and UI feedback utilities
+ * @version 2.00	2024-11-01 Added methods for generating invite codes and setting FXML roots
+ * @version 3.00	2024-11-15 Enhanced validation methods and added convenience methods for feedback
+ * 
+ */
 package asu.cse360project;
 
 import java.io.IOException;
@@ -13,7 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-// Utility class for validation and UI management in the application
+
 public class Utils {
     // Regular expressions for validating usernames, passwords, emails, and names
     public static String username_regex = "^[a-zA-Z][a-zA-Z0-9._-]{5,15}$";

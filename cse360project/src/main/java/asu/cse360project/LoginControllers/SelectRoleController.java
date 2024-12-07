@@ -1,3 +1,15 @@
+/*******
+ * <p> SelectRoleController. </p>
+ * 
+ * <p> Description: A controller class for allowing logged-in users to select a role for signing in within the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-09-30 Added role selection functionality
+ * 
+ */
 package asu.cse360project.LoginControllers;
 
 import java.io.IOException;

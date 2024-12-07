@@ -1,3 +1,17 @@
+/*******
+ * <p> SetupAccountController. </p>
+ * 
+ * <p> Description: A controller class for setting up a user account in the JavaFX application. </p>
+ * 
+ * <p> Copyright: Tu35 2024 </p>
+ * 
+ * @author Tu35
+ * 
+ * @version 1.00	2024-10-30 Initial version with basic account setup functionality
+ * @version 2.00	2024-11-01 Added validation for user input fields and error handling
+ * @version 3.00	2024-11-15 Enhanced navigation logic and integrated with user roles
+ * 
+ */
 package asu.cse360project.LoginControllers;
 
 import java.io.IOException;
@@ -15,7 +29,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-// Controller class for setting up a user account in the application
 public class SetupAccountController implements Initializable {
 
     // Current user retrieved from the application context
