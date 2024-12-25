@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 import asu.cse360project.Singleton;
 import asu.cse360project.User;
 import asu.cse360project.Utils;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,6 +29,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 // Controller class for the scene where users can create a new password
 public class NewPwController implements Initializable {
@@ -51,32 +53,62 @@ public class NewPwController implements Initializable {
 
     @FXML
     void Finish(ActionEvent event) throws SQLException, IOException {
-        // Get input from the password field
-        String pw = password.getText().toString();
-        // Validate the password using utility function
+        // Get input from both password fields
+        String pw = password.getText();
+        String confirmPw = re_password.getText();
+
+        // Clear previous error messages
+        Utils.disableNode(password_error);
+        Utils.disableNode(re_password_error);
+
+        // First validate the password
         String validate_pw = Utils.validatePassword(pw);
-
-        // Set true if the password and username are valid; otherwise, display an error
         boolean valid_pw = Utils.isValid(password_error, validate_pw);
-        boolean same = false; // Variable to check if the passwords match
 
-        // Check if the entered passwords match
-        if (password.getText().compareTo(re_password.getText()) == 0) {
-            // Disable the re-password error label if passwords match
-            Utils.disableNode(re_password_error);
-            same = true; // Set same to true if passwords match
-        } else {
-            // Display error message if passwords do not match
-            Utils.setText(re_password_error, "Passwords don't match.", Color.RED);
-            same = false; // Set same to false since passwords don't match
-            return; // Exit the method if passwords don't match
+        // Then check if passwords match
+        boolean same = pw.equals(confirmPw);
+        if (!same) {
+            Utils.setText(re_password_error, "Passwords don't match", Color.RED);
+            return;
         }
 
-        // If the password is valid and both entries match, reset the password in the database
+        // If password is valid and matches, update it in the database
         if (valid_pw && same) {
-            data.user_db.resetPassword(curr_user.getUsername(), pw); // Reset password in the database
-            Utils.setRoot("LoginScenes/login"); // Navigate to the login scene
-            data.setAppUser(null); // Clear the current user from the application context
+            try {
+                // Get the current user's details before resetting password
+                User userDetails = data.user_db.getUser(curr_user.getUsername());
+                
+                // Reset the password
+                data.user_db.resetPassword(curr_user.getUsername(), pw);
+                
+                // Update the user details to ensure they're preserved
+                if (userDetails != null) {
+                    data.user_db.finishAccountSetup(
+                        curr_user.getUsername(),
+                        userDetails.getFirst_name(),
+                        userDetails.getMiddle_name(),
+                        userDetails.getLast_name(),
+                        userDetails.getPref_name(),
+                        userDetails.getEmail()
+                    );
+                }
+                
+                Utils.showSuccessFeedback(password_error, "Password updated successfully!");
+                
+                // Wait 1 second before redirecting to login
+                PauseTransition pause = new PauseTransition(Duration.seconds(1));
+                pause.setOnFinished(e -> {
+                    try {
+                        Utils.setRoot("LoginScenes/login");
+                        data.setAppUser(null);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+                pause.play();
+            } catch (SQLException e) {
+                Utils.setText(password_error, "Error updating password: " + e.getMessage(), Color.RED);
+            }
         }
     }
 }
